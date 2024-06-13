@@ -1,4 +1,7 @@
-const OPTIONS = ['Apples', 'Nails', 'Bananas', 'Helicopters'];
+import { useState } from "react";
+import { Select } from "antd";
+
+const OPTIONS = ["Apples", "Nails", "Bananas", "Helicopters"];
 
 const SearchBar = () => {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -11,7 +14,7 @@ const SearchBar = () => {
       value={selectedItems}
       onChange={setSelectedItems}
       style={{
-        width: '300px', // Adjust the width as needed
+        width: "300px", // Adjust the width as needed
       }}
       options={filteredOptions.map((item) => ({
         value: item,
