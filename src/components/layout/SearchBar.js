@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Select } from "antd";
 
-const OPTIONS = ["Apples", "Nails", "Bananas", "Helicopters"];
+const OPTIONS = ["Asset 1", "Asset 2", "Asset 3", "Asset 4"];
 
 const SearchBar = () => {
   const [selectedItems, setSelectedItems] = useState([]);
