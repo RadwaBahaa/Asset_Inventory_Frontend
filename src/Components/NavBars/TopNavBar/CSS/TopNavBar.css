@@ -1,0 +1,36 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 8%;
+}
+.first-div {
+  display: flex;
+  align-items: center;
+  width: 50%;
+}
+.CompanyName {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  width: 50%;
+}
+.searchbar-div {
+  margin-left: 50;
+}
+.menu {
+  direction: rtl;
+  flex: 1;
+  min-width: 0;
+  align-items: end;
+}
+.dropdown {
+  padding-right: 15px;
+  padding-left: 15px;
+  color: white;
+  font-size: 15px;
+}
+.avatar {
+  margin: 0px 10px;
+  background-color: gray;
+}

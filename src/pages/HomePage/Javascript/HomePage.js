@@ -1,6 +1,6 @@
 import React from "react";
 import { Layout, theme } from "antd";
-import TopNavbar from "../../../components/NavBars/TopNavbar";
+import TopNavBar from "../../../components/NavBars/TopNavBar/Javascript/TopNavBar";
 import SideNavbar from "../../../components/NavBars/SideNavBar";
 import FooterComponent from "../../../components/Footer";
 import RouteConfige from "../../../routes/RouteConfig";
@@ -18,7 +18,7 @@ export default function HomePage() {
     <>
       {/* Main layout container */}
       <Layout className="first-layout">
-        <TopNavbar /> {/* Top navigation bar component */}
+        <TopNavBar /> {/* Top navigation bar component */}
         {/* Secondary layout to contain SideNavbar and Content */}
         <Layout className="second-layout">
           <SideNavbar /> {/* Side navigation bar component */}

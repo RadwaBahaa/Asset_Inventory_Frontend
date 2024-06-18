@@ -7,7 +7,11 @@ const FooterComponent = () => {
   return (
     <Footer
       style={{
+        display: "flex",
         textAlign: "center",
+        justifyContent: "center",
+        alignItems: "center",
+        height:"4%",
       }}
     >
       Supply Chain ©{new Date().getFullYear()} Created by GIS Track
