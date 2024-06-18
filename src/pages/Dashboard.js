@@ -1,8 +1,8 @@
 // export default Dashboard;
 import React from "react";
 import { Grid } from "@mui/material";
-import MapComponent from "../components/Dashboard/MapComponent";
-import PieChartComponent from "../components/Dashboard/PieChartComponent";
+import MapComponent from "../../src/Components/Dashboard/MapComponent";
+import PieChartComponent from "../../src/Components/Dashboard/PieChartComponent";
 import { Breadcrumb } from "antd";
 import { Link } from "react-router-dom";
 
