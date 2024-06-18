@@ -1,26 +1,23 @@
 import { useState } from "react";
 import { Select } from "antd";
 
-const OPTIONS = ["Asset 1", "Asset 2", "Asset 3", "Asset 4"];
-
 const SearchBar = () => {
+  // useState hook to manage the state of selected items.
   const [selectedItems, setSelectedItems] = useState([]);
-  const filteredOptions = OPTIONS.filter((o) => !selectedItems.includes(o));
 
   return (
+    // Have to change the select component to be a search bar component.
+    // Render the Select component from Ant Design.
     <Select
-      mode="multiple"
+      mode="multiple" // Allow multiple items to be selected.
       placeholder="Search"
       value={selectedItems}
       onChange={setSelectedItems}
       style={{
-        width: "300px", // Adjust the width as needed
+        width: "300px",
       }}
-      options={filteredOptions.map((item) => ({
-        value: item,
-        label: item,
-      }))}
     />
   );
 };
+
 export default SearchBar;
