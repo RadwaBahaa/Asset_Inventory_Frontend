@@ -4,7 +4,7 @@ import { DownOutlined, BarsOutlined, AppstoreOutlined, PrinterOutlined, FilterOu
 import { Button, Dropdown, Menu, Space, Segmented } from 'antd';
 import AssetsSearchBar from '../../Components/NavBars/AssetsSearchBar';
 
-export default function Assets() {
+export default function AddAsset() {
   const items = [
     { label: "All" },
     { label: "Suppliers" },
@@ -35,9 +35,9 @@ export default function Assets() {
   return (
     <div>
       <SubNavbar
-        title="Assets"
+        title="Create Asset"
         editButtonLabel="Edit Assets"
-        addButtonLabel="Add Asset"
+        addButtonLabel="Done"
       />
       <div style={{ marginTop: '16px', marginLeft: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
         {/* Filter Button */}

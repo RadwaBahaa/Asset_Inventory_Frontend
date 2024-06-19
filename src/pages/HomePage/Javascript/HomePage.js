@@ -1,14 +1,9 @@
 import React from "react";
 import { Layout, theme } from "antd";
-<<<<<<< HEAD
-import TopNavbar from "../../../Components/NavBars/TopNavbar";
+
+import TopNavBar from "../../../Components/NavBars/TopNavBar/Javascript/TopNavBar";
 import SideNavbar from "../../../Components/NavBars/SideNavBar";
 import FooterComponent from "../../../Components/Footer";
-=======
-import TopNavBar from "../../../components/NavBars/TopNavBar/Javascript/TopNavBar";
-import SideNavbar from "../../../components/NavBars/SideNavBar";
-import FooterComponent from "../../../components/Footer";
->>>>>>> SecondBranch
 import RouteConfige from "../../../routes/RouteConfig";
 import "../CSS/HomePage.css";
 
