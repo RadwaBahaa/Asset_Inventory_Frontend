@@ -2,8 +2,8 @@ import React from 'react';
 import SubNavbar from "../../Components/NavBars/SubNavbar";
 import { DownOutlined, BarsOutlined, AppstoreOutlined, PrinterOutlined, FilterOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu, Space, Segmented } from 'antd';
-import AssetsSearchBar from '../../Components/NavBars/AssetsSearchBar';
-
+import AssetsSearchBar from '../../Components/Items/AssetsSearchBar';
+import { Breadcrumb } from "antd";
 export default function AddAsset() {
   const items = [
     { label: "All" },
@@ -34,11 +34,17 @@ export default function AddAsset() {
 
   return (
     <div>
+      
       <SubNavbar
         title="Create Asset"
         editButtonLabel="Edit Assets"
         addButtonLabel="Done"
       />
+      {/* <Breadcrumb className="breadcrumb">
+        <Breadcrumb.Item>
+          <Link to={"/AddAssets"}>AddAsset</Link>{" "}
+        </Breadcrumb.Item>
+      </Breadcrumb> */}
       <div style={{ marginTop: '16px', marginLeft: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
         {/* Filter Button */}
         <Dropdown overlay={filterMenu} placement="bottomLeft">

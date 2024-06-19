@@ -1,7 +1,7 @@
 import React from 'react';
 import { SearchOutlined } from '@ant-design/icons';
 import { Button, Flex, Tooltip,Input } from 'antd';
-const SeconedSearchBar = () => {
+const AssetsSearchBar = () => {
   const { Search } = Input;
   function onSearch() {
     //Handle search function by using API
@@ -23,4 +23,4 @@ const SeconedSearchBar = () => {
   );
 };
 
-export default SeconedSearchBar;
+export default AssetsSearchBar;

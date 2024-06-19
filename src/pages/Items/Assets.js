@@ -1,16 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SubNavbar from "../../Components/NavBars/SubNavbar";
 import { DownOutlined, BarsOutlined, AppstoreOutlined, PrinterOutlined, FilterOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu, Space, Segmented } from 'antd';
-import AssetsSearchBar from '../../Components/NavBars/AssetsSearchBar';
+import AssetsSearchBar from '../../Components/Items/AssetsSearchBar';
+import AssetTable from '../../Components/Items/AssetsTable';
+import GridView from '../../Components/Items/GridView';
 
 export default function Assets() {
+  const [activeComponent, setActiveComponent] = useState('List'); // Default to 'List'
+
   const items = [
     { label: "All" },
     { label: "Suppliers" },
     { label: "Warehouses" },
     { label: "Stores" },
   ];
+
+  // Generate 24 assets for 6 rows of 4 columns
+  const generateAssets = () => {
+    const assets = [];
+    for (let i = 1; i <= 24; i++) {
+      assets.push({
+        id: `ID${i}`,  // Use backticks and curly braces for template literals
+        name: `Asset Name ${i}`,
+        price: `${i * 100}`,  // Use backticks and curly braces for template literals
+        description: `This is a detailed description of asset ${i}.`,
+        image: 'https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png',
+      });
+    }
+    return assets;
+  };
+
+  const assets = generateAssets();
 
   const menu = (
     <Menu>
@@ -19,6 +40,10 @@ export default function Assets() {
       ))}
     </Menu>
   );
+
+  const handleSegmentedChange = (value) => {
+    setActiveComponent(value);
+  };
 
   const handleFilterMenuClick = (e) => {
     console.log('Clicked on filter:', e.key);
@@ -56,6 +81,7 @@ export default function Assets() {
             { value: "List", icon: <BarsOutlined /> },
             { value: "Grid", icon: <AppstoreOutlined /> }
           ]}
+          onChange={handleSegmentedChange}
         />
 
         {/* Print Button */}
@@ -63,6 +89,10 @@ export default function Assets() {
           Print
         </Button>
       </div>
+
+      {/* Conditional rendering based on activeComponent state */}
+      {activeComponent === 'List' && <AssetTable />}
+      {activeComponent === 'Grid' && <GridView assets={assets} />}
     </div>
   );
 }

@@ -49,7 +49,7 @@ const data = [
   },
 ];
 
-const LocationTable = () => {
+const AssetTable = () => {
   const [selectionType, setSelectionType] = useState('checkbox');
 
   return (
@@ -78,4 +78,4 @@ const LocationTable = () => {
   );
 };
 
-export default LocationTable;
+export default AssetTable;

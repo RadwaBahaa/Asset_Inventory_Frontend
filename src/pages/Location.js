@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SubNavbar from "../Components/NavBars/SubNavbar";
 import { DownOutlined, BarsOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu, Space, Segmented } from 'antd';
-import TableComponent from '../Components/Location/Table'; // Assuming Table.js is renamed to TableComponent.js
+import LocationTable from '../Components/Location/Table'; // Assuming Table.js is renamed to TableComponent.js
 import MapComponent from '../Components/Dashboard/MapComponent';
 import MapList from '../Components/Location/MapList'; // Importing MapList component
 
@@ -61,7 +61,7 @@ export default function Location() {
       </div>
 
       {/* Conditional rendering based on activeComponent state */}
-      {activeComponent === 'List' && <TableComponent />}
+      {activeComponent === 'List' && <LocationTable />}
       {activeComponent === 'Location' && (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '16px',paddingLeft:'24px' }}>
           <div style={{ flex: 1, marginRight: '16px' }}>

@@ -7,6 +7,7 @@ import FooterComponent from "../../../Components/Footer";
 import RouteConfige from "../../../routes/RouteConfig";
 import "../CSS/HomePage.css";
 
+
 const { Content } = Layout;
 
 export default function HomePage() {
@@ -17,6 +18,7 @@ export default function HomePage() {
 
   return (
     <>
+    
       {/* Main layout container */}
       <Layout className="first-layout">
         <TopNavBar /> {/* Top navigation bar component */}
