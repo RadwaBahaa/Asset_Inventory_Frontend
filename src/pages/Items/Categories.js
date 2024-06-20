@@ -38,6 +38,7 @@ export default function Categories() {
         title="Categories"
         editButtonLabel="Edit Category"
         addButtonLabel="Add Category"
+        addButtonPath= "/addNew/categories"
       />
       <div style={{ marginTop: '16px', marginLeft: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
 

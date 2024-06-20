@@ -9,15 +9,19 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  margin: 0 auto;
 }
 .breadcrumb {
   margin: 16px 0;
 }
 .content {
   /* padding: 0 10px; */
-  min-height: 280;
+  /* min-height: 280; */
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: calc(100vh - 100px); /* Adjust height for footer size */
+  margin-bottom: 100px; /* Adjust margin for footer size */
 }
+
 

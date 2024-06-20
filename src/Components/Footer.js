@@ -7,11 +7,18 @@ const FooterComponent = () => {
   return (
     <Footer
       style={{
-        display: "flex",
+        // display: "flex",
         textAlign: "center",
-        justifyContent: "center",
-        alignItems: "center",
-        height:"4%",
+        // justifyContent: "center",
+        // alignItems: "center",
+        height:"50px",
+        padding: "10px",
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        width: "100%",
+        position:'fixed'
+
       }}
     >
       Supply Chain ©{new Date().getFullYear()} Created by GIS Track
@@ -20,3 +27,4 @@ const FooterComponent = () => {
 };
 
 export default FooterComponent;
+

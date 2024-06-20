@@ -18,7 +18,8 @@ const Reports = React.lazy(() => import("../pages/Reports"));
 const AddNewAssets = React.lazy(() => import("../pages/AddNew/Assets"));
 const AddNewCategories = React.lazy(() => import("../pages/AddNew/Categories"));
 const AddNewRequests = React.lazy(() => import("../pages/AddNew/Requests"));
-const AddNewLocation = React.lazy(() => import("../../src/pages/AddNew/Location"));
+const AddNewLocation = React.lazy(() => import("../pages/AddNew/Location"));
+const AddingSuccessfully = React.lazy(()=> import("../pages/AddNew/AddingSuccessfully"))
 
 const UserViewProfile = React.lazy(() => import("../pages/User/ViewProfile"));
 const AddNewSettings = React.lazy(() => import("../pages/User/Settings"));
@@ -52,6 +53,7 @@ function RouteConfige() {
         <Route path="/addNew/categories" element={<AddNewCategories />} />
         <Route path="/addNew/requests" element={<AddNewRequests />} />
         <Route path="/addNew/location" element={<AddNewLocation />} />
+        <Route path="/addNew/addingSuccessfully"element={<AddingSuccessfully/>} />
 
         <Route path="/user/viewprofile" element={<UserViewProfile />} />
         <Route path="/user/settings" element={<AddNewSettings />} />

@@ -61,14 +61,17 @@ export default function Assets() {
     <div>
       <SubNavbar
         title="Assets"
-        editButtonLabel="Edit Assets"
+        editButtonLabel= "Edit Asset"
         addButtonLabel="Add Asset"
+        addButtonPath= "/addNew/assets"
+
+
       />
       <div style={{ marginTop: '16px', marginLeft: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
         {/* Filter Button */}
         <Dropdown overlay={filterMenu} placement="bottomLeft">
-          <Button icon={<FilterOutlined />} style={{ width: '120px' }}>
-            Filter <DownOutlined />
+          <Button icon={<FilterOutlined />} style={{ width: '60px' }}>
+           <DownOutlined />
           </Button>
         </Dropdown>
         

@@ -15,10 +15,10 @@ const PieChartComponent = () => {
         {
           data, // Use the data defined above for the series.
           highlightScope: { faded: "global", highlighted: "item" }, // Highlight configuration.
-          faded: { innerRadius: 30, additionalRadius: -30, color: "gray" }, // Fading configuration for the unhighlighted segments.
+          faded: { innerRadius:10 , additionalRadius: -10, color: "gray" }, // Fading configuration for the unhighlighted segments.
         },
       ]}
-      height={400} // Set the height of the PieChart to 400 pixels.
+      height={300} // Set the height of the PieChart to 400 pixels.
     />
   );
 };
