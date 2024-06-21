@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import SubNavbar from "../../Components/NavBars/SubNavbar";
-import { DownOutlined, BarsOutlined, AppstoreOutlined, PrinterOutlined, FilterOutlined } from '@ant-design/icons';
+import { DownOutlined, BarsOutlined, AppstoreOutlined, PrinterOutlined, FilterOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu, Space, Segmented } from 'antd';
 import AssetsSearchBar from '../../Components/Items/AssetsSearchBar';
 import AssetTable from '../../Components/Items/AssetsTable';
@@ -61,20 +61,28 @@ export default function Assets() {
     <div>
       <SubNavbar
         title="Assets"
-        editButtonLabel= "Edit Asset"
-        addButtonLabel="Add Asset"
-        addButtonPath= "/addNew/assets"
-
-
+        editButtonLabel={
+          <>
+            <EditOutlined />
+            <span style={{ marginLeft: '8px' }}>Edit Asset</span>
+          </>
+        }
+        addButtonLabel={
+          <>
+            <PlusOutlined />
+            <span style={{ marginLeft: '8px' }}>Add Asset</span>
+           </>
+                }
+        addButtonPath="/addNew/assets"
       />
       <div style={{ marginTop: '16px', marginLeft: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
         {/* Filter Button */}
         <Dropdown overlay={filterMenu} placement="bottomLeft">
           <Button icon={<FilterOutlined />} style={{ width: '60px' }}>
-           <DownOutlined />
+            <DownOutlined />
           </Button>
         </Dropdown>
-        
+
         {/* Search Bar */}
         <AssetsSearchBar />
 

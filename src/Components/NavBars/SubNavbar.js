@@ -1,6 +1,5 @@
 import React from 'react';
 import { Layout, Button } from 'antd';
-import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 
 const { Header } = Layout;
@@ -29,12 +28,12 @@ const SubNavbar = ({ title, editButtonLabel, addButtonLabel, addButtonPath, edit
       </div>
       <div style={{ display: 'flex', gap: '10px' }}>
         <Link to={editButtonPath}>
-          <Button type="primary" icon={<EditOutlined />}>
+          <Button type="primary" >
             {editButtonLabel}
           </Button>
         </Link>
         <Link to={addButtonPath}>
-          <Button type="primary" icon={<PlusOutlined />}>
+          <Button type="primary">
             {addButtonLabel}
           </Button>
         </Link>

@@ -1,6 +1,6 @@
 import React from 'react';
 import SubNavbar from "../../Components/NavBars/SubNavbar";
-import { PrinterOutlined } from '@ant-design/icons';
+import { PrinterOutlined, EditOutlined, PlusOutlined  } from '@ant-design/icons';
 import { Button, Menu } from 'antd';
 import CategorySearchBar from '../../Components/Items/CategorySearchBar';
 import CategoryTable from '../../Components/Items/CategoryTable';
@@ -36,8 +36,18 @@ export default function Categories() {
     <div>
       <SubNavbar
         title="Categories"
-        editButtonLabel="Edit Category"
-        addButtonLabel="Add Category"
+        editButtonLabel={
+          <>
+            <EditOutlined />
+            <span style={{ marginLeft: '8px' }}>Edit Asset</span>
+          </>
+        }
+addButtonLabel={
+  <>
+    <PlusOutlined />
+    <span style={{ marginLeft: '8px' }}>Add Category</span>
+   </>
+        }
         addButtonPath= "/addNew/categories"
       />
       <div style={{ marginTop: '16px', marginLeft: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
