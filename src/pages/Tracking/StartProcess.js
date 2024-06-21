@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import SubNavbar from "../../Components/NavBars/SubNavbar";
-import { EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { EditOutlined, EyeOutlined } from '@ant-design/icons';
 import { Row, Col, Button } from 'antd';
 import WarehouseTable from '../../Components/Tracking/WarehousesTable';
 import AssetsTable from '../../Components/Tracking/AssetsTable';
@@ -20,6 +20,7 @@ export default function StartProcess() {
       setAssetsActivated(false);
     }
   }, [selectedWarehouse]);
+
   useEffect(() => {
     if (selectAssets.length > 0) {
       setStartProcessDisabled(false);
@@ -41,8 +42,37 @@ export default function StartProcess() {
     setProcessData((prevData) => [...prevData, newProcessEntry]);
   };
 
+  // Function to handle deletion of a process row
+  const handleDeleteProcess = (key) => {
+    setProcessData((prevData) => prevData.filter(item => item.key !== key));
+  };
+
+  const pageStyle = {
+    minHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'auto',
+  };
+
+  // const tableContainerStyle = {
+  //   background: '#f9f9f9',
+  //   // padding: '16px',
+  //   // borderRadius: '8px',
+  //   // marginBottom: '16px',
+  // };
+
+  const buttonContainerStyle = {
+    paddingTop: '15px',
+    textAlign: 'right',
+  };
+
+  const headerStyle = {
+    marginBottom: '16px',
+    textAlign: 'center',
+  };
+
   return (
-    <div>
+    <div style={pageStyle}>
       <SubNavbar
         title="Starting Process Of Tracking"
         editButtonLabel={
@@ -53,42 +83,43 @@ export default function StartProcess() {
         }
         addButtonLabel={
           <>
-            <PlusOutlined />
-            <span style={{ marginLeft: '8px' }}>Add Location</span>
+            <EyeOutlined />
+            <span style={{ marginLeft: '8px' }}>View Tracking</span>
           </>
         }
+        addButtonPath="/tracking/viewTracking"
       />
-
-      <Row gutter={[16, 16]} style={{ padding: '16px' }}>
-        {/* Left side with WarehouseTable */}
-        <Col span={12}>
-          <div style={{ background: '#f9f9f9', padding: '16px', borderRadius: '8px' }}>
-            <h3 style={{ marginBottom: '16px', textAlign: 'center' }}>Warehouse Table</h3>
-            <WarehouseTable setSelectedWarehouse={setSelectedWarehouse} />
-            <div style={{ paddingTop: '15px', textAlign: 'right' }}>
-              <Button type="primary" onClick={handleActivateAssets} disabled={isDoneButtonDisabled}>
-                Done
-              </Button>
+      <div >
+        <Row gutter={[16, 16]} style={{ padding: '16px' }}>
+          {/* Left side with WarehouseTable */}
+          <Col span={12}>
+            <div >
+              <h3 style={headerStyle}>Warehouse Table</h3>
+              <WarehouseTable style={{ background: '#f9f9f9' }} setSelectedWarehouse={setSelectedWarehouse} />
+              <div style={buttonContainerStyle}>
+                <Button type="primary" onClick={handleActivateAssets} disabled={isDoneButtonDisabled}>
+                  Done
+                </Button>
+              </div>
             </div>
-          </div>
-        </Col>
-        {/* Right side with AssetsTable and Start Process button */}
-        <Col span={12}>
-          <div style={{ background: '#f9f9f9', padding: '16px', borderRadius: '8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          </Col>
+          {/* Right side with AssetsTable and Start Process button */}
+          <Col span={12}>
             <div>
-              <h3 style={{ marginBottom: '16px', textAlign: 'center' }}>Assets Table</h3>
+              <h3 style={headerStyle}>Assets Table</h3>
               <div style={{ opacity: assetsActivated ? 1 : 0.5, pointerEvents: assetsActivated ? 'auto' : 'none' }}>
                 <AssetsTable setSelectAssets={setSelectAssets} />
               </div>
             </div>
-            <div style={{ paddingTop: '15px', textAlign: 'right' }}>
+            <div style={buttonContainerStyle}>
               <Button type="primary" onClick={handleStartProcess} disabled={startProcessDisabled}>Start Process</Button>
             </div>
-          </div>
-        </Col>
-      </Row>
-      <div>
-        <ProcessTable processData={processData} />
+
+          </Col>
+        </Row>
+      </div>
+      <div >
+        <ProcessTable processData={processData} onDelete={handleDeleteProcess} />
       </div>
     </div>
   );

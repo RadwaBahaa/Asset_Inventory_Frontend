@@ -1,7 +1,7 @@
 import React from 'react';
 import { Divider, Table, Button } from 'antd';
 
-const ProcessTable = ({ processData }) => {
+const ProcessTable = ({ processData, onDelete }) => {
   const columns = [
     {
       title: 'Warehouse Name',
@@ -41,7 +41,7 @@ const ProcessTable = ({ processData }) => {
         <span>
           <Button type="link" onClick={() => console.log('Edit:', record)}>Edit</Button>
           <Divider type="vertical" />
-          <Button type="link" onClick={() => console.log('Delete:', record)}>Delete</Button>
+          <Button type="link" onClick={() => onDelete(record.key)}>Delete</Button>
         </span>
       ),
     },
@@ -51,7 +51,6 @@ const ProcessTable = ({ processData }) => {
     <div>
       <Divider />
       <h3 style={{ textAlign: 'center', marginBottom: '16px' }}>Process Table</h3>
-
       <Table
         columns={columns}
         dataSource={processData}
