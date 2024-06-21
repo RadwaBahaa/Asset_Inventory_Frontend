@@ -1,26 +1,44 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import SubNavbar from "../../Components/NavBars/SubNavbar";
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Row, Col, Button } from 'antd'; // Import Row, Col, and Button from Ant Design
+import { Row, Col, Button } from 'antd';
 import WarehouseTable from '../../Components/Tracking/WarehousesTable';
 import AssetsTable from '../../Components/Tracking/AssetsTable';
-import ProcessTable from '../../Components/Tracking/ProcessTable'
+import ProcessTable from '../../Components/Tracking/ProcessTable';
 
 export default function StartProcess() {
   const [selectedWarehouse, setSelectedWarehouse] = useState(null);
+  const [selectAssets, setSelectAssets] = useState([]);
   const [isDoneButtonDisabled, setIsDoneButtonDisabled] = useState(true);
+  const [startProcessDisabled, setStartProcessDisabled] = useState(true);
   const [assetsActivated, setAssetsActivated] = useState(false);
+  const [processData, setProcessData] = useState([]);
 
-  // Function to handle selection from WarehouseTable
-  const handleWarehouseSelection = (selectedRows) => {
-    setSelectedWarehouse(selectedRows.length > 0 ? selectedRows[0] : null);
-    setIsDoneButtonDisabled(selectedRows.length === 0); // Disable "Done" button if no warehouse is selected
-    setAssetsActivated(false); // Reset activation status when selecting a new warehouse
-  };
+  useEffect(() => {
+    if (selectedWarehouse) {
+      setIsDoneButtonDisabled(false);
+      setAssetsActivated(false);
+    }
+  }, [selectedWarehouse]);
+  useEffect(() => {
+    if (selectAssets.length > 0) {
+      setStartProcessDisabled(false);
+    }
+  }, [selectAssets]);
 
   // Function to activate AssetsTable
   const handleActivateAssets = () => {
     setAssetsActivated(true);
+  };
+
+  // Function to handle the "Start Process" button click
+  const handleStartProcess = () => {
+    const newProcessEntry = {
+      key: selectedWarehouse.key,
+      WarehouseName: selectedWarehouse.name,
+      assets: selectAssets,
+    };
+    setProcessData((prevData) => [...prevData, newProcessEntry]);
   };
 
   return (
@@ -46,7 +64,7 @@ export default function StartProcess() {
         <Col span={12}>
           <div style={{ background: '#f9f9f9', padding: '16px', borderRadius: '8px' }}>
             <h3 style={{ marginBottom: '16px', textAlign: 'center' }}>Warehouse Table</h3>
-            <WarehouseTable onWarehouseSelect={handleWarehouseSelection} />
+            <WarehouseTable setSelectedWarehouse={setSelectedWarehouse} />
             <div style={{ paddingTop: '15px', textAlign: 'right' }}>
               <Button type="primary" onClick={handleActivateAssets} disabled={isDoneButtonDisabled}>
                 Done
@@ -60,17 +78,17 @@ export default function StartProcess() {
             <div>
               <h3 style={{ marginBottom: '16px', textAlign: 'center' }}>Assets Table</h3>
               <div style={{ opacity: assetsActivated ? 1 : 0.5, pointerEvents: assetsActivated ? 'auto' : 'none' }}>
-                <AssetsTable warehouse={selectedWarehouse} />
+                <AssetsTable setSelectAssets={setSelectAssets} />
               </div>
             </div>
             <div style={{ paddingTop: '15px', textAlign: 'right' }}>
-              <Button type="primary" disabled={!assetsActivated}>Start Process</Button>
+              <Button type="primary" onClick={handleStartProcess} disabled={startProcessDisabled}>Start Process</Button>
             </div>
           </div>
         </Col>
       </Row>
       <div>
-        <ProcessTable/>
+        <ProcessTable processData={processData} />
       </div>
     </div>
   );

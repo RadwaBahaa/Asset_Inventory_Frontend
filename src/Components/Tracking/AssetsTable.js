@@ -1,76 +1,92 @@
-import React, { useState } from 'react';
-import { Divider, Radio, Table } from 'antd';
+import React, { useEffect, useState } from "react";
+import { Table, InputNumber } from "antd";
 
-const columns = [
+const initialData = [
   {
-    title: 'ID',
-    dataIndex: 'id',
-    render: (text) => <a>{text}</a>,
+    key: "1",
+    id: "001",
+    name: "Asset 1 ",
+    quantity: 0,
   },
   {
-    title: 'Asset Name',
-    dataIndex: 'name',
-    render: (text) => <a>{text}</a>,
+    key: "2",
+    id: "002",
+    name: "Asset 2",
+    quantity: 0,
   },
   {
-    title: 'Quantity',
-    dataIndex: 'quantity',
-  },
-  
-];
-
-const data = [
-  {
-    key: '1',
-    id:'001',
-    name: 'John Brown',
-    quantity: 32,
+    key: "3",
+    id: "003",
+    name: "Asset 3",
+    quantity: 0,
   },
   {
-    key: '2',
-    id:'002',
-    name: 'Jim Green',
-    quantity: 42,
-  },
-  {
-    key: '3',
-    id:'003',
-    name: 'Joe Black',
-    quantity: 32,
-  },
-  {
-    key: '4',
-    id:'004',
-    name: 'Disabled User',
-    quantity: 99,
-    
+    key: "4",
+    id: "004",
+    name: "Asset 4",
+    quantity: 0,
   },
 ];
 
-const AssetsTable = () => {
-  const [selectionType, setSelectionType] = useState('checkbox');
+const AssetsTable = (props) => {
+  const [data, setData] = useState(initialData);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const { setSelectAssets } = props;
+
+  useEffect(() => {
+    const selectedRows = selectedRowKeys.map((key) =>
+      data.find((item) => item.key === key)
+    );
+    const filteredRows = selectedRows.filter((row) => row.quantity > 0);
+    console.log("Selected rows with quantity > 0:", filteredRows);
+    setSelectAssets(filteredRows);
+  }, [selectedRowKeys, data]);
+
+  const handleQuantityChange = (key, value) => {
+    const newData = data.map((item) =>
+      item.key === key ? { ...item, quantity: value } : item
+    );
+    setData(newData);
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedRowKeys, selectedRows) => {
+      setSelectedRowKeys(selectedRowKeys);
+    },
+  };
+
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "id",
+      render: (text) => <a>{text}</a>,
+    },
+    {
+      title: "Asset Name",
+      dataIndex: "name",
+      render: (text) => <a>{text}</a>,
+    },
+    {
+      title: "Quantity",
+      dataIndex: "quantity",
+      render: (_, record) => (
+        <InputNumber
+          style={{ width: "50%" }}
+          min={0}
+          onChange={(value) => handleQuantityChange(record.key, value)}
+        />
+      ),
+    },
+  ];
 
   return (
     <div>
-      <Radio.Group style={{ display: 'flex', paddingTop: '20px', paddingLeft: ' 24px' }}
-        onChange={({ target: { value } }) => {
-          setSelectionType(value);
-        }}
-        value={selectionType}
-      >
-        <Radio value="checkbox">Checkbox</Radio>
-        <Radio value="radio">Radio</Radio>
-      </Radio.Group>
-
-      <Divider />
-
       <Table
-        rowSelection={{
-          type: selectionType,
-          // Add your rowSelection logic here if needed
-        }}
+        rowSelection={rowSelection}
         columns={columns}
         dataSource={data}
+        pagination={false} // Optional: Remove pagination if not needed
       />
     </div>
   );

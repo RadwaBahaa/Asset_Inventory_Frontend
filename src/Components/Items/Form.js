@@ -24,10 +24,10 @@ const AddAssetForm = () => {
       <Form
         layout="vertical"
         style={{
-            width: '700px', // Ensure consistent width for the form
-            marginLeft: '16px', // Add left margin
-            marginTop: '16px' // Add top margin
-          }}
+          width: '700px', // Ensure consistent width for the form
+          marginLeft: '16px', // Add left margin
+          marginTop: '16px' // Add top margin
+        }}
       >
         <Form.Item
           label="Name"
@@ -38,7 +38,7 @@ const AddAssetForm = () => {
               message: 'Please input the name!',
             },
           ]}
-          
+
         >
           <Input />
         </Form.Item>

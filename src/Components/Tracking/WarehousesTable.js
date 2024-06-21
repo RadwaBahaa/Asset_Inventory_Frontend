@@ -1,55 +1,51 @@
-import React, { useState } from 'react';
-import { Table, Radio, Divider } from 'antd';
+import React, { useState } from "react";
+import { Table } from "antd";
 
 const columns = [
   {
-    title: 'Name',
-    dataIndex: 'name',
+    title: "Name",
+    dataIndex: "name",
     render: (text) => <a>{text}</a>,
   },
 ];
 
 const data = [
-  { key: '1', name: 'Warehouse A' },
-  { key: '2', name: 'Warehouse B' },
-  { key: '3', name: 'Warehouse C' },
-  { key: '4', name: 'Warehouse D' },
+  { key: "1", name: "Warehouse A" },
+  { key: "2", name: "Warehouse B" },
+  { key: "3", name: "Warehouse C" },
+  { key: "4", name: "Warehouse D" },
 ];
 
-const WarehouseTable = ({ onWarehouseSelect }) => {
-  const [selectionType, setSelectionType] = useState('checkbox');
+const StartProgress = (props) => {
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const { setSelectedWarehouse } = props;
 
-  const handleRadioChange = (e) => {
-    setSelectionType(e.target.value);
+  const onSelectChange = (selectedRowKeys, selectedRows) => {
+    setSelectedRowKeys(selectedRowKeys);
+    setSelectedWarehouse(selectedRows[0]);
   };
 
-  const handleCheckboxChange = (selectedRowKeys, selectedRows) => {
-    onWarehouseSelect(selectedRows[0]); // Assuming single selection for simplicity
+  const rowSelection = {
+    type: "radio",
+    selectedRowKeys,
+    onChange: onSelectChange,
   };
 
   return (
     <div>
-      <Radio.Group
-        style={{ marginBottom: '16px' }}
-        onChange={handleRadioChange}
-        value={selectionType}
-      >
-        <Radio value="checkbox">Checkbox</Radio>
-        <Radio value="radio">Radio</Radio>
-      </Radio.Group>
-
-      <Divider />
-
       <Table
         columns={columns}
         dataSource={data}
-        rowSelection={{
-          type: selectionType,
-          onChange: handleCheckboxChange,
-        }}
+        rowSelection={rowSelection}
+        pagination={false} // Optional: Remove pagination if not needed
+        onRow={(record) => ({
+          onClick: () => {
+            onSelectChange([record.key], [record]);
+          },
+        })}
       />
     </div>
   );
 };
 
-export default WarehouseTable;
+export default StartProgress;
