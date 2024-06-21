@@ -71,8 +71,8 @@ export default function Assets() {
           <>
             <PlusOutlined />
             <span style={{ marginLeft: '8px' }}>Add Asset</span>
-           </>
-                }
+          </>
+        }
         addButtonPath="/addNew/assets"
       />
       <div style={{ marginTop: '16px', marginLeft: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>

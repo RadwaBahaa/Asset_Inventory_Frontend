@@ -43,7 +43,7 @@ const items = [
     children: [
       {
         key: "Start progress",
-        label: <Link to="/tracking/startProgress">Start progress</Link>,
+        label: <Link to="/tracking/startProcess">Start process</Link>,
       },
       {
         key: "View tracking",

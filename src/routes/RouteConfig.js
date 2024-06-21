@@ -7,7 +7,7 @@ const ItemsAssets = React.lazy(() => import("../pages/Items/Assets"));
 const ItemsCategories = React.lazy(() => import("../pages/Items/Categories"));
 const Location = React.lazy(() => import("../pages/Location"));
 const TrackingStartProgress = React.lazy(() =>
-  import("../pages/Tracking/StartProgress")
+  import("../pages/Tracking/StartProcess")
 );
 const TrackingViewTracking = React.lazy(() =>
   import("../pages/Tracking/ViewTracking")
@@ -39,7 +39,7 @@ function RouteConfige() {
         <Route path="/items/categories" element={<ItemsCategories />} />
         <Route path="/location" element={<Location />} />
         <Route
-          path="/tracking/startProgress"
+          path="/tracking/startprocess"
           element={<TrackingStartProgress />}
         />
         <Route
