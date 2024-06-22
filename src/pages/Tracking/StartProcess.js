@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import SubNavbar from "../../Components/NavBars/SubNavbar";
-import { EditOutlined, EyeOutlined } from '@ant-design/icons';
+import TrackingSubNavbar from '../../Components/NavBars/TrackingSubNavBar';
+import { EyeOutlined } from '@ant-design/icons';
 import { Row, Col, Button } from 'antd';
 import WarehouseTable from '../../Components/Tracking/WarehousesTable';
 import AssetsTable from '../../Components/Tracking/AssetsTable';
 import ProcessTable from '../../Components/Tracking/ProcessTable';
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { Grid, Paper } from "@mui/material";
-
 
 export default function StartProcess() {
   const [selectedWarehouse, setSelectedWarehouse] = useState(null);
@@ -57,10 +56,15 @@ export default function StartProcess() {
   };
 
   const pageStyle = {
-    minHeight: '100vh',
     display: 'flex',
     flexDirection: 'column',
-    overflow: 'auto',
+    minHeight: '100vh',
+  };
+
+  const contentStyle = {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '16px',
   };
 
   const buttonContainerStyle = {
@@ -73,16 +77,23 @@ export default function StartProcess() {
     textAlign: 'center',
   };
 
+  const footerStyle = {
+    background: '#f1f1f1',
+    padding: '16px',
+    textAlign: 'center',
+    zIndex: 1,
+    position: 'relative',
+  };
+
+  const mapContainerStyle = {
+    position: 'relative',
+    zIndex: 0,
+  };
+
   return (
     <div style={pageStyle}>
-      <SubNavbar
+      <TrackingSubNavbar
         title="Starting Process Of Tracking"
-        editButtonLabel={
-          <>
-            <EditOutlined />
-            <span style={{ marginLeft: '8px' }}>Edit Asset</span>
-          </>
-        }
         addButtonLabel={
           <>
             <EyeOutlined />
@@ -91,10 +102,10 @@ export default function StartProcess() {
         }
         addButtonPath="/tracking/viewTracking"
       />
-      <div >
-        <Row gutter={[16, 16]} style={{ padding: '16px' }}>
+      <div style={contentStyle}>
+        <Row gutter={[16, 16]}>
           <Col span={12}>
-            <div >
+            <div>
               <h2 style={headerStyle}>Warehouse Table</h2>
               <WarehouseTable style={{ background: '#f9f9f9' }} setSelectedWarehouse={setSelectedWarehouse} />
               <div style={buttonContainerStyle}>
@@ -108,10 +119,10 @@ export default function StartProcess() {
             <div>
               <h2 style={headerStyle}>Assets Table</h2>
               <div style={{ opacity: assetsActivated ? 1 : 0.5, pointerEvents: assetsActivated ? 'auto' : 'none' }}>
-              <AssetsTable setSelectAssets={(newAssets) => {
-      setSelectAssets(newAssets);
-      setPreviouslySelectedAssets(newAssets); // Update previouslySelectedAssets on selection change
-    }} />
+                <AssetsTable setSelectAssets={(newAssets) => {
+                  setSelectAssets(newAssets);
+                  setPreviouslySelectedAssets(newAssets); // Update previouslySelectedAssets on selection change
+                }} />
               </div>
             </div>
             <div style={buttonContainerStyle}>
@@ -119,10 +130,8 @@ export default function StartProcess() {
             </div>
           </Col>
         </Row>
-      </div>
-      <Grid item xs={12}>
-      <h2 style={headerStyle}>Choose Warehouse Location On</h2>
-          <Paper sx={{ padding: 2, height: "400px" }}>
+        <Grid item xs={12} style={{ marginTop: '16px' }}>
+          <Paper sx={{ padding: 2, height: "400px", ...mapContainerStyle }}>
             <MapContainer
               center={[51.505, -0.09]}
               zoom={13}
@@ -140,8 +149,9 @@ export default function StartProcess() {
             </MapContainer>
           </Paper>
         </Grid>
-      <div>
-        <ProcessTable processData={processData} onDelete={handleDeleteProcess} onSave={handleSaveProcess} />
+        <div style={{ marginTop: '16px' }}>
+          <ProcessTable processData={processData} onDelete={handleDeleteProcess} onSave={handleSaveProcess} />
+        </div>
       </div>
     </div>
   );
