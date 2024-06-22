@@ -27,12 +27,10 @@ export default function StartProcess() {
     }
   }, [selectAssets]);
 
-  // Function to activate AssetsTable
   const handleActivateAssets = () => {
     setAssetsActivated(true);
   };
 
-  // Function to handle the "Start Process" button click
   const handleStartProcess = () => {
     const newProcessEntry = {
       key: selectedWarehouse.key,
@@ -42,9 +40,12 @@ export default function StartProcess() {
     setProcessData((prevData) => [...prevData, newProcessEntry]);
   };
 
-  // Function to handle deletion of a process row
   const handleDeleteProcess = (key) => {
     setProcessData((prevData) => prevData.filter(item => item.key !== key));
+  };
+
+  const handleSaveProcess = (newData) => {
+    setProcessData(newData);
   };
 
   const pageStyle = {
@@ -53,13 +54,6 @@ export default function StartProcess() {
     flexDirection: 'column',
     overflow: 'auto',
   };
-
-  // const tableContainerStyle = {
-  //   background: '#f9f9f9',
-  //   // padding: '16px',
-  //   // borderRadius: '8px',
-  //   // marginBottom: '16px',
-  // };
 
   const buttonContainerStyle = {
     paddingTop: '15px',
@@ -91,7 +85,6 @@ export default function StartProcess() {
       />
       <div >
         <Row gutter={[16, 16]} style={{ padding: '16px' }}>
-          {/* Left side with WarehouseTable */}
           <Col span={12}>
             <div >
               <h3 style={headerStyle}>Warehouse Table</h3>
@@ -103,7 +96,6 @@ export default function StartProcess() {
               </div>
             </div>
           </Col>
-          {/* Right side with AssetsTable and Start Process button */}
           <Col span={12}>
             <div>
               <h3 style={headerStyle}>Assets Table</h3>
@@ -114,12 +106,11 @@ export default function StartProcess() {
             <div style={buttonContainerStyle}>
               <Button type="primary" onClick={handleStartProcess} disabled={startProcessDisabled}>Start Process</Button>
             </div>
-
           </Col>
         </Row>
       </div>
-      <div >
-        <ProcessTable processData={processData} onDelete={handleDeleteProcess} />
+      <div>
+        <ProcessTable processData={processData} onDelete={handleDeleteProcess} onSave={handleSaveProcess} />
       </div>
     </div>
   );
