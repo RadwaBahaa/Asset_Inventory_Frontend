@@ -1,6 +1,5 @@
 import React from "react";
 import { Layout, theme } from "antd";
-
 import TopNavBar from "../../../Components/NavBars/TopNavBar/Javascript/TopNavBar";
 import SideNavbar from "../../../Components/NavBars/SideNavBar";
 import FooterComponent from "../../../Components/Footer";
