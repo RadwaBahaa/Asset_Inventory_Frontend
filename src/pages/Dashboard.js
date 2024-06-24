@@ -1,8 +1,15 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Grid, Paper, Typography, Box, Card, CardContent } from "@mui/material";
 import { Breadcrumb } from "antd";
 import { Link } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  CircleMarker,
+  GeoJSON,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import {
   LineChart,
@@ -21,6 +28,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { PieChart } from "@mui/x-charts/PieChart";
+import database from "../axios/database";
 
 const dataLine = [
   { name: "Jan", value: 50 },
@@ -53,14 +61,44 @@ const dataPie = [
 ];
 
 export default function Dashboard() {
+  const [storesData, setStoresData] = useState();
+  const [warehousesData, setWarehousesData] = useState();
+  const [suppliersData, setSuppliersData] = useState();
+
+  useEffect(() => {
+    database
+      .get("/stores/read/geojson")
+      .then((response) => {
+        console.log("Response data:", response.data); // Log the response data
+        setStoresData(response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error); // Log any errors
+      });
+
+    database
+      .get("/warehouses/read/geojson")
+      .then((response) => {
+        console.log("Response data:", response.data); // Log the response data
+        setWarehousesData(response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error); // Log any errors
+      });
+
+    database
+      .get("/suppliers/read/geojson")
+      .then((response) => {
+        console.log("Response data:", response.data); // Log the response data
+        setSuppliersData(response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error); // Log any errors
+      });
+  }, []);
+
   return (
     <>
-      <Breadcrumb className="breadcrumb">
-        <Breadcrumb.Item>
-          <Link to={"/dashboard"}>Dashboard</Link>
-        </Breadcrumb.Item>
-      </Breadcrumb>
-
       <Grid container spacing={2} sx={{ padding: 2 }}>
         {/* Statistic Cards */}
         <Grid item xs={12} md={4}>
@@ -94,19 +132,65 @@ export default function Dashboard() {
         <Grid item xs={12}>
           <Paper sx={{ padding: 2, height: "400px" }}>
             <MapContainer
-              center={[51.505, -0.09]}
-              zoom={13}
+              center={[40.7128, -74.006]}
+              zoom={10}
               style={{ height: "100%", width: "100%" }}
             >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               />
-              <Marker position={[51.505, -0.09]}>
-                <Popup>
-                  A pretty CSS3 popup. <br /> Easily customizable.
-                </Popup>
-              </Marker>
+              {storesData &&
+                storesData.map((store) => (
+                  <CircleMarker
+                    key={store.properties.storeID}
+                    center={[
+                      store.geometry.coordinates[1], // latitude
+                      store.geometry.coordinates[0], // longitude
+                    ]}
+                    pathOptions={{ fillColor: "blue", color: "blue" }}
+                    radius={5}
+                  >
+                    <Popup>
+                      {store.properties.storeName} <br />
+                      {store.properties.address}
+                    </Popup>
+                  </CircleMarker>
+                ))}
+              {warehousesData &&
+                warehousesData.map((warehouse) => (
+                  <CircleMarker
+                    key={warehouse.properties.warehouseID}
+                    center={[
+                      warehouse.geometry.coordinates[1], // latitude
+                      warehouse.geometry.coordinates[0], // longitude
+                    ]}
+                    pathOptions={{ fillColor: "green", color: "green" }}
+                    radius={10}
+                  >
+                    <Popup>
+                      {warehouse.properties.warehouseName} <br />
+                      {warehouse.properties.address}
+                    </Popup>
+                  </CircleMarker>
+                ))}
+              {suppliersData &&
+                suppliersData.map((supplier) => (
+                  <CircleMarker
+                    key={supplier.properties.supplierID}
+                    center={[
+                      supplier.geometry.coordinates[1], // latitude
+                      supplier.geometry.coordinates[0], // longitude
+                    ]}
+                    pathOptions={{ fillColor: "red", color: "red" }}
+                    radius={15}
+                  >
+                    <Popup>
+                      {supplier.properties.supplierName} <br />
+                      {supplier.properties.address}
+                    </Popup>
+                  </CircleMarker>
+                ))}
             </MapContainer>
           </Paper>
         </Grid>

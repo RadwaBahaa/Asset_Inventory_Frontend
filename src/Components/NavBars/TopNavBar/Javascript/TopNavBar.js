@@ -1,12 +1,14 @@
-import React from "react";
-import { Layout, Dropdown, Space, Menu, Avatar } from "antd";
+import React, { useState, useEffect } from "react";
+import { Layout, Dropdown, Space, Avatar } from "antd";
 import SearchBar from "../../SearchBar";
-import { Link } from "react-router-dom";
-import { DownOutlined, UserOutlined } from "@ant-design/icons";
+import { Link, useLocation } from "react-router-dom";
+import { UserOutlined } from "@ant-design/icons";
 import "../CSS/TopNavBar.css";
 
 const TopNavBar = () => {
   const { Header } = Layout;
+  const location = useLocation();
+  const [activeDropdown, setActiveDropdown] = useState("");
 
   const addNew = [
     { label: <Link to="/addNew/assets">Assets</Link>, key: "Assets" },
@@ -36,6 +38,24 @@ const TopNavBar = () => {
     { label: "Signout", key: "signout" },
   ];
 
+  // Determine which dropdown should be active based on the current path
+  useEffect(() => {
+    const path = location.pathname.split("/")[2];
+    if (path) {
+      if (["assets", "categories", "requests", "location"].includes(path)) {
+        setActiveDropdown("addNew");
+      } else if (["purchaserequests", "messages"].includes(path)) {
+        setActiveDropdown("alert");
+      } else if (["viewprofile", "settings"].includes(path)) {
+        setActiveDropdown("user");
+      } else {
+        setActiveDropdown(""); // No active dropdown for other paths
+      }
+    } else {
+      setActiveDropdown(""); // No active dropdown for other paths
+    }
+  }, [location.pathname]);
+
   return (
     <>
       <Header className="header">
@@ -46,17 +66,35 @@ const TopNavBar = () => {
           <SearchBar />
         </div>
         <div>
-          <Dropdown menu={{ items: addNew }} className="dropdown">
+          <Dropdown
+            overlayClassName="dropdown-menu"
+            menu={{ items: addNew }}
+            className={`dropdown ${
+              activeDropdown === "addNew" ? "dropdown-active" : ""
+            }`}
+          >
             <Link onClick={(e) => e.preventDefault()}>
               <Space>Add New</Space>
             </Link>
           </Dropdown>
-          <Dropdown menu={{ items: alert }} className="dropdown">
+          <Dropdown
+            overlayClassName="dropdown-menu"
+            menu={{ items: alert }}
+            className={`dropdown ${
+              activeDropdown === "alert" ? "dropdown-active" : ""
+            }`}
+          >
             <Link onClick={(e) => e.preventDefault()}>
               <Space>Alert</Space>
             </Link>
           </Dropdown>
-          <Dropdown menu={{ items: user }} className="dropdown">
+          <Dropdown
+            overlayClassName="dropdown-menu"
+            menu={{ items: user }}
+            className={`dropdown ${
+              activeDropdown === "user" ? "dropdown-active" : ""
+            }`}
+          >
             <Link onClick={(e) => e.preventDefault()}>
               <Space>User</Space>
               <Avatar size="large" icon={<UserOutlined />} className="avatar" />

@@ -3,34 +3,57 @@
   align-items: center;
   justify-content: space-between;
   height: 8%;
+  box-shadow: 0px 1px 10px gray;
+  z-index: 1000; /* Ensure the header is on top */
+  position: fixed;
+  top: 0;
+  width: 100%;
 }
+
 .first-div {
   display: flex;
   align-items: center;
   width: 50%;
 }
+
 .CompanyName {
   font-size: 20px;
   font-weight: bold;
   color: white;
   width: 50%;
 }
+
 .searchbar-div {
   margin-left: 50;
 }
+
 .menu {
   direction: rtl;
   flex: 1;
   min-width: 0;
   align-items: end;
 }
+
 .dropdown {
-  padding-right: 15px;
-  padding-left: 15px;
   color: white;
   font-size: 15px;
+  margin: 0px 6px;
+  padding: 0px 5px;
 }
+
 .avatar {
-  margin: 0px 10px;
+  margin-left: 10px;
   background-color: gray;
+}
+
+.dropdown-menu {
+  width: 200px;
+}
+
+.dropdown-active {
+  color: #1890ff;
+  padding-bottom: 6%;
+  border-bottom: #1890ff solid 4px;
+  font-weight: bold;
+  font-size: 16px;
 }

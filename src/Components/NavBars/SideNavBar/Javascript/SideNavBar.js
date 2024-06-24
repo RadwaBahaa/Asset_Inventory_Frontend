@@ -9,6 +9,7 @@ import {
   TeamOutlined,
   AreaChartOutlined,
 } from "@ant-design/icons";
+import "../CSS/SideNavBar.css";
 
 const { Sider } = Layout;
 
@@ -64,24 +65,12 @@ const items = [
 ];
 
 const SideNavbar = () => {
-  // Use theme token for dynamic styling.
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken();
-
   return (
-    <Sider
-      style={{
-        background: colorBgContainer,
-      }}
-      width={200}
-    >
+    <Sider className="sider" width={200}>
       <Menu
+        className="menu"
         mode="inline" // Set menu mode to inline.
         defaultSelectedKeys={["Dashboard"]} // Set default selected key.
-        style={{
-          height: "100%",
-        }}
         items={items} // Use defined menu items.
       />
     </Sider>
