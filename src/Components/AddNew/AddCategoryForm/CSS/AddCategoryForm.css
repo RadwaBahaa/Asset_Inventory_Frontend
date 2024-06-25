@@ -1,0 +1,17 @@
+.category_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 50px;
+  background-color: #f0f2f5;
+  border-radius: 10px;
+  height: 500px;
+}
+
+.category_card {
+  width: 60%;
+  height: 320px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+

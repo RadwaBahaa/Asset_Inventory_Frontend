@@ -1,4 +1,7 @@
 .menu {
+  width: 200px;
   height: 100%;
   direction: ltr;
+  position: fixed;
+  z-index: 999;
 }

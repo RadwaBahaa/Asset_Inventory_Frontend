@@ -1,78 +1,53 @@
-import React, { useState } from 'react';
-import { Divider, Radio, Table } from 'antd';
+import React from "react";
+import { Table } from "antd";
 
-const columns = [
-  {
-    title: 'LOCATIONS',
-    dataIndex: 'name',
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: 'NAME',
-    dataIndex: 'name',
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: 'DESCREPTION',
-    dataIndex: 'address',
-  },
-  {
-    title: 'PATH',
-    dataIndex: 'address',
-  },
-];
+const AssetTable = (props) => {
+  const { assetsData } = props;
 
-const data = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sydney No. 1 Lake Park',
-  },
-  {
-    key: '4',
-    name: 'Disabled User',
-    age: 99,
-    address: 'Sydney No. 1 Lake Park',
-  },
-];
-
-const AssetTable = () => {
-  const [selectionType, setSelectionType] = useState('checkbox');
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "assetID",
+      key: "assetID",
+    },
+    {
+      title: "Asset Name",
+      dataIndex: "assetName",
+      key: "assetName",
+    },
+    {
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
+    },
+    {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+      width: "40%",
+    },
+    {
+      title: "Category Name",
+      dataIndex: "categoryName",
+      key: "categoryName",
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+      key: "action",
+    },
+  ];
 
   return (
     <div>
-      <Radio.Group style={{ display: 'flex', paddingTop: '20px', paddingLeft: ' 24px' }}
-        onChange={({ target: { value } }) => {
-          setSelectionType(value);
-        }}
-        value={selectionType}
-      >
-        <Radio value="checkbox">Checkbox</Radio>
-        <Radio value="radio">Radio</Radio>
-      </Radio.Group>
-
-      <Divider />
-
       <Table
         rowSelection={{
-          type: selectionType,
-          // Add your rowSelection logic here if needed
+          type: "checkbox",
+          alignText: "center",
         }}
         columns={columns}
-        dataSource={data}
+        dataSource={assetsData}
+        pagination={false}
       />
     </div>
   );

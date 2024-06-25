@@ -3,7 +3,7 @@ import TrackingSubNavbar from '../../Components/NavBars/TrackingSubNavBar';
 import { DownOutlined, PlusOutlined, PrinterOutlined, FilterOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu } from 'antd';
 import StepsComponent from "../../Components/Tracking/StepsComponent";
-import AssetsSearchBar from '../../Components/Items/AssetsSearchBar';
+// import AssetsSearchBar from '../../Components/Items/AssetsSearchBar';
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { Grid, Paper } from "@mui/material";
 
@@ -93,7 +93,7 @@ export default function ViewTracking() {
               <DownOutlined />
             </Button>
           </Dropdown>
-          <AssetsSearchBar />
+          {/* <AssetsSearchBar /> */}
           <Button type="primary" icon={<PrinterOutlined />} size="large">
             Print
           </Button>

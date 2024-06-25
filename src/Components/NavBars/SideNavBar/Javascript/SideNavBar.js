@@ -66,7 +66,7 @@ const items = [
 
 const SideNavbar = () => {
   return (
-    <Sider className="sider" width={200}>
+    <Sider className="sider">
       <Menu
         className="menu"
         mode="inline" // Set menu mode to inline.

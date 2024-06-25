@@ -1,20 +1,29 @@
-import React from 'react';
-import { Button } from 'antd';
-import { DownOutlined, ArrowLeftOutlined, CheckOutlined } from '@ant-design/icons'; // Import necessary icons
+import React from "react";
+import { HomeOutlined, ShoppingCartOutlined } from "@ant-design/icons"; // Import necessary icons
 import SubNavbar from "../../Components/NavBars/SubNavbar";
-import AddAssetForm from '../../Components/Items/Form';
+import AddAssetForm from "../../Components/AddNew/AddAssetForm/Javascript/AddAssetForm";
 
 export default function Assets() {
   return (
     <div>
       <SubNavbar
         title="Add Asset"
-        editButtonLabel={<><ArrowLeftOutlined /> To Homepage</>}
+        editButtonLabel={
+          <>
+            <HomeOutlined style={{ marginRight: "10px" }} />
+            To Home Page
+          </>
+        }
         editButtonPath={"/"}
-        addButtonLabel={<><CheckOutlined /> Done</>}
-        addButtonPath={"/addNew/addingSuccessfully"}
+        addButtonLabel={
+          <>
+            <ShoppingCartOutlined style={{ marginRight: "10px" }} />
+            To Assets List
+          </>
+        }
+        addButtonPath={"/items/assets"}
       />
-      <div style={{ padding: '20px' }}>
+      <div style={{ padding: "20px" }}>
         <AddAssetForm />
       </div>
     </div>

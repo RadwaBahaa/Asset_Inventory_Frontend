@@ -2,10 +2,9 @@ import React from "react";
 import { Layout, theme } from "antd";
 import TopNavBar from "../../../Components/NavBars/TopNavBar/Javascript/TopNavBar";
 import SideNavbar from "../../../Components/NavBars/SideNavBar/Javascript/SideNavBar";
-import FooterComponent from "../../../Components/Footer";
+import Footer from "../../../Components/Footer/Javsscript/Footer";
 import RouteConfige from "../../../routes/RouteConfig";
 import "../CSS/HomePage.css";
-
 
 const { Content } = Layout;
 
@@ -36,7 +35,7 @@ export default function HomePage() {
             </Content>
           </Layout>
         </Layout>
-        <FooterComponent /> {/* Footer component */}
+        <Footer /> Footer component
       </Layout>
     </>
   );

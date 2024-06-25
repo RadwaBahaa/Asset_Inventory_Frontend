@@ -18,6 +18,7 @@ const SubNavbar = ({
         alignItems: "center",
         justifyContent: "space-between",
         background: "#D2E7F9", // Adjust the background color as needed
+        boxShadow: "0px 1px 5px lightgray",
       }}
     >
       <div style={{ display: "flex", alignItems: "center" }}>

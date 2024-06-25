@@ -1,31 +1,96 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import SubNavbar from "../../Components/NavBars/SubNavbar";
-import { DownOutlined, BarsOutlined, AppstoreOutlined, PrinterOutlined, FilterOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Menu, Space, Segmented } from 'antd';
-import AssetsSearchBar from '../../Components/Items/AssetsSearchBar';
-import AssetTable from '../../Components/Items/AssetsTable';
-import GridView from '../../Components/Items/GridView';
+import { PlusOutlined, HomeOutlined } from "@ant-design/icons";
+import { Button, Divider } from "antd";
+import AssetTable from "../../Components/Items/AssetsTable";
+import GridView from "../../Components/Items/GridView";
+import AssetSettings from "../../Components/Items/AssetSettings";
+import database from "../../axios/database";
 
 export default function Assets() {
-  const [activeComponent, setActiveComponent] = useState('List'); // Default to 'List'
+  const [assetsData, setAssetsData] = useState([]);
+  const [activeComponent, setActiveComponent] = useState("List"); // Default to 'List'
+  const [order, setOrder] = useState("byID");
+  const [search, setSearch] = useState("");
+  const [searchError, setSearchError] = useState(false);
 
-  const items = [
-    { label: "All" },
-    { label: "Suppliers" },
-    { label: "Warehouses" },
-    { label: "Stores" },
-  ];
+  const action = (
+    <div style={{ display: "flex" }}>
+      <Button type="primary" ghost>
+        Primary
+      </Button>
+      <Button type="primary" danger ghost>
+        Danger
+      </Button>
+    </div>
+  );
+
+  const sortAssets = (assets, order) => {
+    switch (order) {
+      case "byID":
+        return assets.sort((a, b) => parseInt(a.assetID) - parseInt(b.assetID));
+      case "byName":
+        return assets.sort((a, b) => a.assetName.localeCompare(b.assetName));
+      case "byCategory":
+        return assets.sort((a, b) =>
+          a.categoryName.localeCompare(b.categoryName)
+        );
+      case "byPriceA":
+        return assets.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+      case "byPriceD":
+        return assets.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+      default:
+        return assets;
+    }
+  };
+
+  useEffect(() => {
+    let fetchAssets = async () => {
+      try {
+        let response;
+        if (search !== "") {
+          response = await database.get("/assets/search", {
+            params: { name: search },
+          });
+          setSearchError(false);
+        } else {
+          response = await database.get("/assets/read");
+        }
+        setAssetsData(
+          response.data.map((asset) => ({
+            key: asset.assetID,
+            assetID: asset.assetID,
+            assetName: asset.assetName,
+            price: asset.price,
+            description: asset.description,
+            categoryName: asset.category.categoryName,
+            action: action,
+          }))
+        );
+      } catch (error) {
+        console.error(error);
+        setSearchError(true);
+      }
+    };
+
+    fetchAssets();
+  }, [search]);
+
+  useEffect(() => {
+    console.log("Order:", order);
+    setAssetsData((assets) => sortAssets([...assets], order));
+  }, [order]);
 
   // Generate 24 assets for 6 rows of 4 columns
   const generateAssets = () => {
     const assets = [];
     for (let i = 1; i <= 24; i++) {
       assets.push({
-        id: `ID${i}`,  // Use backticks and curly braces for template literals
+        id: `ID${i}`, // Use backticks and curly braces for template literals
         name: `Asset Name ${i}`,
-        price: `${i * 100}`,  // Use backticks and curly braces for template literals
+        price: `${i * 100}`, // Use backticks and curly braces for template literals
         description: `This is a detailed description of asset ${i}.`,
-        image: 'https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png',
+        image: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
       });
     }
     return assets;
@@ -33,77 +98,35 @@ export default function Assets() {
 
   const assets = generateAssets();
 
-  const menu = (
-    <Menu>
-      {items.map((item) => (
-        <Menu.Item key={item.label}>{item.label}</Menu.Item>
-      ))}
-    </Menu>
-  );
-
-  const handleSegmentedChange = (value) => {
-    setActiveComponent(value);
-  };
-
-  const handleFilterMenuClick = (e) => {
-    console.log('Clicked on filter:', e.key);
-    // Handle filtering logic based on selected option (e.g., by Category, by Price)
-  };
-
-  const filterMenu = (
-    <Menu onClick={handleFilterMenuClick}>
-      <Menu.Item key="byCategory">Category</Menu.Item>
-      <Menu.Item key="byPrice">Price</Menu.Item>
-    </Menu>
-  );
-
   return (
     <div>
       <SubNavbar
         title="Assets"
         editButtonLabel={
           <>
-            <EditOutlined />
-            <span style={{ marginLeft: '8px' }}>Edit Asset</span>
+            <HomeOutlined />
+            <span style={{ marginLeft: "8px" }}>To Home Page</span>
           </>
         }
         addButtonLabel={
           <>
             <PlusOutlined />
-            <span style={{ marginLeft: '8px' }}>Add Asset</span>
+            <span style={{ marginLeft: "8px" }}>Add Asset</span>
           </>
         }
         addButtonPath="/addNew/assets"
       />
-      <div style={{ marginTop: '16px', marginLeft: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-        {/* Filter Button */}
-        <Dropdown overlay={filterMenu} placement="bottomLeft">
-          <Button icon={<FilterOutlined />} style={{ width: '60px' }}>
-            <DownOutlined />
-          </Button>
-        </Dropdown>
 
-        {/* Search Bar */}
-        <AssetsSearchBar />
-
-        {/* Icons Segmented Control */}
-        <Segmented
-          options={[
-            { value: "List", icon: <BarsOutlined /> },
-            { value: "Grid", icon: <AppstoreOutlined /> }
-          ]}
-          onChange={handleSegmentedChange}
-        />
-
-        {/* Print Button */}
-        <Button type="primary" icon={<PrinterOutlined />} size="large">
-          Print
-        </Button>
-      </div>
-
+      <AssetSettings
+        setOrder={setOrder}
+        assetsData={assetsData}
+        setSearch={setSearch}
+      />
+      {/* Icons Segmented Control */}
+      <Divider />
       {/* Conditional rendering based on activeComponent state */}
-      {activeComponent === 'List' && <AssetTable />}
-      {activeComponent === 'Grid' && <GridView assets={assets} />}
+      {activeComponent === "List" && <AssetTable assetsData={assetsData} />}
+      {activeComponent === "Grid" && <GridView assets={assets} />}
     </div>
   );
 }
