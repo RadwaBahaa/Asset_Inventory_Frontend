@@ -20,7 +20,7 @@ const AddAssetForm = () => {
   useEffect(() => {
     // Simulating API call to fetch categories
     database
-      .get("/category/read")
+      .get("/categories/read")
       .then((response) => {
         setCategories(response.data);
       })

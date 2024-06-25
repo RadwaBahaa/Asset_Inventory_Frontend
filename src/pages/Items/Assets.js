@@ -13,6 +13,7 @@ export default function Assets() {
   const [order, setOrder] = useState("byID");
   const [search, setSearch] = useState("");
   const [searchError, setSearchError] = useState(false);
+  const [searchBy, setSearchBy] = useState("");
 
   const action = (
     <div style={{ display: "flex" }}>
@@ -49,9 +50,17 @@ export default function Assets() {
       try {
         let response;
         if (search !== "") {
-          response = await database.get("/assets/search", {
-            params: { name: search },
-          });
+          switch (searchBy) {
+            case "Category":
+              response = await database.get("/assets/search", {
+                params: { category: search },
+              });
+              break;
+            default:
+              response = await database.get("/assets/search", {
+                params: { name: search },
+              });
+          }
           setSearchError(false);
         } else {
           response = await database.get("/assets/read");
@@ -72,7 +81,6 @@ export default function Assets() {
         setSearchError(true);
       }
     };
-
     fetchAssets();
   }, [search]);
 
@@ -108,6 +116,7 @@ export default function Assets() {
             <span style={{ marginLeft: "8px" }}>To Home Page</span>
           </>
         }
+        editButtonPath="/"
         addButtonLabel={
           <>
             <PlusOutlined />
@@ -125,7 +134,9 @@ export default function Assets() {
       {/* Icons Segmented Control */}
       <Divider />
       {/* Conditional rendering based on activeComponent state */}
-      {activeComponent === "List" && <AssetTable assetsData={assetsData} />}
+      {activeComponent === "List" && (
+        <AssetTable assetsData={assetsData} setSearchBy={setSearchBy} />
+      )}
       {activeComponent === "Grid" && <GridView assets={assets} />}
     </div>
   );

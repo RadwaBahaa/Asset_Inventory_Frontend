@@ -5,12 +5,12 @@ import {
   OrderedListOutlined,
   PrinterOutlined,
 } from "@ant-design/icons";
-import { Button, Dropdown, Menu, Segmented, Input } from "antd";
+import { Button, Dropdown, Menu, Segmented, Input, Select } from "antd";
 import { useState } from "react";
 
 const AssetSettings = (props) => {
   const [activeComponent, setActiveComponent] = useState("List"); // Default to 'List'
-  const { setOrder, setSearch } = props;
+  const { setOrder, setSearch, setSearchBy } = props;
 
   const orderMenu = (
     <Menu style={{ width: "120%" }} onClick={(e) => setOrder(e.key)}>
@@ -20,6 +20,19 @@ const AssetSettings = (props) => {
       <Menu.Item key="byPriceA">Price (Low to High)</Menu.Item>
       <Menu.Item key="byPriceD">Price (High to Low)</Menu.Item>
     </Menu>
+  );
+
+  const selectBeforeSearch = (
+    <Select
+      defaultValue="Name"
+      dropdownStyle={{ width: 150 }} // Static width for dropdown list
+      onSelect={setSearchBy}
+    >
+      <Select.Option value="Name" defaultValue>
+        Name
+      </Select.Option>
+      <Select.Option value="Category">Category</Select.Option>
+    </Select>
   );
 
   const handleSegmentedChange = (value) => {
@@ -46,6 +59,7 @@ const AssetSettings = (props) => {
 
       {/* Search Bar */}
       <Input.Search
+        addonBefore={selectBeforeSearch}
         placeholder="Assets Search"
         allowClear
         onSearch={(value) => setSearch(value)}
