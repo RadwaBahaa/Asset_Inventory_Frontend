@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, InputNumber } from "antd";
+import { Table, InputNumber, Button } from "antd";
 
 const initialData = [
   {
@@ -28,10 +28,9 @@ const initialData = [
   },
 ];
 
-const AssetsTable = (props) => {
+const AssetsTable = ({ setSelectAssets, deleteAsset }) => {
   const [data, setData] = useState(initialData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const { setSelectAssets } = props;
 
   useEffect(() => {
     const selectedRows = selectedRowKeys.map((key) =>
@@ -47,6 +46,11 @@ const AssetsTable = (props) => {
       item.key === key ? { ...item, quantity: value } : item
     );
     setData(newData);
+  };
+
+  const handleDelete = (key) => {
+    deleteAsset(key);
+    setData(data.filter((item) => item.key !== key));
   };
 
   const rowSelection = {
@@ -76,6 +80,15 @@ const AssetsTable = (props) => {
           min={0}
           onChange={(value) => handleQuantityChange(record.key, value)}
         />
+      ),
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+      render: (_, record) => (
+        <Button type="primary" danger onClick={() => handleDelete(record.key)}>
+          Delete
+        </Button>
       ),
     },
   ];

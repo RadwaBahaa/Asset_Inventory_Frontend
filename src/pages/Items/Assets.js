@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import SubNavbar from "../../Components/NavBars/SubNavbar";
 import { PlusOutlined, HomeOutlined } from "@ant-design/icons";
 import { Button, Divider } from "antd";
-import AssetTable from "../../Components/Items/AssetsTable";
+import AssetsTable from "../../Components/Items/AssetsTable";
 import GridView from "../../Components/Items/GridView";
 import AssetSettings from "../../Components/Items/AssetSettings";
 import database from "../../axios/database";
@@ -15,16 +15,25 @@ export default function Assets() {
   const [searchError, setSearchError] = useState(false);
   const [searchBy, setSearchBy] = useState("");
 
-  const action = (
+  const action = (key) => (
     <div style={{ display: "flex" }}>
       <Button type="primary" ghost>
         Primary
       </Button>
-      <Button type="primary" danger ghost>
-        Danger
+      <Button type="primary" danger ghost onClick={() => deleteAsset(key)}>
+        Delete
       </Button>
     </div>
   );
+
+  const deleteAsset = async (key) => {
+    try {
+      await database.delete(`/assets/delete/${key}`);
+      setAssetsData((prevData) => prevData.filter((item) => item.key !== key));
+    } catch (error) {
+      console.error("Error deleting asset:", error);
+    }
+  };
 
   const sortAssets = (assets, order) => {
     switch (order) {
@@ -73,7 +82,7 @@ export default function Assets() {
             price: asset.price,
             description: asset.description,
             categoryName: asset.category.categoryName,
-            action: action,
+            action: action(asset.assetID), // Pass the key to the action
           }))
         );
       } catch (error) {
@@ -135,7 +144,11 @@ export default function Assets() {
       <Divider />
       {/* Conditional rendering based on activeComponent state */}
       {activeComponent === "List" && (
-        <AssetTable assetsData={assetsData} setSearchBy={setSearchBy} />
+        <AssetsTable
+          assetsData={assetsData}
+          setSearchBy={setSearchBy}
+          deleteAsset={deleteAsset}
+        />
       )}
       {activeComponent === "Grid" && <GridView assets={assets} />}
     </div>
