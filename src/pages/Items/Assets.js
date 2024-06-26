@@ -25,6 +25,15 @@ export default function Assets() {
     </div>
   );
 
+  const deleteAsset = async (key) => {
+    try {
+      await database.delete(`/assets/delete/${key}`);
+      setAssetsData((prevData) => prevData.filter((item) => item.key !== key));
+    } catch (error) {
+      console.error("Error deleting asset:", error);
+    }
+  };
+
   const sortAssets = (assets, order) => {
     switch (order) {
       case "byID":
