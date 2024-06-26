@@ -1,56 +1,97 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SubNavbar from "../../Components/NavBars/SubNavbar";
-<<<<<<< HEAD
-import { EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Input, Modal, Form } from "antd";
-import MapComponent from "../../Components/Location/MapComponent";
-import AddLocation from "../../Components/Location/FlootButton";
-=======
-import { EditOutlined, PlusOutlined, EnvironmentOutlined } from "@ant-design/icons";
-import { Button, Input, Modal, Form, Tooltip, Dropdown, Menu, message } from "antd";
+import {
+  EditOutlined,
+  PlusOutlined,
+  EnvironmentOutlined,
+} from "@ant-design/icons";
+import {
+  Button,
+  Input,
+  Modal,
+  Form,
+  Tooltip,
+  Dropdown,
+  Menu,
+  message,
+  Row,
+  Col,
+} from "antd";
 import MapComponent from "../../Components/AddNew/AddLocation/MapComponent";
->>>>>>> 02b465c7238b8cd72f4eca9d23b26c729a596928
+import database from "../../axios/database";
 
 export default function Location() {
   const [isFormModalVisible, setIsFormModalVisible] = useState(false); // State for form visibility
-  const [formData, setFormData] = useState({ name: "", address: "" }); // State for form data
-  const [drawnPoints, setDrawnPoints] = useState([]); // State for storing drawn points
-  const [selectedPoint, setSelectedPoint] = useState(null); // State for currently selected point
+  const [drawnPoint, setDrawnPoint] = useState({}); // State for storing drawn points
+  const [selectedPointType, setSelectedPointType] = useState(""); // State for currently selected point
+  const [isDrawingEnabled, setIsDrawingEnabled] = useState(false); // State for enabling/disabling drawing
+  const [submitedPoint, setSubmitedPoint] = useState({});
+  const [form] = Form.useForm(); // Create form instance
 
   const handleSearchChange = (event) => {
     console.log("Search term:", event.target.value);
     // Implement search logic here based on your map component's capabilities
   };
 
-  const handleFormSubmit = (event) => {
-    event.preventDefault();
-    console.log("Submitted form data:", formData);
-    console.log("Drawn points:", drawnPoints);
+  useEffect(() => {
+    if (submitedPoint.geometry) {
+      database
+        .post(`/${selectedPointType}s/create/geojson`, submitedPoint)
+        .then((response) => {
+          console.log("Point created:", response);
+          setDrawnPoint({});
+          setSelectedPointType("");
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    }
+  }, [submitedPoint]);
+
+  const handleFormSubmit = (value) => {
+    const { name, address } = value;
+    console.log(name);
+    // Update the drawn point with form data
+    const updatedPoint = {
+      ...drawnPoint,
+      properties: {
+        ...drawnPoint.properties,
+        [`${selectedPointType}Name`]: name,
+        address: address,
+      },
+    };
+    setSubmitedPoint(updatedPoint);
     setIsFormModalVisible(false);
-    setFormData({ name: "", address: "" });
-    setSelectedPoint(null);
+    form.resetFields();
   };
 
-  const handleFormInputChange = (event) => {
-    setFormData({ ...formData, [event.target.name]: event.target.value });
+  const handleCancel = () => {
+    setIsFormModalVisible(false);
+    setSelectedPointType("");
+    setIsDrawingEnabled(false); // Disable drawing when modal is closed
   };
 
-  const handleMapPointSelect = (point) => {
-    setSelectedPoint(point);
-    setIsFormModalVisible(true);
+  const handleDrawComplete = (coordinates) => {
+    if (isDrawingEnabled) {
+      console.log(`Draw a point for ${coordinates}`);
+      const point = {
+        type: "Feature",
+        geometry: { type: "Point", coordinates },
+      };
+      setDrawnPoint(point);
+      setIsFormModalVisible(true);
+    }
   };
 
-  const handleDrawComplete = (type, coordinates) => {
-    message.info(`Draw a point for ${type}`);
-    setDrawnPoints([
-      ...drawnPoints,
-      { type: "Feature", properties: { type }, geometry: { type: "Point", coordinates } },
-    ]);
-    handleMapPointSelect(coordinates);
+  const HandleStartDraw = (e) => {
+    setSelectedPointType(e.key);
+    setIsDrawingEnabled(true); // Enable drawing when a point type is selected
+    message.info(`Draw a point for ${e.key}`);
+    console.log(e.key);
   };
 
   const menu = (
-    <Menu onClick={({ key }) => { setSelectedPoint(key); message.info(`Pick a point for new ${key}`); }}>
+    <Menu onClick={HandleStartDraw}>
       <Menu.Item key="supplier">Supplier</Menu.Item>
       <Menu.Item key="warehouse">Warehouse</Menu.Item>
       <Menu.Item key="store">Store</Menu.Item>
@@ -81,44 +122,21 @@ export default function Location() {
             alignItems: "center",
             position: "absolute",
             top: "1rem",
-<<<<<<< HEAD
-            right: "1rem",
-            zIndex: 1000, // Increase z-index to ensure they are in front of the map
-          }}
-        >
-          {/* Search bar */}
-=======
             right: "calc(18% - 200px)",
             zIndex: 1000,
           }}
         >
->>>>>>> 02b465c7238b8cd72f4eca9d23b26c729a596928
           <Input
             placeholder="Search location..."
-            onChange={handleSearchChange}
             style={{
               padding: "0.5rem",
               marginRight: "1rem",
               width: "400px",
               borderRadius: "8px",
             }}
+            onChange={handleSearchChange}
           />
-<<<<<<< HEAD
-          <AddLocation
-            style={{
-              backgroundColor: "#1890ff",
-              // borderColor: "#1890ff",
-              padding: "0.5rem 1rem",
-              // fontWeight: "bold",
-              // borderRadius: "8px",
-            }}
-          >
-          </AddLocation>
-=======
-          <Dropdown
-            overlay={menu}
-            placement="bottomCenter"
-          >
+          <Dropdown overlay={menu} placement="bottomCenter">
             <Tooltip title="Select Point Type">
               <Button
                 type="primary"
@@ -136,88 +154,83 @@ export default function Location() {
               </Button>
             </Tooltip>
           </Dropdown>
->>>>>>> 02b465c7238b8cd72f4eca9d23b26c729a596928
         </div>
 
-        <MapComponent onDrawComplete={handleDrawComplete} />
-
-        <Modal
-          title="Add New Location"
-          visible={isFormModalVisible}
-          onCancel={() => {
-            setIsFormModalVisible(false);
-            setSelectedPoint(null);
-          }}
-          footer={[
-<<<<<<< HEAD
-            <Button type="primary" onClick={handleFormSubmit}>
-              Submit Location
-=======
-            <Button key="submit" type="primary" onClick={handleFormSubmit}>
-              Submit
->>>>>>> 02b465c7238b8cd72f4eca9d23b26c729a596928
-            </Button>,
-          ]}
-        >
-          <div
-            style={{
-<<<<<<< HEAD
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              padding: '50px',
-              backgroundColor: '#f0f2f5',
-              borderRadius: '10px',
-              height: '350px',
-=======
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: "50px",
-              backgroundColor: "#f0f2f5",
-              borderRadius: "10px",
-              height: "350px",
->>>>>>> 02b465c7238b8cd72f4eca9d23b26c729a596928
-            }}
+        <MapComponent
+          onDrawComplete={handleDrawComplete}
+          isDrawingEnabled={isDrawingEnabled}
+        />
+        {selectedPointType && (
+          <Modal
+            title="Add New Location"
+            visible={isFormModalVisible}
+            onCancel={handleCancel}
+            footer={null}
           >
             <div
               style={{
-<<<<<<< HEAD
-                width: '85%',
-                height: '330px',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                borderRadius: '10px',
-                padding: '10px',
-                backgroundColor: 'white',
-=======
-                width: "85%",
-                height: "330px",
-                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "50px",
+                backgroundColor: "#f0f2f5",
                 borderRadius: "10px",
-                padding: "10px",
-                backgroundColor: "white",
->>>>>>> 02b465c7238b8cd72f4eca9d23b26c729a596928
+                height: "350px",
               }}
             >
-              <Form layout="vertical">
-                <Form.Item label="Location Name">
-                  <Input
+              <div
+                style={{
+                  width: "85%",
+                  height: "330px",
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                  borderRadius: "10px",
+                  padding: "10px",
+                  backgroundColor: "white",
+                }}
+              >
+                <Form
+                  layout="vertical"
+                  onFinish={handleFormSubmit}
+                  id="locationForm"
+                  form={form}
+                >
+                  <Form.Item
+                    label="Location Name"
                     name="name"
-                    value={formData.name}
-                    onChange={handleFormInputChange}
-                  />
-                </Form.Item>
-                <Form.Item label="Address">
-                  <Input
-                    name="address"
-                    value={formData.address}
-                    onChange={handleFormInputChange}
-                  />
-                </Form.Item>
-              </Form>
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input the location name!",
+                      },
+                    ]}
+                  >
+                    <Input name="name" />
+                  </Form.Item>
+                  <Form.Item label="Address" name="address">
+                    <Input name="address" />
+                  </Form.Item>
+                  <Row justify="center">
+                    <Col>
+                      <Button
+                        key="submit"
+                        type="primary"
+                        htmlType="submit"
+                        style={{ marginRight: 8 }}
+                      >
+                        Submit
+                      </Button>
+                    </Col>
+                    <Col>
+                      <Button key="cancel" onClick={handleCancel}>
+                        Cancel
+                      </Button>
+                    </Col>
+                  </Row>
+                </Form>
+              </div>
             </div>
-          </div>
-        </Modal>
+          </Modal>
+        )}
       </div>
     </div>
   );

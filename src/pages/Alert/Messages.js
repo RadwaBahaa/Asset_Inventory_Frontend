@@ -1,8 +1,15 @@
+import MessageSubNavbar from "../../Components/Messages/MessageSubNavbar"
+import React, { useEffect, useState } from "react";
+import Contrillers from "../../Components/Messages/Controllers"
 export default function Messages() {
   return (
     <div>
-      <h1>Alert</h1>
-      <h3>Messages</h3>
+      <MessageSubNavbar
+        title="Messages"
+      />
+      <Contrillers 
+      />
+      
     </div>
   );
 }
