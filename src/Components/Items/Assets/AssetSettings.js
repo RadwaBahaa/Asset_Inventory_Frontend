@@ -61,56 +61,55 @@ const AssetSettings = (props) => {
     const contentHeight = (imgProps.height * contentWidth) / imgProps.width;
 
     pdf.addImage(imgData, "PNG", margin, margin, contentWidth, contentHeight);
-    pdf.save("assets.pdf");
+    pdf.save("Assets.pdf");
   };
 
   return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          width: "70%",
-          gap: "1%",
-          margin: "1.5%",
-        }}
-      >
-        <Button
-          type="primary"
-          danger
-          onClick={handleDelete}
-          icon={<DeleteOutlined />}
-          style={{ width: "5%" }}
-          disabled={selectedRowKeys.length === 0}
-        >
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        width: "70%",
+        gap: "1%",
+        margin: "1.5%",
+      }}
+    >
+      <Button
+        type="primary"
+        danger
+        onClick={handleDelete}
+        icon={<DeleteOutlined />}
+        style={{ width: "5%" }}
+        disabled={selectedRowKeys.length === 0}
+      ></Button>
+      <Dropdown overlay={orderMenu} placement="bottomLeft">
+        <Button icon={<OrderedListOutlined />} style={{ width: "6%" }}>
+          <DownOutlined />
         </Button>
-        <Dropdown overlay={orderMenu} placement="bottomLeft">
-          <Button icon={<OrderedListOutlined />} style={{ width: "6%" }}>
-            <DownOutlined />
-          </Button>
-        </Dropdown>
-        <Input.Search
-          addonBefore={selectBeforeSearch}
-          placeholder="Assets Search"
-          allowClear
-          onSearch={(value) => setSearch(value)}
-          onChange={(e) =>
-            e.target.value === "" ? setSearch(e.target.value) : null
-          }
-          className="search"
-          style={{ backgroundColor: "white", width: "80%" }}
-        />
-        <Segmented
-          options={[
-            { label: "General", value: "General", icon: <MenuOutlined /> },
-            { label: "Specific", value: "Specific", icon: <LineOutlined /> },
-          ]}
-          onChange={setActiveComponent}
-        />
-        <Button type="primary" icon={<PrinterOutlined />} onClick={handlePrint}>
-          Print
-        </Button>
-      </div>
+      </Dropdown>
+      <Input.Search
+        addonBefore={selectBeforeSearch}
+        placeholder="Assets Search"
+        allowClear
+        onSearch={(value) => setSearch(value)}
+        onChange={(e) =>
+          e.target.value === "" ? setSearch(e.target.value) : null
+        }
+        className="search"
+        style={{ backgroundColor: "white", width: "80%" }}
+      />
+      <Segmented
+        options={[
+          { label: "General", value: "General", icon: <MenuOutlined /> },
+          { label: "Specific", value: "Specific", icon: <LineOutlined /> },
+        ]}
+        onChange={setActiveComponent}
+      />
+      <Button type="primary" icon={<PrinterOutlined />} onClick={handlePrint}>
+        Print
+      </Button>
+    </div>
   );
 };
 

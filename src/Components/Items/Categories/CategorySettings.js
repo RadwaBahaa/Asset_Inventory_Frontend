@@ -21,7 +21,7 @@ const CategorySettings = (props) => {
   );
 
   const handlePrint = async () => {
-    const input = document.getElementById("categorysTable");
+    const input = document.getElementById("categoriesTable");
     const canvas = await html2canvas(input);
     const imgData = canvas.toDataURL("image/png");
     const pdf = new jsPDF();
@@ -36,7 +36,7 @@ const CategorySettings = (props) => {
     const contentHeight = (imgProps.height * contentWidth) / imgProps.width;
 
     pdf.addImage(imgData, "PNG", margin, margin, contentWidth, contentHeight);
-    pdf.save("categorys.pdf");
+    pdf.save("Categorys.pdf");
   };
 
   return (

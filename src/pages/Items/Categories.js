@@ -38,38 +38,38 @@ export default function Categories() {
         return categories;
     }
   };
-
-  useEffect(() => {
-    let fetchCategories = async () => {
-      try {
-        let response;
-        if (search !== "") {
-          switch (searchBy) {
-            case "Category":
-              response = await database.get("/categories/search", {
-                params: { category: search },
-              });
-              break;
-            default:
-              response = await database.get("/categories/search", {
-                params: { name: search },
-              });
-          }
-        } else {
-          response = await database.get("/categories/read");
+  let fetchCategories = async () => {
+    try {
+      let response;
+      if (search !== "") {
+        switch (searchBy) {
+          case "Category":
+            response = await database.get("/categories/search", {
+              params: { category: search },
+            });
+            break;
+          default:
+            response = await database.get("/categories/search", {
+              params: { name: search },
+            });
         }
-        setCategoriesData(
-          response.data.map((category) => ({
-            key: category.categoryID,
-            categoryID: category.categoryID,
-            categoryName: category.categoryName,
-            action: action,
-          }))
-        );
-      } catch (error) {
-        console.error(error);
+      } else {
+        response = await database.get("/categories/read");
       }
-    };
+      setCategoriesData(
+        response.data.map((category) => ({
+          key: category.categoryID,
+          categoryID: category.categoryID,
+          categoryName: category.categoryName,
+          action: action,
+        }))
+      );
+    } catch (error) {
+      console.error(error);
+      setCategoriesData([]);
+    }
+  };
+  useEffect(() => {
     fetchCategories();
   }, [search]);
 
@@ -78,9 +78,18 @@ export default function Categories() {
     setCategoriesData((categories) => sortCategories([...categories], order));
   }, [order]);
 
-  const handleDelete = () => {
-    // Handle delete logic here, e.g., send a request to the server to delete the selected categories.
-    console.log("Selected row keys for deletion: ", selectedRowKeys);
+  const handleDelete = async () => {
+    try {
+      await Promise.all(
+        selectedRowKeys.map(async (categoryID) => {
+          await database.delete(`/categories/delete/${categoryID}`);
+        })
+      );
+      setSelectedRowKeys([]);
+      fetchCategories();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

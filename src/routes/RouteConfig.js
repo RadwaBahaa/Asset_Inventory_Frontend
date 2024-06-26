@@ -31,7 +31,7 @@ const AlertPurchaseRequests = React.lazy(() =>
 
 function RouteConfige() {
   return (
-    <Suspense fallback={<h4>Loading...</h4>}>
+    <Suspense fallback={<h4 style={{margin:"2%" }}>Loading...</h4>}>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/items/assets" element={<ItemsAssets />} />
