@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Button, message, Steps, theme } from 'antd';
+import { Grid, Paper } from "@mui/material";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+
 const description = 'This is a description.'
 const steps = [
-    
   {
     title: 'First',
     description,
@@ -16,9 +18,30 @@ const steps = [
   {
     title: 'Last',
     description,
-    content: 'Last-content',
+    content: (
+      <Grid item xs={12} style={{ position: 'relative', zIndex: 0, marginTop: '25px' }}>
+        <Paper sx={{ padding: 2, height: "400px" }}>
+          <MapContainer
+            center={[51.505, -0.09]}
+            zoom={13}
+            style={{ height: "100%", width: "100%" }}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            <Marker position={[51.505, -0.09]}>
+              <Popup>
+                A pretty CSS3 popup. <br /> Easily customizable.
+              </Popup>
+            </Marker>
+          </MapContainer>
+        </Paper>
+      </Grid>
+    ),
   },
 ];
+
 const StepsComponent = () => {
   const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);

@@ -4,8 +4,6 @@ import { DownOutlined, PlusOutlined, PrinterOutlined, FilterOutlined } from '@an
 import { Button, Dropdown, Menu } from 'antd';
 import StepsComponent from "../../Components/Tracking/StepsComponent";
 // import AssetsSearchBar from '../../Components/Items/AssetsSearchBar';
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import { Grid, Paper } from "@mui/material";
 
 export default function ViewTracking() {
   const [activeComponent, setActiveComponent] = useState('Location'); // Set default to 'Location'
@@ -37,7 +35,7 @@ export default function ViewTracking() {
   const filterMenu = (
     <Menu onClick={handleFilterMenuClick}>
       <Menu.Item key="byCategory">Time</Menu.Item>
-      <Menu.Item key="byCategory">Coast</Menu.Item>
+      <Menu.Item key="byCategory">Cost</Menu.Item>
     </Menu>
   );
 
@@ -69,12 +67,6 @@ export default function ViewTracking() {
     position: 'relative',
   };
 
-  const mapContainerStyle = {
-    position: 'relative',
-    zIndex: 0,
-    marginTop: '25px',
-  };
-
   return (
     <div style={pageStyle}>
       <TrackingSubNavbar
@@ -101,25 +93,6 @@ export default function ViewTracking() {
         <div style={{ marginTop: '16px' }}>
           <StepsComponent />
         </div>
-        <Grid item xs={12} style={mapContainerStyle}>
-          <Paper sx={{ padding: 2, height: "400px" }}>
-            <MapContainer
-              center={[51.505, -0.09]}
-              zoom={13}
-              style={{ height: "100%", width: "100%" }}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              <Marker position={[51.505, -0.09]}>
-                <Popup>
-                  A pretty CSS3 popup. <br /> Easily customizable.
-                </Popup>
-              </Marker>
-            </MapContainer>
-          </Paper>
-        </Grid>
       </div>
     </div>
   );
