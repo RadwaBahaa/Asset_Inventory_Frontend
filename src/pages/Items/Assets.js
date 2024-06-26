@@ -2,26 +2,25 @@ import React, { useEffect, useState } from "react";
 import SubNavbar from "../../Components/NavBars/SubNavbar";
 import { PlusOutlined, HomeOutlined } from "@ant-design/icons";
 import { Button, Divider } from "antd";
-import AssetTable from "../../Components/Items/AssetsTable";
-import GridView from "../../Components/Items/GridView";
-import AssetSettings from "../../Components/Items/AssetSettings";
+import AssetTable from "../../Components/Items/Assets/AssetsTable";
+import AssetSettings from "../../Components/Items/Assets/AssetSettings";
 import database from "../../axios/database";
 
 export default function Assets() {
   const [assetsData, setAssetsData] = useState([]);
-  const [activeComponent, setActiveComponent] = useState("List"); // Default to 'List'
+  const [activeComponent, setActiveComponent] = useState("General"); // Default to 'List'
   const [order, setOrder] = useState("byID");
   const [search, setSearch] = useState("");
-  const [searchError, setSearchError] = useState(false);
   const [searchBy, setSearchBy] = useState("");
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const action = (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex", gap: "5%" }}>
       <Button type="primary" ghost>
-        Primary
+        Edit
       </Button>
       <Button type="primary" danger ghost>
-        Danger
+        Delete
       </Button>
     </div>
   );
@@ -45,15 +44,15 @@ export default function Assets() {
     }
   };
 
-  useEffect(() => {
-    let fetchAssets = async () => {
-      try {
-        let response;
+  const fetchAssets = async () => {
+    try {
+      let response;
+      if (activeComponent === "General") {
         if (search !== "") {
           switch (searchBy) {
             case "Category":
               response = await database.get("/assets/search", {
-                params: { category: search },
+                params: { categoryName: search },
               });
               break;
             default:
@@ -61,50 +60,48 @@ export default function Assets() {
                 params: { name: search },
               });
           }
-          setSearchError(false);
         } else {
           response = await database.get("/assets/read");
         }
-        setAssetsData(
-          response.data.map((asset) => ({
-            key: asset.assetID,
-            assetID: asset.assetID,
-            assetName: asset.assetName,
-            price: asset.price,
-            description: asset.description,
-            categoryName: asset.category.categoryName,
-            action: action,
-          }))
-        );
-      } catch (error) {
-        console.error(error);
-        setSearchError(true);
+      } else {
+        response = await database.get("/assets/read");
       }
-    };
+      setAssetsData(
+        response.data.map((asset) => ({
+          key: asset.assetID,
+          assetID: asset.assetID,
+          assetName: asset.assetName,
+          price: asset.price,
+          description: asset.description,
+          categoryName: asset.category.categoryName,
+          action: action,
+        }))
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
     fetchAssets();
   }, [search]);
 
   useEffect(() => {
-    console.log("Order:", order);
     setAssetsData((assets) => sortAssets([...assets], order));
   }, [order]);
 
-  // Generate 24 assets for 6 rows of 4 columns
-  const generateAssets = () => {
-    const assets = [];
-    for (let i = 1; i <= 24; i++) {
-      assets.push({
-        id: `ID${i}`, // Use backticks and curly braces for template literals
-        name: `Asset Name ${i}`,
-        price: `${i * 100}`, // Use backticks and curly braces for template literals
-        description: `This is a detailed description of asset ${i}.`,
-        image: "https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png",
-      });
+  const handleDelete = async () => {
+    try {
+      await Promise.all(
+        selectedRowKeys.map(async (assetID) => {
+          await database.delete(`/assets/delete/${assetID}`);
+        })
+      );
+      fetchAssets();
+    } catch (error) {
+      console.error(error);
     }
-    return assets;
   };
-
-  const assets = generateAssets();
 
   return (
     <div>
@@ -128,16 +125,20 @@ export default function Assets() {
 
       <AssetSettings
         setOrder={setOrder}
-        assetsData={assetsData}
         setSearch={setSearch}
+        setSearchBy={setSearchBy}
+        setActiveComponent={setActiveComponent}
+        selectedRowKeys={selectedRowKeys}
+        handleDelete={handleDelete}
       />
       {/* Icons Segmented Control */}
       <Divider />
       {/* Conditional rendering based on activeComponent state */}
-      {activeComponent === "List" && (
-        <AssetTable assetsData={assetsData} setSearchBy={setSearchBy} />
-      )}
-      {activeComponent === "Grid" && <GridView assets={assets} />}
+      <AssetTable
+        assetsData={assetsData}
+        selectedRowKeys={selectedRowKeys}
+        setSelectedRowKeys={setSelectedRowKeys}
+      />
     </div>
   );
 }

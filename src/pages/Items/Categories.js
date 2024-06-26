@@ -1,36 +1,87 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import SubNavbar from "../../Components/NavBars/SubNavbar";
-import { PrinterOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Menu } from 'antd';
-import CategorySearchBar from '../../Components/Items/CategorySearchBar';
-import CategoryTable from '../../Components/Items/CategoryTable';
+import { PlusOutlined, HomeOutlined } from "@ant-design/icons";
+import { Button, Divider } from "antd";
+import CategoryTable from "../../Components/Items/Categories/CategoryTable";
+import CategorySettings from "../../Components/Items/Categories/CategorySettings";
+import database from "../../axios/database";
 
 export default function Categories() {
-  const items = [
-    { label: "All" },
-    { label: "Suppliers" },
-    { label: "Warehouses" },
-    { label: "Stores" },
-  ];
+  const [categoriesData, setCategoriesData] = useState([]);
+  const [order, setOrder] = useState("byID");
+  const [search, setSearch] = useState("");
+  const [searchBy, setSearchBy] = useState("");
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
-  const menu = (
-    <Menu>
-      {items.map((item) => (
-        <Menu.Item key={item.label}>{item.label}</Menu.Item>
-      ))}
-    </Menu>
+  const action = (
+    <div style={{ display: "flex", gap: "5%" }}>
+      <Button type="primary" ghost>
+        Edit
+      </Button>
+      <Button type="primary" danger ghost>
+        Delete
+      </Button>
+    </div>
   );
 
-  const handleFilterMenuClick = (e) => {
-    console.log('Clicked on filter:', e.key);
-    // Handle filtering logic based on selected option (e.g., by Category, by Price)
+  const sortCategories = (categories, order) => {
+    switch (order) {
+      case "byID":
+        return categories.sort(
+          (a, b) => parseInt(a.categoryID) - parseInt(b.categoryID)
+        );
+      case "byName":
+        return categories.sort((a, b) =>
+          a.categoryName.localeCompare(b.categoryName)
+        );
+      default:
+        return categories;
+    }
   };
 
-  const filterMenu = (
-    <Menu onClick={handleFilterMenuClick}>
-      <Menu.Item key="byPrice">Price</Menu.Item>
-    </Menu>
-  );
+  useEffect(() => {
+    let fetchCategories = async () => {
+      try {
+        let response;
+        if (search !== "") {
+          switch (searchBy) {
+            case "Category":
+              response = await database.get("/categories/search", {
+                params: { category: search },
+              });
+              break;
+            default:
+              response = await database.get("/categories/search", {
+                params: { name: search },
+              });
+          }
+        } else {
+          response = await database.get("/categories/read");
+        }
+        setCategoriesData(
+          response.data.map((category) => ({
+            key: category.categoryID,
+            categoryID: category.categoryID,
+            categoryName: category.categoryName,
+            action: action,
+          }))
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchCategories();
+  }, [search]);
+
+  useEffect(() => {
+    console.log("Order:", order);
+    setCategoriesData((categories) => sortCategories([...categories], order));
+  }, [order]);
+
+  const handleDelete = () => {
+    // Handle delete logic here, e.g., send a request to the server to delete the selected categories.
+    console.log("Selected row keys for deletion: ", selectedRowKeys);
+  };
 
   return (
     <div>
@@ -38,32 +89,35 @@ export default function Categories() {
         title="Categories"
         editButtonLabel={
           <>
-            <EditOutlined />
-            <span style={{ marginLeft: '8px' }}>Edit Asset</span>
+            <HomeOutlined />
+            <span style={{ marginLeft: "8px" }}>To Home Page</span>
           </>
         }
+        editButtonPath="/"
         addButtonLabel={
           <>
             <PlusOutlined />
-            <span style={{ marginLeft: '8px' }}>Add Category</span>
+            <span style={{ marginLeft: "8px" }}>Add Category</span>
           </>
         }
         addButtonPath="/addNew/categories"
       />
-      <div style={{ marginTop: '16px', marginLeft: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
 
-
-        {/* Search Bar */}
-        <CategorySearchBar />
-
-
-
-
-        {/* Print Button */}
-        <Button type="primary" icon={<PrinterOutlined />} size="large">
-          Print
-        </Button>
-      </div><CategoryTable />
+      <CategorySettings
+        setOrder={setOrder}
+        setSearch={setSearch}
+        setSearchBy={setSearchBy}
+        selectedRowKeys={selectedRowKeys}
+        handleDelete={handleDelete}
+      />
+      {/* Icons Segmented Control */}
+      <Divider />
+      {/* Conditional rendering based on activeComponent state */}
+      <CategoryTable
+        categoriesData={categoriesData}
+        selectedRowKeys={selectedRowKeys}
+        setSelectedRowKeys={setSelectedRowKeys}
+      />
     </div>
   );
 }

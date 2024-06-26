@@ -23,16 +23,20 @@ const SubNavbar = ({
     >
       <div style={{ display: "flex", alignItems: "center" }}>
         <div className="demo-logo" />
-        <div style={{ fontSize: 30, fontWeight: "bold", color: "#212529" }}>
+        <div style={{ fontSize: 25, fontWeight: "bold", color: "#212529" }}>
           {title}
         </div>
       </div>
       <div style={{ display: "flex", gap: "10px" }}>
         <Link to={editButtonPath}>
-          <Button type="primary">{editButtonLabel}</Button>
+          <Button type="primary" style={{ width: "140px" }}>
+            {editButtonLabel}
+          </Button>
         </Link>
         <Link to={addButtonPath}>
-          <Button type="primary">{addButtonLabel}</Button>
+          <Button type="primary" style={{ width: "140px" }}>
+            {addButtonLabel}
+          </Button>
         </Link>
       </div>
     </Header>
