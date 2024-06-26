@@ -1,109 +1,134 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import SubNavbar from "../Components/NavBars/SubNavbar";
-import {
-  DownOutlined,
-  EditOutlined,
-  PlusOutlined,
-  FilterOutlined,
-} from "@ant-design/icons";
-import { Button, Dropdown, Menu } from "antd";
-import LocationTable from "../Components/Location/Table";
+import { PlusOutlined, HomeOutlined } from "@ant-design/icons";
+import { Divider, Spin, Alert } from "antd";
 import MapComponent from "../Components/Location/MapComponent";
-import MapList from "../Components/Location/MapList";
+import LocationTable from "../Components/Location/LocationTable";
+import LocationSetting from "../Components/Location/LocationSetting";
+import database from "../axios/database";
 
 export default function Location() {
-  const [activeComponent, setActiveComponent] = useState("Location");
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [storesData, setStoresData] = useState([]);
+  const [warehousesData, setWarehousesData] = useState([]);
+  const [suppliersData, setSuppliersData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [searchBy, setSearchBy] = useState("All");
+  const [search, setSearch] = useState("");
 
-  const handleFilterMenuClick = (e) => {
-    console.log("Clicked on filter:", e.key);
-  };
+  const locationTableRef = useRef(null); // Reference to LocationTable component
 
-  const handleServiceAreaClick = () => {
-    if (selectedLocation) {
-      // Code to create service area
-      console.log(`Creating service area for ${selectedLocation}`);
-    } else {
-      console.log("No location selected");
-    }
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const storesResponse = await database.get("stores/read/geojson");
+        setStoresData(storesResponse.data);
 
-  const filterMenu = (
-    <Menu onClick={handleFilterMenuClick} defaultValue={"All"}>
-      <Menu.Item key="byCategory">All</Menu.Item>
-      <Menu.Item key="byPrice">Suppliers</Menu.Item>
-      <Menu.Item key="byPrice">Warehouses</Menu.Item>
-      <Menu.Item key="byPrice">Stores</Menu.Item>
-    </Menu>
-  );
+        const suppliersResponse = await database.get("suppliers/read/geojson");
+        setSuppliersData(suppliersResponse.data);
+
+        const warehousesResponse = await database.get(
+          "warehouses/read/geojson"
+        );
+        setWarehousesData(warehousesResponse.data);
+
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Check if click occurred outside the LocationTable component
+      if (
+        locationTableRef.current &&
+        !locationTableRef.current.contains(event.target)
+      ) {
+        // Reset selectedItem to null to reset the map view
+        setSelectedItem(null);
+      }
+    };
+    // Add event listener when component mounts
+    document.addEventListener("click", handleClickOutside);
+    // Clean up event listener when component unmounts
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
 
   return (
-    // <MapComponent />
-    <div>
+    <>
       <SubNavbar
         title="Locations"
         editButtonLabel={
           <>
-            <EditOutlined />
-            <span style={{ marginLeft: "8px" }}>Edit Asset</span>
+            <HomeOutlined />
+            <span style={{ marginLeft: "8px" }}>To Home Page</span>
           </>
         }
+        editButtonPath="/"
         addButtonLabel={
           <>
             <PlusOutlined />
             <span style={{ marginLeft: "8px" }}>Add Location</span>
           </>
         }
+        addButtonPath="/addNew/location"
       />
 
       <div
         style={{
-          marginTop: "16px",
-          marginLeft: "24px",
           display: "flex",
-          alignItems: "center",
-          gap: "16px",
+          // height: "calc(100vh - 64px)", // Adjust height to fit your layout
+          zIndex: 1,
         }}
       >
-        <Dropdown overlay={filterMenu} placement="bottomLeft">
-          <Button>
-            <FilterOutlined />
-            Filter
-            <DownOutlined />
-          </Button>
-        </Dropdown>
-        <Button onClick={handleServiceAreaClick}>
-          <FilterOutlined />
-          Service Area
-        </Button>
-      </div>
-
-      {activeComponent === "List" && <LocationTable />}
-      {activeComponent === "Location" && (
         <div
           style={{
             display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            marginTop: "16px",
-            paddingLeft: "24px",
+            flexDirection: "column",
+            padding: "2%",
+            width: "30%", // Adjust width as needed
+            overflowY: "auto", // Enable scrolling if content overflows
           }}
+          // Assign ref to the LocationTable component
         >
-          <div style={{ flex: 1, marginRight: "16px" }}>
-            <MapList />
-          </div>
-          <div
-            style={{
-              width: "65%",
-              height: "400px",
-              marginTop: "3%",
-              marginLeft: "5%",
-            }}
-          >
-            <MapComponent />
+          <LocationSetting
+            selectedLocation={selectedLocation}
+            setSearchBy={setSearchBy}
+            setSearch={setSearch}
+          />
+
+          <Divider style={{ marginTop: "4%", marginBottom: "4%" }} />
+
+          <div ref={locationTableRef}>
+            <LocationTable
+              storesData={storesData}
+              warehousesData={warehousesData}
+              suppliersData={suppliersData}
+              setSelectedItem={setSelectedItem}
+              selectedItem={selectedItem}
+            />
           </div>
         </div>
-      )}
-    </div>
+        <div
+          style={{ flex: 1, position: "relative", height: "120%", width: "0%" }}
+        >
+          <MapComponent
+            storesData={storesData}
+            warehousesData={warehousesData}
+            suppliersData={suppliersData}
+            selectedItem={selectedItem}
+          />
+        </div>
+      </div>
+    </>
   );
 }

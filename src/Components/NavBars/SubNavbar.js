@@ -18,12 +18,14 @@ const SubNavbar = ({
         alignItems: "center",
         justifyContent: "space-between",
         background: "#D2E7F9", // Adjust the background color as needed
-        boxShadow: "0px 1px 5px lightgray",
+        boxShadow: "0px 1px 10px lightgray",
+        height: "60px",
+        zIndex: 999,
       }}
     >
       <div style={{ display: "flex", alignItems: "center" }}>
         <div className="demo-logo" />
-        <div style={{ fontSize: 25, fontWeight: "bold", color: "#212529" }}>
+        <div style={{ fontSize: 20, fontWeight: "bold", color: "#212529" }}>
           {title}
         </div>
       </div>

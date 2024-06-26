@@ -1,7 +1,6 @@
 import React from "react";
 import { Menu, Dropdown, Button, Input, Select, Segmented } from "antd";
 import {
-  DeleteColumnOutlined,
   DeleteOutlined,
   DownOutlined,
   LineOutlined,
