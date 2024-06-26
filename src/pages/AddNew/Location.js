@@ -1,15 +1,9 @@
 import React, { useState } from "react";
 import SubNavbar from "../../Components/NavBars/SubNavbar";
-import {
-  DownOutlined,
-  EditOutlined,
-  PlusOutlined,
-  FilterOutlined,
-} from "@ant-design/icons";
-import { Button, Dropdown, Menu } from "antd";
-
+import { EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Input, Modal, Form } from "antd";
 import MapComponent from "../../Components/Location/MapComponent";
-import { Modal, Form, Input } from "antd"; // Import necessary components for form
+import AddLocation from "../../Components/Location/FlootButton";
 
 export default function Location() {
   const [isFormModalVisible, setIsFormModalVisible] = useState(false); // State for form visibility
@@ -53,23 +47,33 @@ export default function Location() {
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "flex-end", // Align buttons to the right
             position: "absolute",
             top: "1rem",
             right: "1rem",
-            zIndex: 100,
+            zIndex: 1000, // Increase z-index to ensure they are in front of the map
           }}
         >
           {/* Search bar */}
-          <input
-            type="text"
+          <Input
             placeholder="Search location..."
             onChange={handleSearchChange}
-            style={{ flex: 1, padding: "0.5rem", marginRight: "1rem" }}
+            style={{
+              padding: "0.5rem",
+              marginRight: "1rem",
+              width: "400px",
+              borderRadius: "8px",
+            }}
           />
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsFormModalVisible(true)}>
-            Add Location
-          </Button>
+          <AddLocation
+            style={{
+              backgroundColor: "#1890ff",
+              // borderColor: "#1890ff",
+              padding: "0.5rem 1rem",
+              // fontWeight: "bold",
+              // borderRadius: "8px",
+            }}
+          >
+          </AddLocation>
         </div>
         <MapComponent style={{ height: "100%" }} /> {/* Set height to 100% to fill remaining space */}
         {/* Form modal */}
@@ -79,18 +83,49 @@ export default function Location() {
           onCancel={() => setIsFormModalVisible(false)}
           footer={[
             <Button type="primary" onClick={handleFormSubmit}>
-              Add Location
+              Submit Location
             </Button>,
           ]}
         >
-          <Form layout="vertical">
-            <Form.Item label="Name">
-              <Input name="name" value={formData.name} onChange={handleFormInputChange} />
-            </Form.Item>
-            <Form.Item label="Address">
-              <Input name="address" value={formData.address} onChange={handleFormInputChange} />
-            </Form.Item>
-          </Form>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: '50px',
+              backgroundColor: '#f0f2f5',
+              borderRadius: '10px',
+              height: '350px',
+            }}
+          >
+            <div
+              style={{
+                width: '85%',
+                height: '330px',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                borderRadius: '10px',
+                padding: '10px',
+                backgroundColor: 'white',
+              }}
+            >
+              <Form layout="vertical">
+                <Form.Item label="Location Name">
+                  <Input
+                    name="name"
+                    value={formData.name}
+                    onChange={handleFormInputChange}
+                  />
+                </Form.Item>
+                <Form.Item label="Address">
+                  <Input
+                    name="address"
+                    value={formData.address}
+                    onChange={handleFormInputChange}
+                  />
+                </Form.Item>
+              </Form>
+            </div>
+          </div>
         </Modal>
       </div>
     </div>

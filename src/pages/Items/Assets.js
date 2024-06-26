@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import SubNavbar from "../../Components/NavBars/SubNavbar";
 import { PlusOutlined, HomeOutlined } from "@ant-design/icons";
-import { Button, Divider } from "antd";
-import AssetsTable from "../../Components/Items/AssetsTable";
+import { Button, Divider, message } from "antd";
+import AssetTable from "../../Components/Items/AssetsTable";
 import GridView from "../../Components/Items/GridView";
 import AssetSettings from "../../Components/Items/AssetSettings";
 import database from "../../axios/database";
@@ -14,24 +14,67 @@ export default function Assets() {
   const [search, setSearch] = useState("");
   const [searchError, setSearchError] = useState(false);
   const [searchBy, setSearchBy] = useState("");
+  const [editingKey, setEditingKey] = useState(""); // State to track editing asset
+  const [originalData, setOriginalData] = useState({}); // Store original data
 
-  const action = (key) => (
-    <div style={{ display: "flex" }}>
-      <Button type="primary" ghost>
-        Primary
-      </Button>
-      <Button type="primary" danger ghost onClick={() => deleteAsset(key)}>
-        Delete
-      </Button>
-    </div>
-  );
+  const updateAssetInDatabase = async (assetID, updatedData) => {
+    try {
+      const response = await database.put(`/assets/update/${assetID}`, updatedData, {
+        headers: {
+          'Content-Type': 'application/json', // Ensure Content-Type is set to JSON
+        },
+      });
+      return response.data; // Assume response contains success status
+    } catch (error) {
+      console.error("Error updating asset:", error);
+      return { success: false, error: error.message }; // Return error object
+    }
+  };
+
+  const saveEdit = async (assetID, updatedData) => {
+    try {
+      const response = await updateAssetInDatabase(assetID, updatedData);
+      
+      if (response.success) {
+        const updatedAssetsData = assetsData.map(asset => 
+          asset.assetID === assetID ? { ...asset, ...updatedData } : asset
+        );
+        setAssetsData(updatedAssetsData);
+        setEditingKey(""); // Reset editing state
+        message.success('Asset updated successfully');
+      } else {
+        console.error("Error saving edited asset:", response.error);
+        message.error('Error saving asset');
+      }
+    } catch (error) {
+      console.error("Error saving edited asset:", error);
+      message.error('Error saving asset');
+    }
+  };
+
+  const handleInputChange = (key, field, value) => {
+    const updatedAssetsData = [...assetsData];
+    const editedAssetIndex = updatedAssetsData.findIndex((asset) => asset.key === key);
+    updatedAssetsData[editedAssetIndex][field] = value;
+    setAssetsData(updatedAssetsData);
+  };
+
+  const cancelEdit = (key) => {
+    const updatedAssetsData = [...assetsData];
+    const editedAssetIndex = updatedAssetsData.findIndex((asset) => asset.key === key);
+    updatedAssetsData[editedAssetIndex] = originalData[key];
+    setAssetsData(updatedAssetsData);
+    setEditingKey(""); // Reset editing state
+  };
 
   const deleteAsset = async (key) => {
     try {
       await database.delete(`/assets/delete/${key}`);
       setAssetsData((prevData) => prevData.filter((item) => item.key !== key));
+      message.success('Asset deleted successfully');
     } catch (error) {
       console.error("Error deleting asset:", error);
+      message.error('Error deleting asset');
     }
   };
 
@@ -42,9 +85,7 @@ export default function Assets() {
       case "byName":
         return assets.sort((a, b) => a.assetName.localeCompare(b.assetName));
       case "byCategory":
-        return assets.sort((a, b) =>
-          a.categoryName.localeCompare(b.categoryName)
-        );
+        return assets.sort((a, b) => a.categoryName.localeCompare(b.categoryName));
       case "byPriceA":
         return assets.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
       case "byPriceD":
@@ -55,7 +96,7 @@ export default function Assets() {
   };
 
   useEffect(() => {
-    let fetchAssets = async () => {
+    const fetchAssets = async () => {
       try {
         let response;
         if (search !== "") {
@@ -74,17 +115,19 @@ export default function Assets() {
         } else {
           response = await database.get("/assets/read");
         }
-        setAssetsData(
-          response.data.map((asset) => ({
-            key: asset.assetID,
-            assetID: asset.assetID,
-            assetName: asset.assetName,
-            price: asset.price,
-            description: asset.description,
-            categoryName: asset.category.categoryName,
-            action: action(asset.assetID), // Pass the key to the action
-          }))
-        );
+        const assets = response.data.map((asset) => ({
+          key: asset.assetID,
+          assetID: asset.assetID,
+          assetName: asset.assetName,
+          price: asset.price,
+          description: asset.description,
+          categoryName: asset.category.categoryName,
+        }));
+        setAssetsData(assets);
+        setOriginalData(assets.reduce((acc, asset) => {
+          acc[asset.key] = { ...asset };
+          return acc;
+        }, {}));
       } catch (error) {
         console.error(error);
         setSearchError(true);
@@ -94,7 +137,6 @@ export default function Assets() {
   }, [search]);
 
   useEffect(() => {
-    console.log("Order:", order);
     setAssetsData((assets) => sortAssets([...assets], order));
   }, [order]);
 
@@ -135,19 +177,18 @@ export default function Assets() {
         addButtonPath="/addNew/assets"
       />
 
-      <AssetSettings
-        setOrder={setOrder}
-        assetsData={assetsData}
-        setSearch={setSearch}
-      />
-      {/* Icons Segmented Control */}
+      <AssetSettings setOrder={setOrder} assetsData={assetsData} setSearch={setSearch} />
       <Divider />
-      {/* Conditional rendering based on activeComponent state */}
       {activeComponent === "List" && (
-        <AssetsTable
+        <AssetTable
           assetsData={assetsData}
           setSearchBy={setSearchBy}
+          setEditingKey={setEditingKey}
+          saveEdit={saveEdit}
+          editingKey={editingKey}
+          handleInputChange={handleInputChange}
           deleteAsset={deleteAsset}
+          cancelEdit={cancelEdit}
         />
       )}
       {activeComponent === "Grid" && <GridView assets={assets} />}
