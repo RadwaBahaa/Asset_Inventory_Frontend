@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import ReactDOM from "react-dom";
 import {
   MapContainer,
   TileLayer,
@@ -7,15 +8,21 @@ import {
   useMap,
   GeoJSON,
 } from "react-leaflet";
+import L from "leaflet";
+import ResetViewButton from "../../Components/Location/ResetViewButton"; // Import the custom button component
+import "leaflet/dist/leaflet.css";
 
 const MapComponent = ({
   storesData,
   warehousesData,
   suppliersData,
-  selectedItem,
+  setSelectedItem,
+  selectedLocation,
+  serviceArea,
+  setServiceArea,
+  setSelectedLocation,
 }) => {
   const center = [40.71105853111035, -74.00752039016318];
-  // const [serviceArea, setServiceArea] = useState(null);
 
   const outerCircleOptions = {
     fillColor: "#006688",
@@ -77,45 +84,55 @@ const MapComponent = ({
 
   const MapZoomHandler = () => {
     const map = useMap();
-    let selectedData;
-
     useEffect(() => {
-      if (selectedItem) {
-        const [type, id] = selectedItem.split("-");
-
-        switch (type) {
-          case "store":
-            selectedData = storesData.find(
-              (store) => store.properties.storeID == id
-            );
-            break;
-          case "warehouse":
-            selectedData = warehousesData.find(
-              (warehouse) => warehouse.properties.warehouseID == id
-            );
-            break;
-          case "supplier":
-            selectedData = suppliersData.find(
-              (supplier) => supplier.properties.supplierID == id
-            );
-            break;
-          default:
-            selectedData = null;
-            console.log("Invalid item type");
-            return;
-        }
-
-        if (selectedData) {
-          const latLng = [
-            selectedData.geometry.coordinates[1],
-            selectedData.geometry.coordinates[0],
-          ];
-          map.flyTo(latLng, 15, { animate: true, duration: 1 });
-        }
+      if (serviceArea) {
+        const bounds = L.geoJSON(serviceArea).getBounds();
+        map.fitBounds(bounds, {
+          animate: true,
+          duration: 2, // Adjust the duration to make the animation smoother
+          padding: [20, 20], // Add some padding to make the fit more comfortable
+        });
+      } else if (selectedLocation) {
+        const latLng = [
+          selectedLocation.geometry.coordinates[1],
+          selectedLocation.geometry.coordinates[0],
+        ];
+        map.flyTo(latLng, 15, { animate: true, duration: 1 });
       } else {
         map.flyTo(center, 10, { animate: true, duration: 1 });
       }
-    }, [selectedItem, storesData, warehousesData, suppliersData]);
+    }, [serviceArea, selectedLocation]);
+    return null;
+  };
+  const AddResetViewButton = () => {
+    const map = useMap();
+
+    useEffect(() => {
+      const control = L.control({ position: "topleft" });
+
+      control.onAdd = () => {
+        const div = L.DomUtil.create("div", "reset-view-button");
+        ReactDOM.render(
+          <ResetViewButton
+            onClick={async () => {
+              await new Promise((resolve) => {
+                setSelectedItem(null);
+                setSelectedLocation(null);
+                setServiceArea(null);
+                resolve();
+              });
+              map.flyTo(center, 10, { animate: true, duration: 1 });
+            }}
+          />,
+          div
+        );
+        return div;
+      };
+      control.addTo(map);
+      return () => {
+        control.remove();
+      };
+    }, [selectedLocation, serviceArea]);
 
     return null;
   };
@@ -131,9 +148,7 @@ const MapComponent = ({
         attribution='&copy; <a href="http://services.arcgisonline.com">Arcgisonline</a> contributors'
       />
       <MapZoomHandler />
-      {/* {serviceArea && <GeoJSON data={serviceArea} />} */}
-
-      {/* Render CircleMarkers for stores, warehouses, and suppliers */}
+      <AddResetViewButton />
       {storesData &&
         storesData.map((store) => (
           <>
@@ -152,6 +167,11 @@ const MapComponent = ({
                 store.geometry.coordinates[0],
               ]}
               pathOptions={storeCircleOptions.inner}
+              eventHandlers={{
+                click: () => {
+                  setSelectedItem(`store-${store.properties.storeID}`);
+                },
+              }}
             >
               <Popup>
                 <strong>{store.properties.storeName}</strong> <br />
@@ -178,6 +198,13 @@ const MapComponent = ({
                 warehouse.geometry.coordinates[0],
               ]}
               pathOptions={warehouseCircleOptions.inner}
+              eventHandlers={{
+                click: () => {
+                  setSelectedItem(
+                    `warehouse-${warehouse.properties.warehouseID}`
+                  );
+                },
+              }}
             >
               <Popup>
                 <strong>{warehouse.properties.warehouseName}</strong> <br />
@@ -204,6 +231,11 @@ const MapComponent = ({
                 supplier.geometry.coordinates[0],
               ]}
               pathOptions={supplierCircleOptions.inner}
+              eventHandlers={{
+                click: () => {
+                  setSelectedItem(`supplier-${supplier.properties.supplierID}`);
+                },
+              }}
             >
               <Popup>
                 <strong>{supplier.properties.supplierName}</strong> <br />
@@ -212,6 +244,7 @@ const MapComponent = ({
             </CircleMarker>
           </>
         ))}
+      {serviceArea && <GeoJSON data={serviceArea} />}
     </MapContainer>
   );
 };

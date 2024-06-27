@@ -5,7 +5,9 @@ const Dashboard = React.lazy(() => import("../pages/Dashboard"));
 const ItemsAssets = React.lazy(() => import("../pages/Items/Assets"));
 
 const ItemsCategories = React.lazy(() => import("../pages/Items/Categories"));
-const Location = React.lazy(() => import("../pages/Location"));
+const Location = React.lazy(() =>
+  import("../pages/Location/Javascript/Location")
+);
 const TrackingStartProgress = React.lazy(() =>
   import("../pages/Tracking/StartProcess")
 );
@@ -30,11 +32,11 @@ const AlertPurchaseRequests = React.lazy(() =>
 
 function RouteConfige() {
   return (
-    <Suspense fallback={<h4 style={{margin:"2%" }}>Loading...</h4>}>
+    <Suspense fallback={<h4 style={{ margin: "2%" }}>Loading...</h4>}>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/items/assets" element={<ItemsAssets />} />
-        
+
         <Route path="/items/categories" element={<ItemsCategories />} />
         <Route path="/location" element={<Location />} />
         <Route

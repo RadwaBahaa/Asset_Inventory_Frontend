@@ -53,6 +53,7 @@ const LocationTable = ({
   };
 
   const onSelect = (key) => {
+    console.log(key.key);
     setSelectedItem(key.key);
   };
 
@@ -64,7 +65,6 @@ const LocationTable = ({
         selectedKeys={selectedItem}
         onOpenChange={onOpenChange}
         onClick={onSelect}
-        // onSelect={onSelect}
         items={items}
         style={{ border: "0.3px solid lightgray", borderRadius: "3%" }}
       />
