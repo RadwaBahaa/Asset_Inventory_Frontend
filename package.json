@@ -16,6 +16,7 @@
     "axios": "^1.7.2",
     "leaflet": "^1.9.4",
     "leaflet-routing-machine": "^3.2.12",
+    "moment": "^2.30.1",
     "openrouteservice-js": "^0.3.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
