@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import ReactDOM from "react-dom";
+import React, { useEffect, useState } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -9,26 +8,30 @@ import {
   GeoJSON,
 } from "react-leaflet";
 import L from "leaflet";
-import ResetViewButton from "../../Components/Location/ResetViewButton"; // Import the custom button component
+import { createRoot } from "react-dom/client";
+import ResetViewButton from "../../Components/Location/ResetViewButton";
 import "leaflet/dist/leaflet.css";
+import MapZoomHandler from "../../Components/Location/MapZoomHandler";
 
-const MapComponent = ({
-  storesData,
-  warehousesData,
-  suppliersData,
-  setSelectedItem,
-  selectedLocation,
-  serviceArea,
-  setServiceArea,
-  setSelectedLocation,
-}) => {
+const MapComponent = (props) => {
+  const {
+    locations,
+    setSelectedItem,
+    selectedLocation,
+    serviceArea,
+    setSelectedLocation,
+    serviedLocations,
+    setServiceArea,
+    setServiedLocations,
+  } = props;
   const center = [40.71105853111035, -74.00752039016318];
+  const [pointsVisible, setPointsVisible] = useState(true); // State to control points visibility
 
   const outerCircleOptions = {
     fillColor: "#006688",
     color: "#006688",
-    opacity: 0.3,
-    fillOpacity: 0.3,
+    opacity: 0.2,
+    fillOpacity: 0.2,
   };
   const innerCircleOptions = {
     fillColor: "#006688",
@@ -82,49 +85,21 @@ const MapComponent = ({
     },
   };
 
-  const MapZoomHandler = () => {
-    const map = useMap();
-    useEffect(() => {
-      if (serviceArea) {
-        const bounds = L.geoJSON(serviceArea).getBounds();
-        map.fitBounds(bounds, {
-          animate: true,
-          duration: 2, // Adjust the duration to make the animation smoother
-          padding: [20, 20], // Add some padding to make the fit more comfortable
-        });
-      } else if (selectedLocation) {
-        const latLng = [
-          selectedLocation.geometry.coordinates[1],
-          selectedLocation.geometry.coordinates[0],
-        ];
-        map.flyTo(latLng, 15, { animate: true, duration: 1 });
-      } else {
-        map.flyTo(center, 10, { animate: true, duration: 1 });
-      }
-    }, [serviceArea, selectedLocation]);
-    return null;
-  };
   const AddResetViewButton = () => {
     const map = useMap();
-
     useEffect(() => {
       const control = L.control({ position: "topleft" });
-
       control.onAdd = () => {
         const div = L.DomUtil.create("div", "reset-view-button");
-        ReactDOM.render(
+        const root = createRoot(div);
+        root.render(
           <ResetViewButton
-            onClick={async () => {
-              await new Promise((resolve) => {
-                setSelectedItem(null);
-                setSelectedLocation(null);
-                setServiceArea(null);
-                resolve();
-              });
-              map.flyTo(center, 10, { animate: true, duration: 1 });
+            onClick={() => {
+              setSelectedItem(null);
+              setSelectedLocation(null);
+              setServiedLocations(null);
             }}
-          />,
-          div
+          />
         );
         return div;
       };
@@ -132,10 +107,17 @@ const MapComponent = ({
       return () => {
         control.remove();
       };
-    }, [selectedLocation, serviceArea]);
-
-    return null;
+    }, []);
   };
+
+  if (
+    !locations ||
+    !locations.stores ||
+    !locations.warehouses ||
+    !locations.suppliers
+  ) {
+    return null; // or render a loading indicator
+  }
 
   return (
     <MapContainer
@@ -147,11 +129,59 @@ const MapComponent = ({
         url="http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
         attribution='&copy; <a href="http://services.arcgisonline.com">Arcgisonline</a> contributors'
       />
-      <MapZoomHandler />
+      <MapZoomHandler
+        serviceArea={serviceArea}
+        selectedLocation={selectedLocation}
+        center={center}
+        setPointsVisible={setPointsVisible}
+      />
       <AddResetViewButton />
-      {storesData &&
-        storesData.map((store) => (
-          <>
+      {serviceArea && selectedLocation && (
+        <GeoJSON
+          data={serviceArea}
+          pathOptions={() => {
+            if (selectedLocation && selectedLocation.properties) {
+              if (selectedLocation.properties.type === "supplier") {
+                return supplierCircleOptions.outer;
+              } else if (selectedLocation.properties.type === "warehouse") {
+                return warehouseCircleOptions.outer;
+              } else {
+                return storeCircleOptions.outer;
+              }
+            }
+            return {};
+          }}
+        />
+      )}
+      {serviedLocations &&
+        pointsVisible &&
+        serviedLocations.map((location) => (
+          <CircleMarker
+            key={
+              location.properties.storeID ||
+              location.properties.warehouseID ||
+              location.properties.supplierID
+            }
+            center={[
+              location.geometry.coordinates[1],
+              location.geometry.coordinates[0],
+            ]}
+            pathOptions={{
+              color:
+                selectedLocation &&
+                selectedLocation.properties.type === "supplier"
+                  ? "#7f1f4b"
+                  : "#436726",
+            }}
+          />
+        ))}
+      
+      {/* <MapClickHandler /> */}
+
+      {locations.stores &&
+        pointsVisible &&
+        locations.stores.map((store) => (
+          <React.Fragment key={store.properties.storeID}>
             <CircleMarker
               key={`${store.properties.storeID}-outer`}
               center={[
@@ -178,11 +208,12 @@ const MapComponent = ({
                 {store.properties.address}
               </Popup>
             </CircleMarker>
-          </>
+          </React.Fragment>
         ))}
-      {warehousesData &&
-        warehousesData.map((warehouse) => (
-          <>
+      {locations.warehouses &&
+        pointsVisible &&
+        locations.warehouses.map((warehouse) => (
+          <React.Fragment key={warehouse.properties.warehouseID}>
             <CircleMarker
               key={`${warehouse.properties.warehouseID}-outer`}
               center={[
@@ -211,11 +242,12 @@ const MapComponent = ({
                 {warehouse.properties.address}
               </Popup>
             </CircleMarker>
-          </>
+          </React.Fragment>
         ))}
-      {suppliersData &&
-        suppliersData.map((supplier) => (
-          <>
+      {locations.suppliers &&
+        pointsVisible &&
+        locations.suppliers.map((supplier) => (
+          <React.Fragment key={supplier.properties.supplierID}>
             <CircleMarker
               key={`${supplier.properties.supplierID}-outer`}
               center={[
@@ -242,9 +274,8 @@ const MapComponent = ({
                 {supplier.properties.address}
               </Popup>
             </CircleMarker>
-          </>
+          </React.Fragment>
         ))}
-      {serviceArea && <GeoJSON data={serviceArea} />}
     </MapContainer>
   );
 };

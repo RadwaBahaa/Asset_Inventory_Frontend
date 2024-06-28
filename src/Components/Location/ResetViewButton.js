@@ -27,8 +27,7 @@ const ResetViewButton = ({ onClick }) => {
       onMouseLeave={(e) =>
         (e.target.style.backgroundColor = buttonStyle.backgroundColor)
       }
-    >
-      
+    >    
       <FullscreenExitOutlined />
     </button>
   );
