@@ -16,21 +16,32 @@ import {
   message,
   Row,
   Col,
+  AutoComplete,
 } from "antd";
 import MapComponent from "../../Components/AddNew/AddLocation/MapComponent";
 import database from "../../axios/database";
+import { OpenStreetMapProvider } from "leaflet-geosearch";
+
+const provider = new OpenStreetMapProvider();
 
 export default function Location() {
-  const [isFormModalVisible, setIsFormModalVisible] = useState(false); // State for form visibility
-  const [drawnPoint, setDrawnPoint] = useState({}); // State for storing drawn points
-  const [selectedPointType, setSelectedPointType] = useState(""); // State for currently selected point
-  const [isDrawingEnabled, setIsDrawingEnabled] = useState(false); // State for enabling/disabling drawing
+  const [isFormModalVisible, setIsFormModalVisible] = useState(false);
+  const [drawnPoint, setDrawnPoint] = useState({});
+  const [selectedPointType, setSelectedPointType] = useState("");
+  const [isDrawingEnabled, setIsDrawingEnabled] = useState(false);
   const [submitedPoint, setSubmitedPoint] = useState({});
-  const [form] = Form.useForm(); // Create form instance
+  const [form] = Form.useForm();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [suggestions, setSuggestions] = useState([]); // State for autocomplete suggestions
 
-  const handleSearchChange = (event) => {
-    console.log("Search term:", event.target.value);
-    // Implement search logic here based on your map component's capabilities
+  const handleSearchChange = async (value) => {
+    setSearchTerm(value);
+    if (value) {
+      const results = await provider.search({ query: value });
+      setSuggestions(results.map((result) => ({ value: result.label })));
+    } else {
+      setSuggestions([]);
+    }
   };
 
   useEffect(() => {
@@ -50,8 +61,6 @@ export default function Location() {
 
   const handleFormSubmit = (value) => {
     const { name, address } = value;
-    console.log(name);
-    // Update the drawn point with form data
     const updatedPoint = {
       ...drawnPoint,
       properties: {
@@ -68,12 +77,11 @@ export default function Location() {
   const handleCancel = () => {
     setIsFormModalVisible(false);
     setSelectedPointType("");
-    setIsDrawingEnabled(false); // Disable drawing when modal is closed
+    setIsDrawingEnabled(false);
   };
 
   const handleDrawComplete = (coordinates) => {
     if (isDrawingEnabled) {
-      console.log(`Draw a point for ${coordinates}`);
       const point = {
         type: "Feature",
         geometry: { type: "Point", coordinates },
@@ -85,9 +93,8 @@ export default function Location() {
 
   const HandleStartDraw = (e) => {
     setSelectedPointType(e.key);
-    setIsDrawingEnabled(true); // Enable drawing when a point type is selected
+    setIsDrawingEnabled(true);
     message.info(`Draw a point for ${e.key}`);
-    console.log(e.key);
   };
 
   const menu = (
@@ -126,13 +133,14 @@ export default function Location() {
             zIndex: 1000,
           }}
         >
-          <Input
-            placeholder="Search location..."
+          <AutoComplete
+            options={suggestions}
+            placeholder="Search for location..."
             style={{
-              padding: "0.5rem",
-              marginRight: "1rem",
               width: "400px",
               borderRadius: "8px",
+              border: "1px solid #ccc",
+              marginRight: "1rem",
             }}
             onChange={handleSearchChange}
           />
@@ -159,6 +167,7 @@ export default function Location() {
         <MapComponent
           onDrawComplete={handleDrawComplete}
           isDrawingEnabled={isDrawingEnabled}
+          searchTerm={searchTerm}
         />
         {selectedPointType && (
           <Modal
