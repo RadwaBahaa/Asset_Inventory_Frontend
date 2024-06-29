@@ -124,94 +124,91 @@ export default function Assets() {
         } else {
           response = await database.get("/assets/read");
         }
-        const assets = response.data.map((asset) => ({
+      } else {
+        response = await database.get("/assets/read");
+      }
+      setAssetsData(
+        response.data.map((asset) => ({
           key: asset.assetID,
           assetID: asset.assetID,
           assetName: asset.assetName,
           price: asset.price,
           description: asset.description,
           categoryName: asset.category.categoryName,
-        }));
-        setAssetsData(assets);
-        setOriginalData(
-          assets.reduce((acc, asset) => {
-            acc[asset.key] = { ...asset };
-            return acc;
-          }, {})
-        );
-      }
+          action: action,
+        }))
+      );
     } catch (error) {
       console.error(error);
-      setSearchError(true);
+      setAssetsData([]);
     }
-
-    useEffect(() => {
-      fetchAssets();
-    }, [search]);
-
-    useEffect(() => {
-      setAssetsData((assets) => sortAssets([...assets], order));
-    }, [order]);
-
-    const handleDelete = async () => {
-      try {
-        await Promise.all(
-          selectedRowKeys.map(async (assetID) => {
-            await database.delete(`/assets/delete/${assetID}`);
-          })
-        );
-        setSelectedRowKeys([]);
-        fetchAssets();
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    return (
-      <div>
-        <SubNavbar
-          title="Assets"
-          editButtonLabel={
-            <>
-              <HomeOutlined />
-              <span style={{ marginLeft: "8px" }}>To Home Page</span>
-            </>
-          }
-          editButtonPath="/"
-          addButtonLabel={
-            <>
-              <PlusOutlined />
-              <span style={{ marginLeft: "8px" }}>Add Asset</span>
-            </>
-          }
-          addButtonPath="/addNew/assets"
-        />
-
-        <AssetSettings
-          setOrder={setOrder}
-          setSearch={setSearch}
-          setSearchBy={setSearchBy}
-          setActiveComponent={setActiveComponent}
-          selectedRowKeys={selectedRowKeys}
-          handleDelete={handleDelete}
-          assetsData={assetsData}
-        />
-        {/* Icons Segmented Control */}
-        <Divider />
-        {/* Conditional rendering based on activeComponent state */}
-        <AssetTable
-          selectedRowKeys={selectedRowKeys}
-          setSelectedRowKeys={setSelectedRowKeys}
-          assetsData={assetsData}
-          setSearchBy={setSearchBy}
-          setEditingKey={setEditingKey}
-          saveEdit={saveEdit}
-          editingKey={editingKey}
-          handleInputChange={handleInputChange}
-          deleteAsset={deleteAsset}
-          cancelEdit={cancelEdit}
-        />
-      </div>
-    );
   };
+
+  useEffect(() => {
+    fetchAssets();
+  }, [search]);
+
+  useEffect(() => {
+    setAssetsData((assets) => sortAssets([...assets], order));
+  }, [order]);
+
+  const handleDelete = async () => {
+    try {
+      await Promise.all(
+        selectedRowKeys.map(async (assetID) => {
+          await database.delete(`/assets/delete/${assetID}`);
+        })
+      );
+      setSelectedRowKeys([]);
+      fetchAssets();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <div>
+      <SubNavbar
+        title="Assets"
+        editButtonLabel={
+          <>
+            <HomeOutlined />
+            <span style={{ marginLeft: "8px" }}>To Home Page</span>
+          </>
+        }
+        editButtonPath="/"
+        addButtonLabel={
+          <>
+            <PlusOutlined />
+            <span style={{ marginLeft: "8px" }}>Add Asset</span>
+          </>
+        }
+        addButtonPath="/addNew/assets"
+      />
+      <AssetSettings
+        setOrder={setOrder}
+        setSearch={setSearch}
+        setSearchBy={setSearchBy}
+        setActiveComponent={setActiveComponent}
+        selectedRowKeys={selectedRowKeys}
+        handleDelete={handleDelete}
+        assetsData={assetsData}
+      />
+      {/* Icons Segmented Control */}
+      <Divider />
+      {/* Conditional rendering based on activeComponent state */}
+      <AssetTable
+        selectedRowKeys={selectedRowKeys}
+        setSelectedRowKeys={setSelectedRowKeys}
+        assetsData={assetsData}
+        setSearchBy={setSearchBy}
+        setEditingKey={setEditingKey}
+        saveEdit={saveEdit}
+        editingKey={editingKey}
+        handleInputChange={handleInputChange}
+        deleteAsset={deleteAsset}
+        cancelEdit={cancelEdit}
+      />
+    </div>
+  );
 }
