@@ -3,7 +3,6 @@ import SubNavbar from "../../Components/NavBars/SubNavbar";
 import { PlusOutlined, HomeOutlined } from "@ant-design/icons";
 import { Button, Divider, message } from "antd";
 import AssetTable from "../../Components/Items/AssetsTable";
-import GridView from "../../Components/Items/GridView";
 import AssetSettings from "../../Components/Items/AssetSettings";
 
 import database from "../../axios/database";
@@ -16,6 +15,18 @@ export default function Assets() {
   const [searchBy, setSearchBy] = useState("");
   const [editingKey, setEditingKey] = useState(""); // State to track editing asset
   const [originalData, setOriginalData] = useState({}); // Store original data
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
+  const action = (
+    <div style={{ display: "flex", gap: "5%" }}>
+      <Button type="primary" ghost>
+        Edit
+      </Button>
+      <Button type="primary" danger ghost>
+        Delete
+      </Button>
+    </div>
+  );
 
   const updateAssetInDatabase = async (assetID, updatedData) => {
     try {
