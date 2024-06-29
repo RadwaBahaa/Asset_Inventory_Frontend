@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Divider, Table, Button, InputNumber, Space } from 'antd';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 
-const ProcessTable = ({ processData, onDelete, onSave }) => {
+const ReceiverTable = ({ processData, onDelete, onSave }) => {
   const [editingKey, setEditingKey] = useState('');
   const [editedAssets, setEditedAssets] = useState({});
+  const [isStartProcessDisabled, setIsStartProcessDisabled] = useState(true);
+
+  useEffect(() => {
+    // Check if there is any data in processData to enable/disable the Start Process button
+    setIsStartProcessDisabled(processData.length === 0);
+  }, [processData]);
 
   const isEditing = (record) => record.key === editingKey;
 
@@ -35,12 +42,12 @@ const ProcessTable = ({ processData, onDelete, onSave }) => {
     const newData = processData.map((item) =>
       item.key === record.key
         ? {
-            ...item,
-            assets: item.assets.map((asset) => ({
-              ...asset,
-              quantity: editedAssets[asset.key] !== undefined ? editedAssets[asset.key] : asset.quantity,
-            })),
-          }
+          ...item,
+          assets: item.assets.map((asset) => ({
+            ...asset,
+            quantity: editedAssets[asset.key] !== undefined ? editedAssets[asset.key] : asset.quantity,
+          })),
+        }
         : item
     );
 
@@ -116,8 +123,13 @@ const ProcessTable = ({ processData, onDelete, onSave }) => {
     },
   ];
 
+  const tableContainerStyle = {
+    maxHeight: '400px', // Adjust the max height as needed
+    overflowY: 'auto', // Enable vertical scrolling
+  };
+
   return (
-    <div>
+    <div style={tableContainerStyle}>
       <Divider />
       <h3 style={{ textAlign: 'center', marginBottom: '16px' }}>Process Table</h3>
       <Table
@@ -125,8 +137,14 @@ const ProcessTable = ({ processData, onDelete, onSave }) => {
         dataSource={processData}
         pagination={false}
       />
+      <div style={{ textAlign: 'center', marginTop: '16px' }}>
+        <Link to="/tracking/viewTracking">
+          <Button type="primary" disabled={isStartProcessDisabled}>Start Process</Button>
+        </Link>
+      </div>
+      <br />
     </div>
   );
 };
 
-export default ProcessTable;
+export default ReceiverTable;

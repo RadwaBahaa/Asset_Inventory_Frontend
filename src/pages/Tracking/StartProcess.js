@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import TrackingSubNavbar from '../../Components/NavBars/TrackingSubNavBar';
-import { EyeOutlined } from '@ant-design/icons';
-import { Row, Col, Button } from 'antd';
-import WarehouseTable from '../../Components/Tracking/WarehousesTable';
-import AssetsTable from '../../Components/Tracking/AssetsTable';
-import ProcessTable from '../../Components/Tracking/ProcessTable';
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import { Grid, Paper } from "@mui/material";
+import { EyeOutlined, BarsOutlined, AppstoreOutlined } from '@ant-design/icons';
+import { Row, Col, Button, Segmented, Dropdown, Menu } from 'antd';
+import AssetsTable from '../../Components/Tracking/StartProcess/AssetsTable';
+import ReceiverTable from '../../Components/Tracking/StartProcess/ReceiverTable'; // Import ReceiverTable
+import ReceiverMap from '../../Components/Tracking/StartProcess/ReceiverMap';
+import ProcessSettings from '../../Components/Tracking/StartProcess/ProcessSettings';
 
 export default function StartProcess() {
   const [selectedWarehouse, setSelectedWarehouse] = useState(null);
@@ -16,11 +15,11 @@ export default function StartProcess() {
   const [assetsActivated, setAssetsActivated] = useState(false);
   const [processData, setProcessData] = useState([]);
   const [previouslySelectedAssets, setPreviouslySelectedAssets] = useState([]);
+  const [viewType, setViewType] = useState("List"); // State to manage view type (List or Grid)
 
   useEffect(() => {
     if (selectedWarehouse) {
-      setIsDoneButtonDisabled(false);
-      setAssetsActivated(false);
+      setAssetsActivated(true);
       // Check if previously selected assets exist and update current selection
       if (previouslySelectedAssets.length > 0) {
         setSelectAssets(previouslySelectedAssets);
@@ -34,18 +33,11 @@ export default function StartProcess() {
     }
   }, [selectAssets]);
 
-  const handleActivateAssets = () => {
-    setAssetsActivated(true);
-  };
+  // const handleActivateAssets = () => {
+  //   setAssetsActivated(true);
+  // };
 
-  const handleStartProcess = () => {
-    const newProcessEntry = {
-      key: selectedWarehouse.key,
-      WarehouseName: selectedWarehouse.name,
-      assets: selectAssets,
-    };
-    setProcessData((prevData) => [...prevData, newProcessEntry]);
-  };
+
 
   const handleDeleteProcess = (key) => {
     setProcessData((prevData) => prevData.filter(item => item.key !== key));
@@ -55,39 +47,27 @@ export default function StartProcess() {
     setProcessData(newData);
   };
 
+  const handleSegmentedChange = (value) => {
+    setViewType(value);
+    // Handle view change logic if needed
+  };
+
   const pageStyle = {
     display: 'flex',
     flexDirection: 'column',
     minHeight: '100vh',
+    overflowY: 'auto', // Enable vertical scrolling if needed
   };
 
   const contentStyle = {
     flex: 1,
-    overflowY: 'auto',
+    overflowY: 'auto', // Enable vertical scrolling if needed
     padding: '16px',
-  };
-
-  const buttonContainerStyle = {
-    paddingTop: '15px',
-    textAlign: 'right',
   };
 
   const headerStyle = {
     marginBottom: '16px',
     textAlign: 'center',
-  };
-
-  const footerStyle = {
-    background: '#f1f1f1',
-    padding: '16px',
-    textAlign: 'center',
-    zIndex: 1,
-    position: 'relative',
-  };
-
-  const mapContainerStyle = {
-    position: 'relative',
-    zIndex: 0,
   };
 
   return (
@@ -103,54 +83,33 @@ export default function StartProcess() {
         addButtonPath="/tracking/viewTracking"
       />
       <div style={contentStyle}>
-        <Row gutter={[16, 16]}>
-          <Col span={12}>
-            <div>
-              <h2 style={headerStyle}>Warehouse Table</h2>
-              <WarehouseTable style={{ background: '#f9f9f9' }} setSelectedWarehouse={setSelectedWarehouse} />
-              <div style={buttonContainerStyle}>
-                <Button type="primary" onClick={handleActivateAssets} disabled={isDoneButtonDisabled}>
-                  Done
-                </Button>
-              </div>
-            </div>
-          </Col>
-          <Col span={12}>
-            <div>
-              <h2 style={headerStyle}>Assets Table</h2>
-              <div style={{ opacity: assetsActivated ? 1 : 0.5, pointerEvents: assetsActivated ? 'auto' : 'none' }}>
+
+        {/* Grid Layout for Assets Table and Map Container */}
+        <Row gutter={16}>
+          {/* Assets Table */}
+          <Col span={13}>
+            <ProcessSettings setSelectedWarehouse={setSelectedWarehouse} />
+            <div style={{ height: '85%', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ opacity: assetsActivated ? 1 : 0.5, pointerEvents: assetsActivated ? 'auto' : 'none', flex: 1 }}>
                 <AssetsTable setSelectAssets={(newAssets) => {
                   setSelectAssets(newAssets);
                   setPreviouslySelectedAssets(newAssets); // Update previouslySelectedAssets on selection change
-                }} />
+                }} startProcessDisabled={startProcessDisabled} selectedWarehouse={selectedWarehouse} selectAssets={selectAssets}
+                  setProcessData={setProcessData} setSelectedWarehouse={setSelectedWarehouse} />
+
               </div>
             </div>
-            <div style={buttonContainerStyle}>
-              <Button type="primary" onClick={handleStartProcess} disabled={startProcessDisabled}>Start Process</Button>
-            </div>
+          </Col>
+
+          {/* Map Container */}
+          <Col span={11}>
+            <ReceiverMap />
           </Col>
         </Row>
-        <Grid item xs={12} style={{ marginTop: '16px' }}>
-          <Paper sx={{ padding: 2, height: "400px", ...mapContainerStyle }}>
-            <MapContainer
-              center={[51.505, -0.09]}
-              zoom={13}
-              style={{ height: "100%", width: "100%" }}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              <Marker position={[51.505, -0.09]}>
-                <Popup>
-                  A pretty CSS3 popup. <br /> Easily customizable.
-                </Popup>
-              </Marker>
-            </MapContainer>
-          </Paper>
-        </Grid>
+
+        {/* Process Table */}
         <div style={{ marginTop: '16px' }}>
-          <ProcessTable processData={processData} onDelete={handleDeleteProcess} onSave={handleSaveProcess} />
+          <ReceiverTable processData={processData} onDelete={handleDeleteProcess} onSave={handleSaveProcess} />
         </div>
       </div>
     </div>

@@ -16,7 +16,7 @@ const data = [
   { key: "4", name: "Warehouse D" },
 ];
 
-const StartProgress = (props) => {
+const WarehouseTable = (props) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const { setSelectedWarehouse } = props;
 
@@ -48,4 +48,4 @@ const StartProgress = (props) => {
   );
 };
 
-export default StartProgress;
+export default WarehouseTable;
