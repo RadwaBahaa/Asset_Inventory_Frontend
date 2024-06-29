@@ -1,13 +1,11 @@
 import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-
+// const Login = React.lazy(()=> import("../pages/HomePage/Javascript/Login"))
 const Dashboard = React.lazy(() => import("../pages/Dashboard"));
 const ItemsAssets = React.lazy(() => import("../pages/Items/Assets"));
 
 const ItemsCategories = React.lazy(() => import("../pages/Items/Categories"));
-const Location = React.lazy(() =>
-  import("../pages/Location/Javascript/Location")
-);
+const Location = React.lazy(() => import("../pages/Location/Javascript/Location"));
 const TrackingStartProgress = React.lazy(() =>
   import("../pages/Tracking/StartProcess")
 );
@@ -21,6 +19,7 @@ const AddNewAssets = React.lazy(() => import("../pages/AddNew/Assets"));
 const AddNewCategories = React.lazy(() => import("../pages/AddNew/Categories"));
 const AddNewRequests = React.lazy(() => import("../pages/AddNew/Requests"));
 const AddNewLocation = React.lazy(() => import("../pages/AddNew/Location"));
+// const AddingSuccessfully = React.lazy(() => import("../pages/AddNew/AddingSuccessfully"))
 
 const UserViewProfile = React.lazy(() => import("../pages/User/ViewProfile"));
 const AddNewSettings = React.lazy(() => import("../pages/User/Settings"));
@@ -30,10 +29,12 @@ const AlertPurchaseRequests = React.lazy(() =>
   import("../pages/Alert/PurchaseRequests")
 );
 
+
 function RouteConfige() {
   return (
-    <Suspense fallback={<h4 style={{ margin: "2%" }}>Loading...</h4>}>
+    <Suspense fallback={<h4>Loading...</h4>}>
       <Routes>
+        {/* <Route path="/login" element={<Login/>}/> */}
         <Route path="/" element={<Dashboard />} />
         <Route path="/items/assets" element={<ItemsAssets />} />
 
@@ -54,6 +55,7 @@ function RouteConfige() {
         <Route path="/addNew/categories" element={<AddNewCategories />} />
         <Route path="/addNew/requests" element={<AddNewRequests />} />
         <Route path="/addNew/location" element={<AddNewLocation />} />
+        {/* <Route path="/addNew/addingSuccessfully" element={<AddingSuccessfully />} /> */}
 
         <Route path="/user/viewprofile" element={<UserViewProfile />} />
         <Route path="/user/settings" element={<AddNewSettings />} />
