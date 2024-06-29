@@ -1,6 +1,6 @@
 import React from "react";
-import { Layout, Menu, theme } from "antd";
-import { Link } from "react-router-dom";
+import { Layout, Menu } from "antd";
+import { Link, useLocation } from "react-router-dom";
 import {
   ShoppingCartOutlined,
   FileDoneOutlined,
@@ -14,64 +14,80 @@ import "../CSS/SideNavBar.css";
 const { Sider } = Layout;
 
 const items = [
-  // Define menu items with keys, icons, labels, and optional children for submenus.
   {
-    key: "Dashboard",
+    key: "/",
     icon: <AreaChartOutlined />,
     label: <Link to="/">Dashboard</Link>,
   },
   {
-    key: "Items",
+    key: "items",
     icon: <ShoppingCartOutlined />,
     label: "Items",
     children: [
-      { key: "Assets", label: <Link to="/items/assets">Assets</Link> },
+      { key: "/items/assets", label: <Link to="/items/assets">Assets</Link> },
       {
-        key: "Categories",
+        key: "/items/categories",
         label: <Link to="/items/categories">Categories</Link>,
       },
     ],
   },
   {
-    key: "Location",
+    key: "/location",
     icon: <PushpinOutlined />,
     label: <Link to="/location">Location</Link>,
   },
   {
-    key: "Tracking",
+    key: "tracking",
     icon: <NodeIndexOutlined />,
     label: "Tracking",
     children: [
       {
-        key: "Start progress",
+        key: "/tracking/startProcess",
         label: <Link to="/tracking/startProcess">Start process</Link>,
       },
       {
-        key: "View tracking",
+        key: "/tracking/viewTracking",
         label: <Link to="/tracking/viewTracking">View tracking</Link>,
       },
     ],
   },
   {
-    key: "Members",
+    key: "/members",
     icon: <TeamOutlined />,
     label: <Link to="/members">Members</Link>,
   },
   {
-    key: "Reports",
+    key: "/reports",
     icon: <FileDoneOutlined />,
     label: <Link to="/reports">Reports</Link>,
   },
 ];
 
 const SideNavbar = () => {
+  const location = useLocation();
+  const { pathname } = location;
+
+  // Function to find the default open keys
+  const getDefaultOpenKeys = (path) => {
+    const segments = path.split("/").filter(Boolean);
+    if (segments.length > 1) {
+      return [`/${segments[0]}/${segments[1]}`];
+    } else if (segments.length === 1) {
+      return [`/${segments[0]}`];
+    }
+    return [];
+  };
+
+  const defaultOpenKeys = getDefaultOpenKeys(pathname);
+
   return (
     <Sider className="sider">
       <Menu
         className="menu"
-        mode="inline" // Set menu mode to inline.
-        defaultSelectedKeys={["Dashboard"]} // Set default selected key.
-        items={items} // Use defined menu items.
+        mode="inline"
+        selectedKeys={[pathname]}
+        defaultOpenKeys={defaultOpenKeys} // Automatically open the parent menu of the current path
+        items={items}
       />
     </Sider>
   );

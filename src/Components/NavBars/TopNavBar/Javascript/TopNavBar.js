@@ -40,13 +40,13 @@ const TopNavBar = () => {
 
   // Determine which dropdown should be active based on the current path
   useEffect(() => {
-    const path = location.pathname.split("/")[2];
+    const path = location.pathname.split("/")[1];
     if (path) {
-      if (["assets", "categories", "requests", "location"].includes(path)) {
+      if (["addNew"].includes(path)) {
         setActiveDropdown("addNew");
-      } else if (["purchaserequests", "messages"].includes(path)) {
+      } else if (["alert"].includes(path)) {
         setActiveDropdown("alert");
-      } else if (["viewprofile", "settings"].includes(path)) {
+      } else if (["user"].includes(path)) {
         setActiveDropdown("user");
       } else {
         setActiveDropdown(""); // No active dropdown for other paths

@@ -21,7 +21,7 @@ export default function Categories() {
             To Category List
           </>
         }
-        addButtonPath={"/addNew/addingSuccessfully"}
+        addButtonPath={"/items/categories"}
       />
       <div style={{ padding: "20px" }}>
         <AddCategoryForm />
@@ -29,11 +29,3 @@ export default function Categories() {
     </div>
   );
 }
-    // database
-    //   .get("/assets/search", { params: { name: value } })
-    //   .then((response) => {
-    //     console.log(response.data);
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //   });

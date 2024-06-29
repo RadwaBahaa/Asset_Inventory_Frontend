@@ -1,101 +1,281 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   MapContainer,
   TileLayer,
   CircleMarker,
   Popup,
-  useMapEvents,
+  useMap,
   GeoJSON,
 } from "react-leaflet";
+import L from "leaflet";
+import { createRoot } from "react-dom/client";
+import ResetViewButton from "../../Components/Location/ResetViewButton";
 import "leaflet/dist/leaflet.css";
-import geoapifyAPI from "../../axios/geoapifyAPI";
-// import targomoAPI from "../../axios/targomoAPI";
+import MapZoomHandler from "../../Components/Location/MapZoomHandler";
 
-const MapComponent = () => {
-  const center = [39.8283, -98.5795]; // Initial center of the USA
-  const [selectedPosition, setSelectedPosition] = useState(center);
-  const [serviceArea, setServiceArea] = useState(null);
+const MapComponent = (props) => {
+  const {
+    locations,
+    setSelectedItem,
+    selectedLocation,
+    serviceArea,
+    setSelectedLocation,
+    serviedLocations,
+    setServiceArea,
+    setServiedLocations,
+  } = props;
+  const center = [40.71105853111035, -74.00752039016318];
+  const [pointsVisible, setPointsVisible] = useState(true); // State to control points visibility
 
-  const MapClickHandler = () => {
-    useMapEvents({
-      click(e) {
-        setServiceArea(null); // Clear previous service area
-        const newPosition = [e.latlng.lat, e.latlng.lng];
-        console.log("Map Clicked at:", newPosition);
-        setSelectedPosition(newPosition);
-
-        // Geoapify API
-        geoapifyAPI
-          .get("/isoline", {
-            params: {
-              lat: newPosition[0],
-              lon: newPosition[1],
-              type: "distance",
-              mode: "drive",
-              range: "100000",
-            },
-          })
-          .then((response) => {
-            console.log(response);
-            setServiceArea(response.data);
-          })
-          .catch((error) => {
-            console.error("Error fetching isoline data:", error);
-          });
-
-        //     // Targomo API
-        //     targomoAPI
-        //       .post("/polygon_post", {
-        //         sources: [
-        //           {
-        //             lat: newPosition[0],
-        //             lng: newPosition[1],
-        //             id: "id123",
-        //             tm: {
-        //               walk: {},
-        //             },
-        //           },
-        //         ],
-        //         polygon: {
-        //           serializer: "geojson",
-        //           srid: 4326,
-        //           values: [900],
-        //         },
-        //       })
-        //       .then((response) => {
-        //         console.log(response.data);
-        //         setServiceArea(response.data);
-        //       })
-        //       .catch((error) =>
-        //         console.error("Error fetching isoline data:", error)
-        //       );
-      },
-    });
-
-    return null;
+  const outerCircleOptions = {
+    fillColor: "#006688",
+    color: "#006688",
+    opacity: 0.2,
+    fillOpacity: 0.2,
   };
+  const innerCircleOptions = {
+    fillColor: "#006688",
+    color: "#006688",
+    opacity: 0.6,
+    fillOpacity: 0.6,
+  };
+
+  const supplierCircleOptions = {
+    outer: {
+      ...outerCircleOptions,
+      fillColor: "#3378cc",
+      color: "#3378cc",
+      radius: 20,
+    },
+    inner: {
+      ...innerCircleOptions,
+      fillColor: "#3378cc",
+      color: "#3378cc",
+      radius: 15,
+    },
+  };
+
+  const warehouseCircleOptions = {
+    outer: {
+      ...outerCircleOptions,
+      fillColor: "#CC3378",
+      color: "#CC3378",
+      radius: 14,
+    },
+    inner: {
+      ...innerCircleOptions,
+      fillColor: "#CC3378",
+      color: "#CC3378",
+      radius: 10,
+    },
+  };
+
+  const storeCircleOptions = {
+    outer: {
+      ...outerCircleOptions,
+      fillColor: "#78CC33",
+      color: "#78CC33",
+      radius: 10,
+    },
+    inner: {
+      ...innerCircleOptions,
+      fillColor: "#78CC33",
+      color: "#78CC33",
+      radius: 6,
+    },
+  };
+
+  const AddResetViewButton = () => {
+    const map = useMap();
+    useEffect(() => {
+      const control = L.control({ position: "topleft" });
+      control.onAdd = () => {
+        const div = L.DomUtil.create("div", "reset-view-button");
+        const root = createRoot(div);
+        root.render(
+          <ResetViewButton
+            onClick={() => {
+              setSelectedItem(null);
+              setSelectedLocation(null);
+              setServiedLocations(null);
+            }}
+          />
+        );
+        return div;
+      };
+      control.addTo(map);
+      return () => {
+        control.remove();
+      };
+    }, []);
+  };
+
+  if (
+    !locations ||
+    !locations.stores ||
+    !locations.warehouses ||
+    !locations.suppliers
+  ) {
+    return null; // or render a loading indicator
+  }
 
   return (
     <MapContainer
       center={center}
-      zoom={4}
+      zoom={10}
       style={{ height: "100%", width: "100%" }}
     >
       <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+        attribution='&copy; <a href="http://services.arcgisonline.com">Arcgisonline</a> contributors'
       />
-      <MapClickHandler />
-      {serviceArea && <GeoJSON data={serviceArea} />}
-      <CircleMarker
-        center={selectedPosition}
-        pathOptions={{ fillColor: "blue" }}
-        radius={10}
-      >
-        <Popup>
-          Selected location. <br /> Easily customizable.
-        </Popup>
-      </CircleMarker>
+      <MapZoomHandler
+        serviceArea={serviceArea}
+        selectedLocation={selectedLocation}
+        center={center}
+        setPointsVisible={setPointsVisible}
+      />
+      <AddResetViewButton />
+      {serviceArea && selectedLocation && (
+        <GeoJSON
+          data={serviceArea}
+          pathOptions={() => {
+            if (selectedLocation && selectedLocation.properties) {
+              if (selectedLocation.properties.type === "supplier") {
+                return supplierCircleOptions.outer;
+              } else if (selectedLocation.properties.type === "warehouse") {
+                return warehouseCircleOptions.outer;
+              } else {
+                return storeCircleOptions.outer;
+              }
+            }
+            return {};
+          }}
+        />
+      )}
+      {serviedLocations &&
+        pointsVisible &&
+        serviedLocations.map((location) => (
+          <CircleMarker
+            key={
+              location.properties.storeID ||
+              location.properties.warehouseID ||
+              location.properties.supplierID
+            }
+            center={[
+              location.geometry.coordinates[1],
+              location.geometry.coordinates[0],
+            ]}
+            pathOptions={{
+              color:
+                selectedLocation &&
+                selectedLocation.properties.type === "supplier"
+                  ? "#7f1f4b"
+                  : "#436726",
+            }}
+          />
+        ))}
+      
+      {/* <MapClickHandler /> */}
+
+      {locations.stores &&
+        pointsVisible &&
+        locations.stores.map((store) => (
+          <React.Fragment key={store.properties.storeID}>
+            <CircleMarker
+              key={`${store.properties.storeID}-outer`}
+              center={[
+                store.geometry.coordinates[1],
+                store.geometry.coordinates[0],
+              ]}
+              pathOptions={storeCircleOptions.outer}
+            />
+            <CircleMarker
+              key={store.properties.storeID}
+              center={[
+                store.geometry.coordinates[1],
+                store.geometry.coordinates[0],
+              ]}
+              pathOptions={storeCircleOptions.inner}
+              eventHandlers={{
+                click: () => {
+                  setSelectedItem(`store-${store.properties.storeID}`);
+                },
+              }}
+            >
+              <Popup>
+                <strong>{store.properties.storeName}</strong> <br />
+                {store.properties.address}
+              </Popup>
+            </CircleMarker>
+          </React.Fragment>
+        ))}
+      {locations.warehouses &&
+        pointsVisible &&
+        locations.warehouses.map((warehouse) => (
+          <React.Fragment key={warehouse.properties.warehouseID}>
+            <CircleMarker
+              key={`${warehouse.properties.warehouseID}-outer`}
+              center={[
+                warehouse.geometry.coordinates[1],
+                warehouse.geometry.coordinates[0],
+              ]}
+              pathOptions={warehouseCircleOptions.outer}
+            />
+            <CircleMarker
+              key={warehouse.properties.warehouseID}
+              center={[
+                warehouse.geometry.coordinates[1],
+                warehouse.geometry.coordinates[0],
+              ]}
+              pathOptions={warehouseCircleOptions.inner}
+              eventHandlers={{
+                click: () => {
+                  setSelectedItem(
+                    `warehouse-${warehouse.properties.warehouseID}`
+                  );
+                },
+              }}
+            >
+              <Popup>
+                <strong>{warehouse.properties.warehouseName}</strong> <br />
+                {warehouse.properties.address}
+              </Popup>
+            </CircleMarker>
+          </React.Fragment>
+        ))}
+      {locations.suppliers &&
+        pointsVisible &&
+        locations.suppliers.map((supplier) => (
+          <React.Fragment key={supplier.properties.supplierID}>
+            <CircleMarker
+              key={`${supplier.properties.supplierID}-outer`}
+              center={[
+                supplier.geometry.coordinates[1],
+                supplier.geometry.coordinates[0],
+              ]}
+              pathOptions={supplierCircleOptions.outer}
+            />
+            <CircleMarker
+              key={supplier.properties.supplierID}
+              center={[
+                supplier.geometry.coordinates[1],
+                supplier.geometry.coordinates[0],
+              ]}
+              pathOptions={supplierCircleOptions.inner}
+              eventHandlers={{
+                click: () => {
+                  setSelectedItem(`supplier-${supplier.properties.supplierID}`);
+                },
+              }}
+            >
+              <Popup>
+                <strong>{supplier.properties.supplierName}</strong> <br />
+                {supplier.properties.address}
+              </Popup>
+            </CircleMarker>
+          </React.Fragment>
+        ))}
     </MapContainer>
   );
 };
