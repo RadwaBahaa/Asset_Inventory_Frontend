@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import TrackingSubNavbar from '../../Components/NavBars/TrackingSubNavBar';
 import { DownOutlined, PlusOutlined, PrinterOutlined, FilterOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu } from 'antd';
-import StepsComponent from "../../Components/Tracking/StepsComponent";
+import StepsComponent from "../../Components/Tracking/ViewTracking/StepsComponent";
 // import AssetsSearchBar from '../../Components/Items/AssetsSearchBar';
 
 export default function ViewTracking() {
@@ -26,7 +26,7 @@ export default function ViewTracking() {
   const handleSegmentedChange = (value) => {
     setActiveComponent(value);
   };
-  
+
   const handleFilterMenuClick = (e) => {
     console.log('Clicked on filter:', e.key);
     // Handle filtering logic based on selected option (e.g., by Category, by Price)
