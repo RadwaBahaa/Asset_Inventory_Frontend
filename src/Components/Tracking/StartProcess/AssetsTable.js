@@ -36,7 +36,7 @@ const initialData = [
   },
 ];
 
-const AssetsTable = ({ setSelectAssets, deleteAsset, startProcessDisabled, selectedWarehouse, selectAssets, setProcessData }) => {
+const AssetsTable = ({ setSelectAssets, deleteAsset, startProcessDisabled, selectedWarehouse, selectAssets, setProcessData, setSelectedWarehouse }) => {
   const [data, setData] = useState(initialData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -70,11 +70,12 @@ const AssetsTable = ({ setSelectAssets, deleteAsset, startProcessDisabled, selec
 
   const handleStartProcess = () => {
     const newProcessEntry = {
-      key: selectedWarehouse.key,
-      WarehouseName: selectedWarehouse.name,
+      // key: selectedWarehouse,
+      WarehouseName: selectedWarehouse,
       assets: selectAssets,
     };
     setProcessData((prevData) => [...prevData, newProcessEntry]);
+    setSelectedWarehouse(null);
   };
 
   const handleDelete = (key) => {

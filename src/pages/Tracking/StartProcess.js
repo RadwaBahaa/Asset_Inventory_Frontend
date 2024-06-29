@@ -19,8 +19,7 @@ export default function StartProcess() {
 
   useEffect(() => {
     if (selectedWarehouse) {
-      setIsDoneButtonDisabled(false);
-      setAssetsActivated(false);
+      setAssetsActivated(true);
       // Check if previously selected assets exist and update current selection
       if (previouslySelectedAssets.length > 0) {
         setSelectAssets(previouslySelectedAssets);
@@ -34,9 +33,9 @@ export default function StartProcess() {
     }
   }, [selectAssets]);
 
-  const handleActivateAssets = () => {
-    setAssetsActivated(true);
-  };
+  // const handleActivateAssets = () => {
+  //   setAssetsActivated(true);
+  // };
 
 
 
@@ -89,14 +88,14 @@ export default function StartProcess() {
         <Row gutter={16}>
           {/* Assets Table */}
           <Col span={13}>
-            <ProcessSettings />
+            <ProcessSettings setSelectedWarehouse={setSelectedWarehouse} />
             <div style={{ height: '85%', display: 'flex', flexDirection: 'column' }}>
-              {/* <h2 style={headerStyle}>Assets Table</h2> */}
               <div style={{ opacity: assetsActivated ? 1 : 0.5, pointerEvents: assetsActivated ? 'auto' : 'none', flex: 1 }}>
                 <AssetsTable setSelectAssets={(newAssets) => {
                   setSelectAssets(newAssets);
                   setPreviouslySelectedAssets(newAssets); // Update previouslySelectedAssets on selection change
-                }} startProcessDisabled={startProcessDisabled} selectedWarehouse={selectedWarehouse} selectAssets={selectAssets} setProcessData={setProcessData} />
+                }} startProcessDisabled={startProcessDisabled} selectedWarehouse={selectedWarehouse} selectAssets={selectAssets}
+                  setProcessData={setProcessData} setSelectedWarehouse={setSelectedWarehouse} />
 
               </div>
             </div>
