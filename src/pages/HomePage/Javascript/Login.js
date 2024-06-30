@@ -26,11 +26,12 @@ const Login = ({ setIsAuthenticated }) => {
             boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
             backgroundColor: "white",
             width: "90%",
-            maxWidth: "1100px", // Adjusted max width for the entire card
-            overflow: "hidden"
+            maxWidth: "1100px",
+            overflow: "hidden",
+            minHeight: "70vh" // Added to increase the height of the card
           }}
         >
-          <Col span={12} style={{ padding: "5%" }}> {/* Use percentage padding */}
+          <Col span={12} style={{ padding: "5%", display: "flex", flexDirection: "column", justifyContent: "center" }}>
             <Form
               name="normal_login"
               className="login-form"
@@ -38,11 +39,11 @@ const Login = ({ setIsAuthenticated }) => {
               onFinish={onFinish}
               style={{ width: "100%" }}
             >
-              <h2 style={{ textAlign: "center", color: "#101251", marginBottom: "4%" }}>SIGN <span style={{ color: "#1890ff" }}>IN</span></h2>
+              <h1 style={{ textAlign: "center", color: "#101251", marginBottom: "24px", fontSize: "2.1rem" }}>SIGN <span style={{ color: "#1890ff" }}>IN</span></h1>
               <Form.Item
                 name="username"
                 rules={[{ required: true, message: "Please input your Username!" }]}
-                style={{ marginBottom: "2%" }}
+                style={{ marginBottom: "24px" }}
               >
                 <Input
                   size="large"
@@ -53,7 +54,7 @@ const Login = ({ setIsAuthenticated }) => {
               <Form.Item
                 name="password"
                 rules={[{ required: true, message: "Please input your Password!" }]}
-                style={{ marginBottom: "4%" }}
+                style={{ marginBottom: "24px" }}
               >
                 <Input
                   size="large"
@@ -62,20 +63,31 @@ const Login = ({ setIsAuthenticated }) => {
                   placeholder="Password"
                 />
               </Form.Item>
-              <Form.Item style={{ marginBottom: "4%" }}>
+              <Form.Item style={{ marginBottom: "24px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <Checkbox>Stay signed in</Checkbox>
                   <a className="login-form-forgot" href="">Forgot Password?</a>
                 </div>
               </Form.Item>
-              <Form.Item style={{ marginBottom: "4%" }}>
+              <Form.Item style={{ marginBottom: "24px" }}>
                 <div style={{ display: "flex", justifyContent: "center" }}>
                   <Button
-                    style={{ width: "100%", maxWidth: "200px", backgroundColor: "#1890ff", borderColor: "#1890ff" }}
+                    style={{
+                      width: "100%",
+                      maxWidth: "200px",
+                      backgroundColor: "#1890ff",
+                      borderColor: "#1890ff",
+                      backgroundImage: "linear-gradient(45deg, #1890ff, #40a9ff)",
+                      borderRadius: "20px", // Increased border radius for a more curved button
+                      fontWeight: "bold",
+                      transition: "background-image 0.3s ease",
+                    }}
                     size="large"
                     type="primary"
                     htmlType="submit"
                     className="login-form-button"
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundImage = "linear-gradient(45deg, #40a9ff, #1890ff)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundImage = "linear-gradient(45deg, #1890ff, #40a9ff)")}
                   >
                     Login
                   </Button>
@@ -83,7 +95,7 @@ const Login = ({ setIsAuthenticated }) => {
               </Form.Item>
             </Form>
           </Col>
-          <Col span={12} style={{ padding: "0" }}> {/* Adjusted width */}
+          <Col span={12} style={{ padding: "0" }}>
             <video
               autoPlay
               loop
