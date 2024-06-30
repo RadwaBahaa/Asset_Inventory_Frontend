@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Table, InputNumber, Button, message, Pagination } from "antd";
+import { Table, InputNumber, Button, message, Pagination, Tooltip } from "antd";
+import { ReloadOutlined } from "@ant-design/icons";
 
 const initialData = [
   {
@@ -36,7 +37,7 @@ const initialData = [
   },
 ];
 
-const AssetsTable = ({ setSelectAssets, deleteAsset, startProcessDisabled, selectedWarehouse, selectAssets, setProcessData, setSelectedWarehouse }) => {
+const AssetsTable = ({ setSelectAssets, startProcessDisabled, selectedWarehouse, selectAssets, setProcessData, setSelectedWarehouse }) => {
   const [data, setData] = useState(initialData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -70,7 +71,6 @@ const AssetsTable = ({ setSelectAssets, deleteAsset, startProcessDisabled, selec
 
   const handleStartProcess = () => {
     const newProcessEntry = {
-      // key: selectedWarehouse,
       WarehouseName: selectedWarehouse,
       assets: selectAssets,
     };
@@ -78,9 +78,19 @@ const AssetsTable = ({ setSelectAssets, deleteAsset, startProcessDisabled, selec
     setSelectedWarehouse(null);
   };
 
-  const handleDelete = (key) => {
-    deleteAsset(key);
-    setData(data.filter((item) => item.key !== key));
+  const handleReset = (key) => {
+    const newData = data.map((item) => {
+      if (item.key === key) {
+        return { ...item, quantity: 0, availableQuantity: item.initialAvailableQuantity };
+      }
+      return item;
+    });
+    setData(newData);
+
+    // Remove the item from selectedRowKeys if it was selected
+    setSelectedRowKeys((prevSelectedRowKeys) =>
+      prevSelectedRowKeys.filter((selectedKey) => selectedKey !== key)
+    );
   };
 
   const rowSelection = {
@@ -123,9 +133,15 @@ const AssetsTable = ({ setSelectAssets, deleteAsset, startProcessDisabled, selec
       title: "Action",
       dataIndex: "action",
       render: (_, record) => (
-        <Button type="primary" danger onClick={() => handleDelete(record.key)}>
-          Delete
-        </Button>
+        <Tooltip title="Reset to initial quantity">
+          <Button
+            type="link"
+            icon={<ReloadOutlined />}
+            onClick={() => handleReset(record.key)}
+          >
+            Reset
+          </Button>
+        </Tooltip>
       ),
     },
   ];
