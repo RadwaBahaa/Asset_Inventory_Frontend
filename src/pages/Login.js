@@ -18,7 +18,17 @@ const Login = () => {
 
   const onFinish = async (values) => {
     try {
-      await dispatch(login(values)).unwrap(); // Dispatch the login action
+      const { staySignedIn, ...loginValues } = values;
+      const response = await dispatch(login(loginValues)).unwrap();
+      console.log(response);
+      console.log(staySignedIn);
+
+      if (staySignedIn) {
+        localStorage.setItem("token", response.token);
+      } else {
+        sessionStorage.setItem("token", response.token);
+      }
+
       navigate("/"); // Navigate to the home page
     } catch (err) {
       message.error(err || "Login failed"); // Show an error message if login fails
@@ -100,6 +110,13 @@ const Login = () => {
                   }
                 />
               </Form.Item>
+              <Form.Item
+                name="staySignedIn"
+                valuePropName="checked"
+                style={{ marginBottom: "24px" }}
+              >
+                <Checkbox>Stay signed in</Checkbox>
+              </Form.Item>
               <Form.Item style={{ marginBottom: "24px" }}>
                 <div
                   style={{
@@ -108,7 +125,6 @@ const Login = () => {
                     alignItems: "center",
                   }}
                 >
-                  <Checkbox>Stay signed in</Checkbox>
                   <a className="login-form-forgot" href="">
                     Forgot Password?
                   </a>
