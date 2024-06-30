@@ -8,11 +8,18 @@ const database = axios.create({
   },
 });
 
-export const setAuthToken = (token) => {
-  if (token) {
-    database.defaults.headers.common["Authorization"] = token;
-  } else {
-    delete database.defaults.headers.common["Authorization"];
+export const setAuthToken = async (token) => {
+  try {
+    if (token) {
+      database.defaults.headers.common["Authorization"] = token;
+      const response = await database.get("/account/validate-token");
+      return response;
+    } else {
+      delete database.defaults.headers.common["Authorization"];
+    }
+  } catch (err) {
+    console.log("Error setting token: ", err);
+    throw err;
   }
 };
 

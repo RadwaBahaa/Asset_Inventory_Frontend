@@ -1,5 +1,21 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import database from "../../axios/database";
+import database, { setAuthToken } from "../../axios/database";
+
+export const validateToken = createAsyncThunk(
+  "login/validate-token",
+  async (token, { rejectWithValue }) => {
+    try {
+      const response = await setAuthToken(token);
+      return response.data; // Assume your API returns user data on successful validation
+    } catch (error) {
+      if (!error.response) {
+        // Network or connection error
+        return rejectWithValue("Network error: Cannot connect to API");
+      }
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 
 export const login = createAsyncThunk(
   "login/login",
@@ -9,6 +25,10 @@ export const login = createAsyncThunk(
       const token = response.data.token;
       return { token, ...response.data };
     } catch (error) {
+      if (!error.response) {
+        // Network or connection error
+        return rejectWithValue("Network error: Cannot connect to API");
+      }
       return rejectWithValue(error.response.data);
     }
   }
@@ -28,6 +48,11 @@ const loginSlice = createSlice({
       state.role = "";
       state.id = 0;
     },
+    setLogin: (state, action) => {
+      state.token = action.payload.token;
+      state.role = action.payload.role;
+      state.id = action.payload.id;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -39,9 +64,18 @@ const loginSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.error = action.payload;
+      })
+      .addCase(validateToken.fulfilled, (state, action) => {
+        state.token = action.payload.token;
+        state.role = action.payload.role;
+        state.id = action.payload.id;
+        state.error = null;
+      })
+      .addCase(validateToken.rejected, (state, action) => {
+        state.error = action.payload;
       });
   },
 });
 
-export const { setLogout } = loginSlice.actions;
+export const { setLogout, setLogin } = loginSlice.actions;
 export default loginSlice.reducer;
