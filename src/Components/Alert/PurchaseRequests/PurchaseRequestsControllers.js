@@ -30,8 +30,8 @@ const items = [
     ,
   },
 ];
-const PurchaseRequestControllers = () => <Tabs style={{
+const PurchaseRequestsControllers = () => <Tabs style={{
   marginTop: "15px",
   marginLeft: "24px",
 }} defaultActiveKey="1" items={items} onChange={onChange} />;
-export default PurchaseRequestControllers;
+export default PurchaseRequestsControllers;

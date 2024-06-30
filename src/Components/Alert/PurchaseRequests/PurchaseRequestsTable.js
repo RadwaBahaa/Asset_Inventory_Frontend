@@ -5,7 +5,7 @@ const initialData = [
   {
     key: '1',
     id: 1001,
-    vendorName: 'John Brown',
+    placeName: 'John Brown',
     price: 300,
     requestedBy: 'Alice Smith',
     deliveryDate: '2023-06-21',
@@ -13,7 +13,7 @@ const initialData = [
   {
     key: '2',
     id: 1002,
-    vendorName: 'Jim Green',
+    placeName: 'Jim Green',
     price: 500,
     requestedBy: 'Bob Johnson',
     deliveryDate: '2023-06-22',
@@ -21,7 +21,7 @@ const initialData = [
   {
     key: '3',
     id: 1003,
-    vendorName: 'Joe Black',
+    placeName: 'Joe Black',
     price: 200,
     requestedBy: 'Carol Williams',
     deliveryDate: '2023-06-23',
@@ -29,7 +29,7 @@ const initialData = [
   {
     key: '4',
     id: 1004,
-    vendorName: 'Disabled User',
+    placeName: 'Disabled User',
     price: 1000,
     requestedBy: 'David Brown',
     deliveryDate: '2023-06-24',
@@ -78,13 +78,13 @@ const PurchaseRequestsTable = () => {
 
   const columns = [
     {
-      title: 'PO #',
+      title: 'ID #',
       dataIndex: 'id',
       render: (text) => <a>{text}</a>,
     },
     {
-      title: 'Vendor',
-      dataIndex: 'vendorName',
+      title: 'Name',
+      dataIndex: 'placeName',
       render: (text) => <a>{text}</a>,
     },
     {

@@ -1,11 +1,7 @@
 import MessageSubNavbar from "../../Components/Alert/Messages/MessageSubNavbar";
-import PurchaseRequestControllers from "../../Components/Alert/PurchaseRequests/PurchaseRequestsControllers";
+import PurchaseRequestControllers from "../../Components/Location/LocationData/LocationDataControllers";
 import React from "react";
 import {
-  AppstoreOutlined,
-  BarsOutlined,
-  DownOutlined,
-  OrderedListOutlined,
   PrinterOutlined,
 } from "@ant-design/icons";
 import { Button, Dropdown, Input, Segmented } from "antd";
@@ -46,13 +42,6 @@ export default function Messages() {
             width: "100%",
           }}
         />
-        {/* <Segmented
-          options={[
-            { value: "List", icon: <BarsOutlined /> },
-            { value: "Grid", icon: <AppstoreOutlined /> },
-          ]}
-          onChange={handleSegmentedChange}
-        /> */}
         {/* Print Button */}
         <Button type="primary" icon={<PrinterOutlined />}>
           Print

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import TrackingSubNavbar from '../../Components/NavBars/TrackingSubNavBar';
 import { DownOutlined, PlusOutlined, PrinterOutlined, FilterOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Menu } from 'antd';
+import { Button, Dropdown, Menu, Input, Select } from 'antd';
 import StepsComponent from "../../Components/Tracking/ViewTracking/StepsComponent";
 // import AssetsSearchBar from '../../Components/Items/AssetsSearchBar';
 
@@ -15,13 +15,8 @@ export default function ViewTracking() {
     { label: "Stores" },
   ];
 
-  const menu = (
-    <Menu>
-      {items.map((item) => (
-        <Menu.Item key={item.label}>{item.label}</Menu.Item>
-      ))}
-    </Menu>
-  );
+  const [searchValue, setSearch] = useState(''); // State for search input value
+  const [searchBy, setSearchBy] = useState('Name'); // State for search by option
 
   const handleSegmentedChange = (value) => {
     setActiveComponent(value);
@@ -67,6 +62,19 @@ export default function ViewTracking() {
     position: 'relative',
   };
 
+  const selectBeforeSearch = (
+    <Select
+      defaultValue="Search Type"
+      dropdownStyle={{ width: 150 }}
+      onSelect={value => setSearchBy(value)}
+    >
+      <Select.Option value="Time" defaultValue>
+        Time
+      </Select.Option>
+      <Select.Option value="Cost">Cost</Select.Option>
+    </Select>
+  );
+
   return (
     <div style={pageStyle}>
       <TrackingSubNavbar
@@ -85,10 +93,21 @@ export default function ViewTracking() {
               <DownOutlined />
             </Button>
           </Dropdown>
+          <Input.Search
+            addonBefore={selectBeforeSearch}
+            placeholder="Location Search"
+            allowClear
+            onSearch={(value) => setSearch(value)}
+            onChange={(e) =>
+              e.target.value === "" ? setSearch(e.target.value) : null
+            }
+            className="search"
+            style={{ backgroundColor: "white", width: "80%" }}
+          />
           {/* <AssetsSearchBar /> */}
-          <Button type="primary" icon={<PrinterOutlined />} size="large">
+          {/* <Button type="primary" icon={<PrinterOutlined />} size="large">
             Print
-          </Button>
+          </Button> */}
         </div>
         <div style={{ marginTop: '16px' }}>
           <StepsComponent />

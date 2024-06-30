@@ -8,11 +8,11 @@ import "./App.css";
 function App() {
   return (
     <BrowserRouter>
-      {/* <HomePage /> */}
-      <Routes>
+      <HomePage />
+      {/* <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="*" element={<ProtectedRoute element={<HomePage />} />} />
-      </Routes>
+      </Routes> */}
     </BrowserRouter>
   );
 }

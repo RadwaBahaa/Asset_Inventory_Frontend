@@ -34,8 +34,19 @@ const items = [
   {
     key: "/location",
     icon: <PushpinOutlined />,
-    label: <Link to="/location">Location</Link>,
+    label: "Location",
+    children: [
+      {
+        key: "/location/locationData",
+        label: <Link to="/location/locationData">Locations Data</Link>,
+      },
+      {
+        key: "/tracking/viewTracking",
+        label: <Link to="/tracking/viewTracking">Locations Visualizations</Link>,
+      },
+    ],
   },
+
   {
     key: "tracking",
     icon: <NodeIndexOutlined />,
