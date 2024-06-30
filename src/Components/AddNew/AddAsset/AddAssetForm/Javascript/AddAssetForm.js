@@ -1,68 +1,24 @@
-import React, { useEffect, useState } from "react";
-import {
-  Card,
-  Form,
-  Input,
-  InputNumber,
-  Select,
-  Button,
-  message,
-  Modal,
-} from "antd";
-import database from "../../../../axios/database";
+import React from "react";
+import { Card, Form, Input, InputNumber, Select, Button } from "antd";
 import "../CSS/AddAssetForm.css";
 
 const { TextArea } = Input;
 
-const AddAssetForm = () => {
-  const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
-    // Simulating API call to fetch categories
-    database
-      .get("/categories/read")
-      .then((response) => {
-        setCategories(response.data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  }, []);
-
-  const [form] = Form.useForm(); // Create form instance
+const AddAssetForm = (props) => {
+  const { categories, setAssetData, form } = props;
 
   const onFinish = (values) => {
     const { name, category, price, description } = values;
 
     // Prepare payload for POST request
-    const assetData = {
+    const newAsset = {
       assetName: name,
       categoryID: category,
       price: price,
-      description: description ?? "",
+      description: description ?? null,
     };
-    database
-      .post("/assets/create", assetData)
-      .then((response) => {
-        console.log("Asset created:", response.data);
-        // Display success modal
-        Modal.success({
-          content: response.data,
-        });
-        form.resetFields();
-      })
-      .catch((error) => {
-        if (error.response) {
-          // Server responded with a status other than 200 range
-          message.error(`${error.response.data}`);
-        } else if (error.request) {
-          // Request was made but no response was received
-          message.error("Error: No response from the server.");
-        } else {
-          // Something happened in setting up the request
-          message.error(`Error: ${error.message}`);
-        }
-      });
+
+    setAssetData(newAsset);
   };
 
   return (
@@ -89,7 +45,10 @@ const AddAssetForm = () => {
                 rules={[
                   {
                     required: true,
-                    message: "Please select a category!",
+                    message:
+                      categories.length > 0
+                        ? "Please select a category!"
+                        : "No categories found! Please add a category first.",
                   },
                 ]}
                 className="form-item-half"
@@ -137,7 +96,6 @@ const AddAssetForm = () => {
           >
             <TextArea rows={4} placeholder="Enter asset description" />
           </Form.Item>
-
           <Form.Item className="button-container">
             <Button type="primary" htmlType="submit" className="button">
               Add Asset

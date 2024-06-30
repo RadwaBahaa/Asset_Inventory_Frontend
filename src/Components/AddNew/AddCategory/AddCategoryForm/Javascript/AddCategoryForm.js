@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, Form, Input, Button, message, Modal } from "antd";
-import database from "../../../../axios/database";
+import database from "../../../../../axios/database";
 import "../CSS/AddCategoryForm.css";
 
 const { TextArea } = Input;

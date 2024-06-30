@@ -1,7 +1,7 @@
 import React from "react";
 import { ShoppingCartOutlined, HomeOutlined } from "@ant-design/icons";
 import SubNavbar from "../../Components/NavBars/SubNavbar";
-import AddCategoryForm from "../../Components/AddNew/AddCategoryForm/Javascript/AddCategoryForm";
+import AddCategoryForm from "../../Components/AddNew/AddCategory/AddCategoryForm/Javascript/AddCategoryForm";
 
 export default function Categories() {
   return (

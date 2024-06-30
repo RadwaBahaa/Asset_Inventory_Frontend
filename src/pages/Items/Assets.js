@@ -3,7 +3,7 @@ import SubNavbar from "../../Components/NavBars/SubNavbar";
 import { PlusOutlined, HomeOutlined } from "@ant-design/icons";
 import { Button, Divider, message } from "antd";
 import AssetTable from "../../Components/Items/AssetsTable";
-import AssetSettings from "../../Components/Items/AssetSettings";
+import AssetSettings from "../../Components/Items/Assets/AssetSettings";
 
 import database from "../../axios/database";
 

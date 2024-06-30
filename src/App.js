@@ -1,32 +1,17 @@
-import React, { useState } from "react";
+import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage/Javascript/HomePage";
-import Login from "./pages/HomePage/Javascript/Login";
+import Login from "./pages/Login";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import "./App.css";
 
-
-
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
   return (
     <BrowserRouter>
-    
+      {/* <HomePage /> */}
       <Routes>
-        <Route
-          path="/login"
-          element={<Login setIsAuthenticated={setIsAuthenticated} />}
-        />
-        <Route
-          path="*"
-          element={
-            <ProtectedRoute
-              isAuthenticated={isAuthenticated}
-              element={<HomePage />}
-            />
-          }
-        />
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<ProtectedRoute element={<HomePage />} />} />
       </Routes>
     </BrowserRouter>
   );

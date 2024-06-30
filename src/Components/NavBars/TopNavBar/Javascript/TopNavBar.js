@@ -3,11 +3,15 @@ import { Layout, Dropdown, Space, Avatar } from "antd";
 import SearchBar from "../../SearchBar";
 import { Link, useLocation } from "react-router-dom";
 import { UserOutlined } from "@ant-design/icons";
+import { useDispatch } from "react-redux";
+import { setLogout } from "../../../../store/Slices/login";
 import "../CSS/TopNavBar.css";
 
 const TopNavBar = () => {
   const { Header } = Layout;
   const location = useLocation();
+  const dispatch = useDispatch();
+
   const [activeDropdown, setActiveDropdown] = useState("");
 
   const addNew = [
@@ -33,9 +37,16 @@ const TopNavBar = () => {
       label: <Link to="/user/viewprofile">View Profile</Link>,
       key: "viewprofile",
     },
-    { label: <Link to="/user/settings">Settings</Link>, key: "settings" },
     { type: "divider" },
-    { label: "Signout", key: "signout" },
+    {
+      label: (
+        <Link to="/login" onClick={() => dispatch(setLogout())} type="danger">
+          Logout
+        </Link>
+      ),
+      key: "logout",
+      danger: true,
+    },
   ];
 
   // Determine which dropdown should be active based on the current path

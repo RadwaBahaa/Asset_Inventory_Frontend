@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Layout, theme } from "antd";
 import TopNavBar from "../../../Components/NavBars/TopNavBar/Javascript/TopNavBar";
 import SideNavbar from "../../../Components/NavBars/SideNavBar/Javascript/SideNavBar";
@@ -10,9 +10,9 @@ const { Content } = Layout;
 
 export default function HomePage() {
   // Destructuring colorBgContainer and borderRadiusLG from the theme tokens
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
+  // const {
+  //   token: { colorBgContainer, borderRadiusLG },
+  // } = theme.useToken();
 
   return (
     <>
@@ -24,14 +24,15 @@ export default function HomePage() {
           <SideNavbar /> {/* Side navigation bar component */}
           <Layout
             className="third-layout" // Third layout for the main content area
-            style={{
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-            }}
+            // style={{
+            //   background: colorBgContainer,
+            //   borderRadius: borderRadiusLG,
+            // }}
           >
             {/* Main content area */}
             <Content className="content">
-              <RouteConfige /> {/* Route configuration component */}
+              <RouteConfige />
+              {/* <RouteConfige /> Route configuration component */}
             </Content>
           </Layout>
         </Layout>
