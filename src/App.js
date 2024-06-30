@@ -5,18 +5,21 @@ import Login from "./pages/HomePage/Javascript/Login";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import "./App.css";
 
+
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   return (
     <BrowserRouter>
+    
       <Routes>
         <Route
           path="/login"
           element={<Login setIsAuthenticated={setIsAuthenticated} />}
         />
         <Route
-          path="/"
+          path="*"
           element={
             <ProtectedRoute
               isAuthenticated={isAuthenticated}

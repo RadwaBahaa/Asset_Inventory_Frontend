@@ -112,6 +112,7 @@ const Login = ({ setIsAuthenticated }) => {
           </Col>
         </Row>
       </Content>
+
     </Layout>
   );
 };

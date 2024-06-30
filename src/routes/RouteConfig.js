@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-// const Login = React.lazy(()=> import("../pages/HomePage/Javascript/Login"))
+
 const Dashboard = React.lazy(() => import("../pages/Dashboard"));
 const ItemsAssets = React.lazy(() => import("../pages/Items/Assets"));
 
@@ -19,7 +19,7 @@ const AddNewAssets = React.lazy(() => import("../pages/AddNew/Assets"));
 const AddNewCategories = React.lazy(() => import("../pages/AddNew/Categories"));
 const AddNewRequests = React.lazy(() => import("../pages/AddNew/Requests"));
 const AddNewLocation = React.lazy(() => import("../pages/AddNew/Location"));
-// const AddingSuccessfully = React.lazy(() => import("../pages/AddNew/AddingSuccessfully"))
+
 
 const UserViewProfile = React.lazy(() => import("../pages/User/ViewProfile"));
 const AddNewSettings = React.lazy(() => import("../pages/User/Settings"));
