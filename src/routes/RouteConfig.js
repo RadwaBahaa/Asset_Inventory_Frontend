@@ -8,7 +8,9 @@ const ItemsCategories = React.lazy(() => import("../pages/Items/Categories"));
 const Location = React.lazy(() =>
   import("../pages/Location/Javascript/Location")
 );
-const LocationData = React.lazy(() => import("../pages/Location/Javascript/LocationData"));
+const LocationData = React.lazy(() =>
+  import("../pages/Location/Javascript/LocationData")
+);
 const TrackingStartProgress = React.lazy(() =>
   import("../pages/Tracking/StartProcess")
 );

@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import SubNavbar from "../../Components/NavBars/SubNavbar";
 import { PlusOutlined, HomeOutlined } from "@ant-design/icons";
-import { Divider, message } from "antd";
-import AssetTable from "../../Components/Items/Assets/AssetsTable";
+import { Divider, Empty, Typography, message } from "antd";
+import AssetsTable from "../../Components/Items/Assets/AssetsTable";
 import AssetSettings from "../../Components/Items/Assets/AssetSettings";
 import database from "../../axios/database";
+import { useLocation } from "react-router-dom";
 
 export default function Assets() {
   const [assetsData, setAssetsData] = useState([]);
   const [categories, setCategories] = useState([]); // State for categories
-  const [activeComponent, setActiveComponent] = useState("General"); // Default to 'List'
+  const [activeComponent, setActiveComponent] = useState("Overview"); // Default to 'List'
   const [order, setOrder] = useState("byID");
   const [search, setSearch] = useState("");
   const [searchBy, setSearchBy] = useState("");
@@ -17,24 +18,47 @@ export default function Assets() {
   const [editingKey, setEditingKey] = useState(""); // State to track editing asset
   const [updatedAsset, setUpdatedAsset] = useState({}); // State for updated asset
 
-  const fetchAssets = async () => {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const role = queryParams.get("role");
+  const id = queryParams.get("id");
+
+  const fetchSpecificAssets = async () => {
+    setAssetsData([]);
+    await database
+      .get(`/${role}/assets/read/${id}`)
+      .then((response) => {
+        setAssetsData(
+          response.data.map((asset) => ({
+            key: asset.assetID + "-" + asset.serialNumber,
+            assetID: asset.assetID,
+            assetName: asset.asset.assetName,
+            serialNumber: asset.serialNumber,
+            count: asset.count,
+          }))
+        );
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
+
+  const fetchOverviewAssets = async () => {
+    setAssetsData([]);
     try {
       let response;
-      if (activeComponent === "General") {
-        if (search !== "") {
-          switch (searchBy) {
-            case "Category":
-              response = await database.get("/assets/search", {
-                params: { categoryName: search },
-              });
-              break;
-            default:
-              response = await database.get("/assets/search", {
-                params: { name: search },
-              });
-          }
-        } else {
-          response = await database.get("/assets/read");
+      if (search !== "") {
+        switch (searchBy) {
+          case "Category":
+            response = await database.get("/assets/search", {
+              params: { categoryName: search },
+            });
+            break;
+          default:
+            response = await database.get("/assets/search", {
+              params: { name: search },
+            });
         }
       } else {
         response = await database.get("/assets/read");
@@ -42,7 +66,6 @@ export default function Assets() {
       setAssetsData(
         response.data.map((asset) => ({
           key: asset.assetID,
-          assetID: asset.assetID,
           assetName: asset.assetName,
           price: asset.price,
           description: asset.description,
@@ -66,9 +89,17 @@ export default function Assets() {
 
   const saveEdit = async (key) => {
     try {
-      console.log(updatedAsset);
-
-      await database.put(`/assets/update/${key}`, updatedAsset);
+      console.log(key);
+      if (role && id) {
+        const [assetID, serialNumber] = key.split("-");
+        await database.put(
+          `/${role}/assets/update?assetID=${assetID}&serialNumber=${serialNumber}`,
+          updatedAsset,
+          { params: { assetID, serialNumber } }
+        );
+      } else {
+        await database.put(`/assets/update/${key}`, updatedAsset);
+      }
       setEditingKey("");
       setUpdatedAsset({});
 
@@ -103,7 +134,16 @@ export default function Assets() {
 
   const deleteAsset = async (key) => {
     try {
-      await database.delete(`/assets/delete/${key}`);
+      if (role && id) {
+        const [assetID, serialNumber] = key.split("-");
+        await database.delete(
+          `/${role}/assets/delete?assetID=${assetID}&serialNumber=${serialNumber}`,
+          { params: { storeID: id } }
+        );
+      } else {
+        await database.delete(`/assets/delete/${key}`);
+      }
+
       setAssetsData((prevData) => prevData.filter((item) => item.key !== key));
       message.success("Asset deleted successfully");
     } catch (error) {
@@ -114,22 +154,38 @@ export default function Assets() {
 
   const handleDelete = async () => {
     try {
-      await Promise.all(
-        selectedRowKeys.map(async (assetID) => {
-          await database.delete(`/assets/delete/${assetID}`);
-        })
-      );
+      if (role && id) {
+        await Promise.all(
+          selectedRowKeys.map(async (key) => {
+            const [assetID, serialNumber] = key.split("-");
+            await database.delete(
+              `/${role}/assets/delete?assetID=${assetID}&serialNumber=${serialNumber}`,
+              { params: { storeID: id } }
+            );
+          })
+        );
+      } else {
+        await Promise.all(
+          selectedRowKeys.map(async (assetID) => {
+            await database.delete(`/assets/delete/${assetID}`);
+          })
+        );
+      }
       setSelectedRowKeys([]);
-      fetchAssets();
+      fetchOverviewAssets();
     } catch (error) {
       console.error(error);
     }
   };
 
   useEffect(() => {
-    fetchAssets();
+    if (role && id && activeComponent === "Specific") {
+      fetchSpecificAssets();
+    } else if (activeComponent === "Overview") {
+      fetchOverviewAssets(); // Fetch assets on mount
+    }
     fetchCategories(); // Fetch categories on mount
-  }, [search]);
+  }, [role, id, search, activeComponent]);
 
   useEffect(() => {
     setAssetsData((assets) => sortAssets([...assets], order));
@@ -161,11 +217,12 @@ export default function Assets() {
         setActiveComponent={setActiveComponent}
         selectedRowKeys={selectedRowKeys}
         handleDelete={handleDelete}
-        assetsData={assetsData}
+        activeComponent={activeComponent}
       />
       <Divider />
-      {activeComponent === "General" ? (
-        <AssetTable
+
+      {activeComponent === "Overview" || (role && id) ? (
+        <AssetsTable
           assetsData={assetsData}
           setAssetsData={setAssetsData}
           editingKey={editingKey}
@@ -177,8 +234,17 @@ export default function Assets() {
           categories={categories} // Pass categories to AssetTable
           setUpdatedAsset={setUpdatedAsset}
           updatedAsset={updatedAsset}
+          activeComponent={activeComponent}
         />
-      ) : null}
+      ) : (
+        <Empty
+          description={
+            <Typography.Text>
+              Please choose a specific location to display assets.
+            </Typography.Text>
+          }
+        />
+      )}
     </div>
   );
 }
