@@ -25,10 +25,10 @@ export default function Location() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const storesResponse = await database.get("stores/read/geojson");
-        const suppliersResponse = await database.get("suppliers/read/geojson");
+        const storesResponse = await database.get("store/read/geojson");
+        const suppliersResponse = await database.get("supplier/read/geojson");
         const warehousesResponse = await database.get(
-          "warehouses/read/geojson"
+          "warehouse/read/geojson"
         );
 
         // Update locations state with all fetched data

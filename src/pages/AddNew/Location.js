@@ -25,6 +25,10 @@ import { OpenStreetMapProvider } from "leaflet-geosearch";
 const provider = new OpenStreetMapProvider();
 
 export default function Location() {
+  const [locations, setLocations] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [error, setError] = useState(null);
+
   const [isFormModalVisible, setIsFormModalVisible] = useState(false);
   const [drawnPoint, setDrawnPoint] = useState({});
   const [selectedPointType, setSelectedPointType] = useState("");
@@ -33,6 +37,35 @@ export default function Location() {
   const [form] = Form.useForm();
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState([]); // State for autocomplete suggestions
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const storesResponse = await database.get("store/read/geojson");
+        const suppliersResponse = await database.get("supplier/read/geojson");
+        const warehousesResponse = await database.get(
+          "warehouse/read/geojson"
+        );
+
+        // Update locations state with all fetched data
+        setLocations({
+          stores: storesResponse.data,
+          suppliers: suppliersResponse.data,
+          warehouses: warehousesResponse.data,
+        });
+      } catch (error) {
+        setError(error.message);
+        setLocations({ stores: [], suppliers: [], warehouses: [] }); // Initialize state in case of error
+      }
+    };
+
+    fetchData();
+  }, []);
+  useEffect(() => {
+    if (locations !== null) {
+      console.log(locations);
+    }
+  }, [locations]);
 
   const handleSearchChange = async (value) => {
     setSearchTerm(value);
@@ -47,14 +80,16 @@ export default function Location() {
   useEffect(() => {
     if (submitedPoint.geometry) {
       database
-        .post(`/${selectedPointType}s/create/geojson`, submitedPoint)
+        .post(`/${selectedPointType}/create/geojson`, submitedPoint)
         .then((response) => {
           console.log("Point created:", response);
           setDrawnPoint({});
           setSelectedPointType("");
+          message.success("Point created successfully");
         })
         .catch((error) => {
           console.error("Error:", error);
+          message.error("Error creating point");
         });
     }
   }, [submitedPoint]);
@@ -82,6 +117,7 @@ export default function Location() {
 
   const handleDrawComplete = (coordinates) => {
     if (isDrawingEnabled) {
+      console.log(coordinates);
       const point = {
         type: "Feature",
         geometry: { type: "Point", coordinates },
@@ -168,6 +204,8 @@ export default function Location() {
           onDrawComplete={handleDrawComplete}
           isDrawingEnabled={isDrawingEnabled}
           searchTerm={searchTerm}
+          locations={locations}
+          selectedLocation={selectedLocation}
         />
         {selectedPointType && (
           <Modal
