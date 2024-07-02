@@ -67,7 +67,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     database
-      .get("/stores/read/geojson")
+      .get("/store/read/geojson")
       .then((response) => {
         console.log("Response data:", response.data); // Log the response data
         setStoresData(response.data);
@@ -77,7 +77,7 @@ export default function Dashboard() {
       });
 
     database
-      .get("/warehouses/read/geojson")
+      .get("/warehouse/read/geojson")
       .then((response) => {
         console.log("Response data:", response.data); // Log the response data
         setWarehousesData(response.data);
@@ -87,7 +87,7 @@ export default function Dashboard() {
       });
 
     database
-      .get("/suppliers/read/geojson")
+      .get("/supplier/read/geojson")
       .then((response) => {
         console.log("Response data:", response.data); // Log the response data
         setSuppliersData(response.data);

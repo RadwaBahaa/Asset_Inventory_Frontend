@@ -1,10 +1,10 @@
 import React from "react";
 import { Card, Form, Input, InputNumber, Select, Button } from "antd";
-import "../CSS/AddAssetForm.css";
+import "../CSS/AddCompanyAssetForm.css";
 
 const { TextArea } = Input;
 
-const AddAssetForm = (props) => {
+const AddCompanyAssetForm = (props) => {
   const { categories, setAssetData, form } = props;
 
   const onFinish = (values) => {
@@ -110,4 +110,4 @@ const AddAssetForm = (props) => {
   );
 };
 
-export default AddAssetForm;
+export default AddCompanyAssetForm;
