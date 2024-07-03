@@ -47,7 +47,7 @@ const ReceiverTable = ({
     });
   };
 
-  const save = (record) => {
+  const save = async (record) => {
     const newData = processData.map((item) =>
       item.key === record.key
         ? {
@@ -55,35 +55,26 @@ const ReceiverTable = ({
             assets: item.assets.map((asset) => ({
               ...asset,
               assetQuantity: editedAssets[asset.key],
-              availableQuantity:
-                asset.originalQuantity - editedAssets[asset.key],
-              initialAvailableQuantity:
-                asset.originalQuantity - editedAssets[asset.key],
             })),
           }
         : item
     );
 
-    console.log("newData:", newData);
     onSave(newData);
 
     // Update asset quantities in assetsData
     const updatedAssetsData = assetsData.map((asset) => {
-      const editedAsset = newData
+      const totalEditedQuantity = newData
         .flatMap((item) => item.assets)
-        .find((a) => a.key === asset.key);
-      if (editedAsset) {
-        console.log("editedAsset:", editedAsset);
-        return {
-          ...asset,
-          assetQuantity: editedAsset.assetQuantity,
-          availableQuantity: editedAsset.availableQuantity,
-          initialAvailableQuantity: editedAsset.initialAvailableQuantity,
-        };
-      }
-      return asset;
+        .filter((a) => a.id === asset.id)
+        .reduce((sum, a) => sum + a.assetQuantity, 0);
+
+      return {
+        ...asset,
+        initialAvailableQuantity: asset.originalQuantity - totalEditedQuantity,
+      };
     });
-    // console.log("updatedAssetsData:", updatedAssetsData);
+
     setAssetsData(updatedAssetsData);
     setEditingKey("");
     setEditedAssets({});
@@ -103,13 +94,12 @@ const ReceiverTable = ({
         [`${receiverRole}ID`]: process.key, // Assuming key is receiverID here
         note: "Start Process Confirmed", // Replace with actual note if needed
         assetShipmentWSts: process.assets.map((asset) => ({
-          assetID: asset.key,
+          assetID: asset.id,
           serialNumber: asset.serialNumber,
           quantity: asset.assetQuantity,
         })),
       })),
     };
-    console.log("Request data:", requestData);
 
     await database
       .post(
@@ -118,13 +108,11 @@ const ReceiverTable = ({
       )
       .then((response) => {
         // Handle success (if needed)
-        console.log("API response:", response.data);
         message.success("Process started successfully!");
         setProcessData([]);
       })
       .catch((error) => {
         // Handle error
-        console.error("Error starting process:", error);
         message.error("Failed to start process. Please try again.");
       });
   };
@@ -141,7 +129,7 @@ const ReceiverTable = ({
       render: (assets) => (
         <div>
           {assets.map((asset, index) => (
-            <div key={index}>{asset.name}</div>
+            <div key={asset.id}>{asset.name}</div>
           ))}
         </div>
       ),
@@ -152,7 +140,7 @@ const ReceiverTable = ({
       render: (assets) => (
         <div>
           {assets.map((asset, index) => (
-            <div key={index}>{asset.serialNumber}</div>
+            <div key={asset.id}>{asset.serialNumber}</div>
           ))}
         </div>
       ),
@@ -173,7 +161,10 @@ const ReceiverTable = ({
                   }
                   onChange={(value) => handleQuantityChange(a.key, value)}
                   min={0}
-                  max={a.originalQuantity - a.initialAvailableQuantity}
+                  max={
+                    assetsData.find((asset) => asset.id === a.id)
+                      .originalQuantity
+                  }
                 />
               </div>
             ))}
