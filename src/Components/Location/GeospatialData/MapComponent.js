@@ -9,9 +9,9 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import { createRoot } from "react-dom/client";
-import ResetViewButton from "../../Components/Location/ResetViewButton";
+import ResetViewButton from "./ResetViewButton";
 import "leaflet/dist/leaflet.css";
-import MapZoomHandler from "../../Components/Location/MapZoomHandler";
+import MapZoomHandler from "./MapZoomHandler";
 
 const MapComponent = (props) => {
   const {

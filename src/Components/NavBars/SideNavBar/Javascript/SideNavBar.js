@@ -32,17 +32,17 @@ const items = [
     ],
   },
   {
-    key: "/location",
+    key: "/locations",
     icon: <PushpinOutlined />,
-    label: "Location",
+    label: "Locations",
     children: [
       {
-        key: "/location/locationData",
-        label: <Link to="/location/locationData">Locations Data</Link>,
+        key: "/locations/descriptive-data",
+        label: <Link to="/locations/descriptive-data">Descriptive Data</Link>,
       },
       {
-        key: "/tracking/viewTracking",
-        label: <Link to="/tracking/viewTracking">Locations Visualizations</Link>,
+        key: "/locations/geospatial-data",
+        label: <Link to="/locations/geospatial-data">Geospatial Data</Link>,
       },
     ],
   },

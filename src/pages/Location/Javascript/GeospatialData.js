@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import SubNavbar from "../../../Components/NavBars/SubNavbar";
 import { PlusOutlined, HomeOutlined } from "@ant-design/icons";
 import { Divider } from "antd";
-import MapComponent from "../../../Components/Location/MapComponent";
-import LocationTable from "../../../Components/Location/LocationTable";
-import LocationSetting from "../../../Components/Location/LocationSetting";
+import MapComponent from "../../../Components/Location/GeospatialData/MapComponent";
+import LocationTable from "../../../Components/Location/GeospatialData/LocationTable";
+import LocationSetting from "../../../Components/Location/GeospatialData/LocationSetting";
 import database from "../../../axios/database";
 import geoapifyAPI from "../../../axios/geoapifyAPI";
-import ServiceAreaSetting from "../../../Components/Location/ServiceAreaSetting";
+import ServiceAreaSetting from "../../../Components/Location/GeospatialData/ServiceAreaSetting";
 import * as turf from "@turf/turf";
 
-export default function Location() {
+export default function GeospatialData() {
   const [locations, setLocations] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [error, setError] = useState(null);
@@ -27,9 +27,7 @@ export default function Location() {
       try {
         const storesResponse = await database.get("store/read/geojson");
         const suppliersResponse = await database.get("supplier/read/geojson");
-        const warehousesResponse = await database.get(
-          "warehouse/read/geojson"
-        );
+        const warehousesResponse = await database.get("warehouse/read/geojson");
 
         // Update locations state with all fetched data
         setLocations({

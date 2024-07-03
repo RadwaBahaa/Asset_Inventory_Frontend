@@ -1,6 +1,6 @@
 import SubNavbar from "../../../Components/NavBars/SubNavbar";
 import { HomeOutlined, ShoppingCartOutlined } from "@ant-design/icons";
-import LocationDataControllers from "../../../Components/Location/LocationData/LocationDataControllers";
+import Controllers from "../../../Components/Location/DescriptiveData/Controllers";
 import React from "react";
 import { PrinterOutlined } from "@ant-design/icons";
 import { Button, Input } from "antd";
@@ -54,7 +54,7 @@ export default function LocationData() {
           Print
         </Button>
       </div>
-      <LocationDataControllers />
+      <Controllers />
     </div>
   );
 }

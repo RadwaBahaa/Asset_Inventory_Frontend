@@ -1,13 +1,13 @@
 import { LineOutlined, MenuOutlined } from "@ant-design/icons";
-import { Card, Segmented, Select } from "antd";
+import { Card, Select, Radio } from "antd";
 import { useEffect, useState } from "react";
 import database from "../../../axios/database";
 
 const AddAssetSetting = (props) => {
   const { setActiveComponent, activeComponent, setRole, setId } = props;
-  const [secondDropownData, setSecondDropownData] = useState([]);
-  const [firstDropdownValue, setFirstDropdownValue] = useState("");
-  const [secondDropdownValue, setSecondDropdownValue] = useState(null);
+  const [secondDropdownData, setSecondDropdownData] = useState([]);
+  const [firstDropdownValue, setFirstDropdownValue] = useState();
+  const [secondDropdownValue, setSecondDropdownValue] = useState();
 
   const { Option } = Select;
 
@@ -16,7 +16,7 @@ const AddAssetSetting = (props) => {
       const response = await database.get(`/${value}/read/json`);
       switch (value) {
         case "store":
-          setSecondDropownData(
+          setSecondDropdownData(
             response.data.map((store) => ({
               key: store.storeID,
               name: store.storeName,
@@ -24,7 +24,7 @@ const AddAssetSetting = (props) => {
           );
           break;
         case "warehouse":
-          setSecondDropownData(
+          setSecondDropdownData(
             response.data.map((warehouse) => ({
               key: warehouse.warehouseID,
               name: warehouse.warehouseName,
@@ -32,7 +32,7 @@ const AddAssetSetting = (props) => {
           );
           break;
         case "supplier":
-          setSecondDropownData(
+          setSecondDropdownData(
             response.data.map((supplier) => ({
               key: supplier.supplierID,
               name: supplier.supplierName,
@@ -54,6 +54,11 @@ const AddAssetSetting = (props) => {
     setSecondDropdownValue(null);
   }, [firstDropdownValue]);
 
+  useEffect(() => {
+    setFirstDropdownValue();
+    setSecondDropdownValue();
+  }, [activeComponent]);
+
   const handleSecondDropdownChange = (option) => {
     setSecondDropdownValue(option);
     setId(option.key);
@@ -62,27 +67,47 @@ const AddAssetSetting = (props) => {
 
   return (
     <div className="asset_container" style={{ marginBottom: "20px" }}>
-      <Card bordered={false} className="asset_card">
-        <Segmented
-          options={[
-            {
-              label: "Company Wide",
-              value: "companyWide",
-              icon: <MenuOutlined />,
-            },
-            {
-              label: "Specific Location",
-              value: "specificLocation",
-              icon: <LineOutlined />,
-            },
-          ]}
-          onChange={setActiveComponent}
-        />
-        <div>
+      <Card
+        bordered={false}
+        className="asset_card"
+        style={{
+          padding: "20px",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+          borderRadius: "8px",
+          backgroundColor: "#ffffff",
+        }}
+      >
+        <div style={{ marginBottom: "10px" }}>
+          <Radio.Group
+            options={[
+              {
+                label: (
+                  <>
+                    <MenuOutlined /> Company Wide
+                  </>
+                ),
+                value: "companyWide",
+              },
+              {
+                label: (
+                  <>
+                    <LineOutlined /> Specific Location
+                  </>
+                ),
+                value: "specificLocation",
+              },
+            ]}
+            onChange={(e) => setActiveComponent(e.target.value)}
+            value={activeComponent}
+            optionType="button"
+            buttonStyle="solid"
+          />
+        </div>
+        <div className="dropdown-container" style={{ display: "flex" }}>
           <Select
             placeholder="Select Location Type"
             onChange={handleFirstDropdownChange}
-            style={{ width: 200 }}
+            style={{ width: 250, marginRight: "20px" }}
             disabled={activeComponent === "companyWide"}
           >
             <Option value="store">Store</Option>
@@ -91,16 +116,15 @@ const AddAssetSetting = (props) => {
           </Select>
           <Select
             placeholder="Select Name"
-            key={secondDropownData.value}
             value={secondDropdownValue}
-            onChange={(value, option) => handleSecondDropdownChange(option)}
-            style={{ width: 200 }}
+            onChange={(value, option)=>handleSecondDropdownChange(option)}
+            style={{ width: 250 }}
             disabled={!firstDropdownValue}
           >
-            {secondDropownData.map((item) => (
-              <Select.Option key={item.key} value={item.name}>
+            {secondDropdownData.map((item) => (
+              <Option key={item.key} value={item.name}>
                 {item.name}
-              </Select.Option>
+              </Option>
             ))}
           </Select>
         </div>

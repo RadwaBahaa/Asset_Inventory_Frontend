@@ -5,11 +5,11 @@ const Dashboard = React.lazy(() => import("../pages/Dashboard"));
 const ItemsAssets = React.lazy(() => import("../pages/Items/Assets"));
 
 const ItemsCategories = React.lazy(() => import("../pages/Items/Categories"));
-const Location = React.lazy(() =>
-  import("../pages/Location/Javascript/Location")
+const GeospatialData = React.lazy(() =>
+  import("../pages/Location/Javascript/GeospatialData")
 );
-const LocationData = React.lazy(() =>
-  import("../pages/Location/Javascript/LocationData")
+const DescriptiveData = React.lazy(() =>
+  import("../pages/Location/Javascript/DescriptiveData")
 );
 const TrackingStartProgress = React.lazy(() =>
   import("../pages/Tracking/StartProcess")
@@ -40,8 +40,11 @@ function RouteConfige() {
         <Route path="/items/assets" element={<ItemsAssets />} />
 
         <Route path="/items/categories" element={<ItemsCategories />} />
-        <Route path="/location" element={<Location />} />
-        <Route path="/location/locationData" element={<LocationData />} />
+        <Route path="/locations/geospatial-data" element={<GeospatialData />} />
+        <Route
+          path="/locations/descriptive-data"
+          element={<DescriptiveData />}
+        />
         <Route
           path="/tracking/startprocess"
           element={<TrackingStartProgress />}

@@ -22,6 +22,8 @@ export default function Assets() {
   const [id, setId] = useState("");
 
   useEffect(() => {
+    console.log(userRole);
+    console.log(userID);
     if (userRole !== "Admin") {
       setRole(userRole);
       setId(userID);
@@ -31,7 +33,7 @@ export default function Assets() {
 
   useEffect(() => {
     // Simulating API call to fetch categories
-    if (activeComponent === "companyWide") {
+    if (userRole === "Admin" && activeComponent === "companyWide") {
       database
         .get("/categories/read")
         .then((response) => {
@@ -40,7 +42,7 @@ export default function Assets() {
         .catch((error) => {
           console.error("Error:", error);
         });
-    } else if (userRole === "Admin" && activeComponent === "specificLocation") {
+    } else if (activeComponent === "specificLocation") {
       database
         .get("/assets/read")
         .then((response) => {
@@ -111,13 +113,17 @@ export default function Assets() {
         }
         addButtonPath={"/items/assets"}
       />
-      <div style={{ padding: "20px", backgroundColor: "#f0f2f5",margin:"20px" }}>
-        <AddAssetSetting
-          activeComponent={activeComponent}
-          setActiveComponent={setActiveComponent}
-          setRole={setRole}
-          setId={setId}
-        />
+      <div
+        style={{ padding: "20px", backgroundColor: "#f0f2f5", margin: "20px" }}
+      >
+        {userRole === "Admin" && (
+          <AddAssetSetting
+            activeComponent={activeComponent}
+            setActiveComponent={setActiveComponent}
+            setRole={setRole}
+            setId={setId}
+          />
+        )}
         <div>
           {activeComponent === "companyWide" ? (
             <AddCompanyAssetForm
