@@ -4,6 +4,7 @@ import { DownOutlined, PlusOutlined, PrinterOutlined, FilterOutlined } from '@an
 import { Button, Dropdown, Menu, Input, Select } from 'antd';
 import StepsComponent from "../../Components/Tracking/ViewTracking/StepsComponent";
 // import AssetsSearchBar from '../../Components/Items/AssetsSearchBar';
+import TrackingTable from '../../Components/Tracking/ViewTracking/TrackingTable';
 
 export default function ViewTracking() {
   const [activeComponent, setActiveComponent] = useState('Location'); // Set default to 'Location'
