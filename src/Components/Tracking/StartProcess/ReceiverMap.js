@@ -37,12 +37,10 @@ const ReceiverMap = (props) => {
       setLoading(true);
       return;
     }
-    setTimeout(() => {
-      setLoading(false);
-      setDataLoaded(true);
-      console.log("Data loaded");
-      console.log(serviceArea); // Make sure serviceArea is not null here
-    }, 100);
+    setLoading(false);
+    setDataLoaded(true);
+    console.log("Data loaded");
+    console.log(serviceArea); // Make sure serviceArea is not null here
   }, [receiverData, senderData, serviceArea]);
 
   const outerCircleOptions = {

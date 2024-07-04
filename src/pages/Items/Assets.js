@@ -16,7 +16,7 @@ export default function Assets() {
   const [searchBy, setSearchBy] = useState("");
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [editingKey, setEditingKey] = useState(""); // State to track editing asset
-  const [updatedAsset, setUpdatedAsset] = useState({}); // State for updated asset
+  const [updatedAsset, setUpdatedAsset] = useState(null); // State for updated asset
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -92,16 +92,14 @@ export default function Assets() {
       console.log(key);
       if (role && id) {
         const [assetID, serialNumber] = key.split("-");
-        await database.put(
-          `/${role}/assets/update?assetID=${assetID}&serialNumber=${serialNumber}`,
-          updatedAsset,
-          { params: { assetID, serialNumber } }
-        );
+        await database.put(`/${role}/assets/update/${id}`, updatedAsset, {
+          params: { assetID, serialNumber },
+        });
       } else {
         await database.put(`/assets/update/${key}`, updatedAsset);
       }
       setEditingKey("");
-      setUpdatedAsset({});
+      setUpdatedAsset(null);
 
       message.success("Asset updated successfully");
     } catch (error) {
@@ -221,7 +219,7 @@ export default function Assets() {
       />
       <Divider />
 
-      {activeComponent === "Overview" || (role && id) ? (
+      {/* {activeComponent === "Overview" || (role && id) ? ( */}
         <AssetsTable
           assetsData={assetsData}
           setAssetsData={setAssetsData}
@@ -236,15 +234,7 @@ export default function Assets() {
           updatedAsset={updatedAsset}
           activeComponent={activeComponent}
         />
-      ) : (
-        <Empty
-          description={
-            <Typography.Text>
-              Please choose a specific location to display assets.
-            </Typography.Text>
-          }
-        />
-      )}
+      
     </div>
   );
 }

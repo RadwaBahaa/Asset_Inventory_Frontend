@@ -257,9 +257,7 @@ const ReceiverTable = ({
           Start Process
         </Button>
       </div>
-      {processData.length > 0 && (
         <Table columns={columns} dataSource={processData} pagination={false} />
-      )}
     </div>
   );
 };

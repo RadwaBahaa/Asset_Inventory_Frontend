@@ -1,13 +1,23 @@
-import React, { useState } from 'react';
-import TrackingSubNavbar from '../../Components/NavBars/TrackingSubNavBar';
-import { DownOutlined, PlusOutlined, PrinterOutlined, FilterOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Menu, Input, Select } from 'antd';
+import React, { useEffect, useState } from "react";
+import TrackingSubNavbar from "../../Components/NavBars/TrackingSubNavBar";
+import {
+  DownOutlined,
+  PlusOutlined,
+  PrinterOutlined,
+  FilterOutlined,
+} from "@ant-design/icons";
+import { Button, Dropdown, Menu, Input, Select } from "antd";
 import StepsComponent from "../../Components/Tracking/ViewTracking/StepsComponent";
 // import AssetsSearchBar from '../../Components/Items/AssetsSearchBar';
-import TrackingTable from '../../Components/Tracking/ViewTracking/TrackingTable';
+import TrackingTable from "../../Components/Tracking/ViewTracking/TrackingTable";
+import { useSelector } from "react-redux";
+import database from "../../axios/database";
 
 export default function ViewTracking() {
-  const [activeComponent, setActiveComponent] = useState('Location'); // Set default to 'Location'
+  const [activeComponent, setActiveComponent] = useState("Location"); // Set default to 'Location'
+
+  const userRole = useSelector((state) => state.login.role);
+  const userID = useSelector((state) => state.login.id);
 
   const items = [
     { label: "All" },
@@ -16,15 +26,15 @@ export default function ViewTracking() {
     { label: "Stores" },
   ];
 
-  const [searchValue, setSearch] = useState(''); // State for search input value
-  const [searchBy, setSearchBy] = useState('Name'); // State for search by option
+  const [searchValue, setSearch] = useState(""); // State for search input value
+  const [searchBy, setSearchBy] = useState("Name"); // State for search by option
 
   const handleSegmentedChange = (value) => {
     setActiveComponent(value);
   };
 
   const handleFilterMenuClick = (e) => {
-    console.log('Clicked on filter:', e.key);
+    console.log("Clicked on filter:", e.key);
     // Handle filtering logic based on selected option (e.g., by Category, by Price)
   };
 
@@ -36,38 +46,94 @@ export default function ViewTracking() {
   );
 
   const pageStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '100vh',
+    display: "flex",
+    flexDirection: "column",
+    minHeight: "100vh",
   };
 
   const contentStyle = {
     flex: 1,
-    overflowY: 'auto',
-    padding: '16px',
+    overflowY: "auto",
+    padding: "16px",
   };
 
   const buttonContainerStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-    marginTop: '16px',
-    marginLeft: '24px',
+    display: "flex",
+    alignItems: "center",
+    gap: "16px",
+    marginTop: "16px",
+    marginLeft: "24px",
   };
 
   const footerStyle = {
-    background: '#f1f1f1',
-    padding: '16px',
-    textAlign: 'center',
+    background: "#f1f1f1",
+    padding: "16px",
+    textAlign: "center",
     zIndex: 1,
-    position: 'relative',
+    position: "relative",
+  };
+
+  useEffect(() => {
+    if (userRole === "Supplier") {
+      fetchReceiverProcesses(
+        "warehouse",
+        "warehouseID",
+        "warehouseName",
+        "Warehouse"
+      );
+      fetchSenderProcesses("supplier", "supplierID", "Supplier", userID);
+    } else if (userRole === "Warehouse") {
+      fetchReceiverProcesses("store", "storeID", "storeName", "Store");
+      fetchSenderProcesses("warehouse", "warehouseID", "Warehouse", userID);
+    }
+  }, []);
+
+
+  const fetchReceiverProcesses = (endpoint, idField, nameField, type) => {
+    database
+      .get(`${endpoint}/read/geojson`)
+      .then((response) => {
+        const responseData = response.data.map((item) => ({
+          ...item,
+          properties: {
+            ...item.properties,
+            id: item.properties[idField],
+            name: item.properties[nameField],
+            type,
+          },
+        }));
+        // setReceiverData(responseData);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const fetchSenderProcesses = (endpoint, idField, nameField, type) => {
+    database
+      .get(`${endpoint}/read/geojson`)
+      .then((response) => {
+        const responseData = response.data.map((item) => ({
+          ...item,
+          properties: {
+            ...item.properties,
+            id: item.properties[idField],
+            name: item.properties[nameField],
+            type,
+          },
+        }));
+        // setReceiverData(responseData);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   const selectBeforeSearch = (
     <Select
       defaultValue="Search Type"
       dropdownStyle={{ width: 150 }}
-      onSelect={value => setSearchBy(value)}
+      onSelect={(value) => setSearchBy(value)}
     >
       <Select.Option value="Time" defaultValue>
         Time
@@ -83,14 +149,14 @@ export default function ViewTracking() {
         addButtonLabel={
           <>
             <PlusOutlined />
-            <span style={{ marginLeft: '8px' }}>Add Location</span>
+            <span style={{ marginLeft: "8px" }}>Add Location</span>
           </>
         }
       />
       <div style={contentStyle}>
         <div style={buttonContainerStyle}>
           <Dropdown overlay={filterMenu} placement="bottomLeft">
-            <Button icon={<FilterOutlined />} style={{ width: '60px' }}>
+            <Button icon={<FilterOutlined />} style={{ width: "60px" }}>
               <DownOutlined />
             </Button>
           </Dropdown>
@@ -110,7 +176,7 @@ export default function ViewTracking() {
             Print
           </Button> */}
         </div>
-        <div style={{ marginTop: '16px' }}>
+        <div style={{ marginTop: "16px" }}>
           <StepsComponent />
         </div>
       </div>

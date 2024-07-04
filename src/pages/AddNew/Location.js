@@ -21,6 +21,7 @@ import {
 import MapComponent from "../../Components/AddNew/AddLocation/MapComponent";
 import database from "../../axios/database";
 import { OpenStreetMapProvider } from "leaflet-geosearch";
+import { useSelector } from "react-redux";
 
 const provider = new OpenStreetMapProvider();
 
@@ -38,15 +39,15 @@ export default function Location() {
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState([]); // State for autocomplete suggestions
 
+  const userRole = useSelector((state) => state.login.role);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const storesResponse = await database.get("store/read/geojson");
         const suppliersResponse = await database.get("supplier/read/geojson");
-        const warehousesResponse = await database.get(
-          "warehouse/read/geojson"
-        );
-
+        const warehousesResponse = await database.get("warehouse/read/geojson");
+        console.log(userRole);
         // Update locations state with all fetched data
         setLocations({
           stores: storesResponse.data,

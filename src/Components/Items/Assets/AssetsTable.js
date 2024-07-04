@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Input, Button, Select, InputNumber } from "antd";
+import { Table, Input, Button, Select, InputNumber, Empty } from "antd";
 
 const { Option } = Select;
 
@@ -20,9 +20,11 @@ const AssetsTable = (props) => {
   } = props;
   const [originalData, setOriginalData] = useState({}); // Store original data
   const [columns, setColumns] = useState([]);
+  const [saveEditdisabled, setSaveEditdisabled] = useState(true);
 
   const handleInputChange = async (key, field, value, childValue) => {
     console.log(key);
+    console.log(value);
     const updatedAssetsData = [...assetsData];
     const editedAssetIndex = updatedAssetsData.findIndex(
       (asset) => asset.key === key
@@ -36,6 +38,15 @@ const AssetsTable = (props) => {
       setUpdatedAsset({ ...updatedAsset, [field]: value });
     }
   };
+
+  useEffect(() => {
+    if (updatedAsset) {
+      setSaveEditdisabled(false);
+      console.log("updatedAsset:", updatedAsset);
+    } else {
+      setSaveEditdisabled(true);
+    }
+  }, [updatedAsset]);
 
   const cancelEdit = (key) => {
     setAssetsData((prevData) =>
@@ -153,7 +164,11 @@ const AssetsTable = (props) => {
             <div style={{ display: "flex", gap: "8px" }}>
               {editingKey === record.key ? (
                 <>
-                  <Button type="primary" onClick={() => saveEdit(record.key)}>
+                  <Button
+                    type="primary"
+                    disabled={saveEditdisabled}
+                    onClick={() => saveEdit(record.key)}
+                  >
                     Save
                   </Button>
                   <Button onClick={() => cancelEdit(record.key)}>Cancel</Button>
@@ -223,7 +238,11 @@ const AssetsTable = (props) => {
             <div style={{ display: "flex", gap: "8px" }}>
               {editingKey === record.key ? (
                 <>
-                  <Button type="primary" onClick={() => saveEdit(record.key)}>
+                  <Button
+                    type="primary"
+                    disabled={saveEditdisabled}
+                    onClick={() => saveEdit(record.key)}
+                  >
                     Save
                   </Button>
                   <Button onClick={() => cancelEdit(record.key)}>Cancel</Button>
