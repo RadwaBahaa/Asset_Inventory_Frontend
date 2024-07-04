@@ -21,7 +21,7 @@ const MapComponent = (props) => {
     serviceArea,
     setSelectedLocation,
     serviedLocations,
-    setServiceArea,
+    // setServiceArea,
     setServiedLocations,
   } = props;
   const center = [40.71105853111035, -74.00752039016318];
@@ -98,6 +98,7 @@ const MapComponent = (props) => {
               setSelectedItem(null);
               setSelectedLocation(null);
               setServiedLocations(null);
+              map.getCenter().lat != center[0] && map.flyTo(center, 10);
             }}
           />
         );

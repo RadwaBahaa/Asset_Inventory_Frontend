@@ -5,5 +5,8 @@ const targomoAPI = axios.create({
   params: {
     key: process.env.REACT_APP_TRAGOMO_API_KEY,
   },
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 export default targomoAPI;

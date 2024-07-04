@@ -11,6 +11,8 @@ const ReceiverTable = ({
   setProcessData,
   setAssetsData,
   assetsData,
+  selectedReceiver,
+  // setSelectedReceiver,
 }) => {
   const [editingKey, setEditingKey] = useState("");
   const [editedAssets, setEditedAssets] = useState({});
@@ -72,12 +74,15 @@ const ReceiverTable = ({
       return {
         ...asset,
         initialAvailableQuantity: asset.originalQuantity - totalEditedQuantity,
+        availableQuantity: asset.originalQuantity - totalEditedQuantity,
       };
     });
-
+    console.log(updatedAssetsData);
     setAssetsData(updatedAssetsData);
     setEditingKey("");
     setEditedAssets({});
+    // if ()
+    // setSelectedReceiver([]);
   };
 
   const handleStartProcess = async () => {
@@ -117,7 +122,17 @@ const ReceiverTable = ({
       });
   };
 
-  const columns = [
+  const getMaxQuantity = (assetID, assetQuantity) => {
+    const totalEditedQuantity = processData
+      .flatMap((item) => item.assets)
+      .filter((a) => a.id === assetID)
+      .reduce((sum, a) => sum + a.assetQuantity, 0);
+
+    const assetData = assetsData.find((asset) => asset.id === assetID);
+    return assetData.originalQuantity - totalEditedQuantity + assetQuantity;
+  };
+
+  var columns = [
     {
       title: "Receiver Name",
       dataIndex: "receiverName",
@@ -161,10 +176,7 @@ const ReceiverTable = ({
                   }
                   onChange={(value) => handleQuantityChange(a.key, value)}
                   min={0}
-                  max={
-                    assetsData.find((asset) => asset.id === a.id)
-                      .originalQuantity
-                  }
+                  max={getMaxQuantity(a.id, a.assetQuantity)}
                 />
               </div>
             ))}
@@ -213,21 +225,28 @@ const ReceiverTable = ({
       ),
     },
   ];
+  // });
 
   const tableContainerStyle = {
     maxHeight: "400px", // Adjust the max height as needed
-    overflowY: "auto", // Enable vertical scrolling
   };
 
   return (
     <div style={tableContainerStyle}>
-      <Divider />
-      <h3 style={{ textAlign: "center", marginBottom: "16px" }}>
-        Process Table
-      </h3>
-      <Table columns={columns} dataSource={processData} pagination={false} />
-      <div style={{ textAlign: "center", marginTop: "16px" }}>
+      <Divider style={{ margin: "10px " }} />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          flexDirection: "row",
+          alignItems: "center",
+          marginBottom: "10px",
+          padding: " 10px",
+        }}
+      >
+        <h3 style={{ margin: "0" }}>Process Table</h3>
         <Button
+          style={{ margin: "0", width: "15%" }}
           type="primary"
           disabled={isStartProcessDisabled}
           onClick={handleStartProcess}
@@ -235,6 +254,7 @@ const ReceiverTable = ({
           Start Process
         </Button>
       </div>
+      <Table columns={columns} dataSource={processData} pagination={false} />
     </div>
   );
 };

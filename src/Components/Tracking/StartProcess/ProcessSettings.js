@@ -10,42 +10,37 @@ const ProcessSettings = (props) => {
     console.log("search:", value);
   };
 
-  const onSelect = (option) => {
-    setSelectedReceiver({
-      name: option.value,
-      key: option.key,
-    });
+  const onSelect = (value) => {
+    // console.log(
+    //   receiverData.find((receiver) => receiver.properties.name === value)
+    // );
+    setSelectedReceiver(
+      receiverData.find((receiver) => receiver.properties.name === value)
+    );
+    // console.log(selectedReceiver);
+    // setSelectedReceiver(selectedReceiver);
   };
 
   return (
     <div
       style={{ marginBottom: "16px", display: "flex", alignItems: "center" }}
     >
-      <Segmented
-        style={{ marginRight: "8px" }} // Adjust margin-right for gap
-        options={[
-          {
-            value: "List",
-            icon: <BarsOutlined />,
-          },
-          {
-            value: "Grid",
-            icon: <AppstoreOutlined />,
-          },
-        ]}
-      />
       <Select
         showSearch
         placeholder="Select a warehouse"
         optionFilterProp="label"
-        onSelect={(value, option) => onSelect(option)}
+        onSelect={onSelect}
         onSearch={onSearch}
         style={{ width: 620 }} // Set the width here
         value={selectedReceiver ? selectedReceiver.name : null}
       >
         {receiverData.length > 0 &&
           receiverData.map((receiver) => (
-            <Select.Option key={receiver.key} value={receiver.name}>
+            <Select.Option
+              key={receiver.properties.id}
+              value={receiver.properties.name}
+              onSelect={() => onSelect(receiver)}
+            >
               {receiver.name}
             </Select.Option>
           ))}

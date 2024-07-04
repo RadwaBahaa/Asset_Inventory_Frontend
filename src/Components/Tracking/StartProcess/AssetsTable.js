@@ -12,6 +12,7 @@ const AssetsTable = ({
   setProcessData,
   setSelectedReceiver,
   setAssetsActivated,
+  setStartProcessDisabled,
 }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -51,8 +52,8 @@ const AssetsTable = ({
 
   const handleStartProcess = () => {
     const newProcessEntry = {
-      key: selectedReceiver.key,
-      receiverName: selectedReceiver.name,
+      key: selectedReceiver.properties.id,
+      receiverName: selectedReceiver.properties.name,
       assets: selectAssets,
     };
     setProcessData((prevData) => [...prevData, newProcessEntry]);
@@ -62,16 +63,17 @@ const AssetsTable = ({
     newData.map((item) => {
       if (selectedRowKeys.includes(item.key)) {
         item.quantity = 0;
-        // item.assetQuantity = item.assetQuantity;
         item.initialAvailableQuantity = item.availableQuantity;
       }
     });
+    console.log(newData);
     setAssetsData(newData);
     setSelectedReceiver(null);
     setSelectedRowKeys([]);
     setSelectAssets([]);
     setResetSelectedData(true);
     setAssetsActivated(false);
+    setStartProcessDisabled(true);
   };
 
   useEffect(() => {
@@ -79,12 +81,6 @@ const AssetsTable = ({
       setResetSelectedData(false);
     }
   }, [selectedRowKeys, assetsData]);
-
-  // // Reset the selected rows when the assetsData changes
-  // useEffect(() => {
-  //   console.log("Assets data changed:", assetsData);
-  //   // setSelectedRowKeys([]);
-  // }, [assetsData]);
 
   const handleReset = (key) => {
     const newData = assetsData.map((item) => {
@@ -164,7 +160,7 @@ const AssetsTable = ({
   };
 
   return (
-    <div>
+    <div style={{width: "100%"}}>
       {assetsData.length > 0 && (
         <Table
           rowSelection={rowSelection}

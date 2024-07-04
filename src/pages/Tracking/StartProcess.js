@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import TrackingSubNavbar from "../../Components/NavBars/TrackingSubNavBar";
-import { EyeOutlined, BarsOutlined, AppstoreOutlined } from "@ant-design/icons";
-import { Row, Col, Button, Segmented, Dropdown, Menu } from "antd";
+import { EyeOutlined } from "@ant-design/icons";
+import { Row, Col, Divider } from "antd";
 import AssetsTable from "../../Components/Tracking/StartProcess/AssetsTable";
 import ReceiverTable from "../../Components/Tracking/StartProcess/ReceiverTable"; // Import ReceiverTable
 import ReceiverMap from "../../Components/Tracking/StartProcess/ReceiverMap";
 import ProcessSettings from "../../Components/Tracking/StartProcess/ProcessSettings";
 import { useSelector } from "react-redux";
 import database from "../../axios/database";
-import { original } from "@reduxjs/toolkit";
+import { Paper } from "@mui/material";
+import targomoAPI from "../../axios/targomoAPI";
+import geoapifyAPI from "../../axios/geoapifyAPI";
 
 export default function StartProcess() {
   const [selectedReceiver, setSelectedReceiver] = useState(null);
@@ -17,9 +19,13 @@ export default function StartProcess() {
   const [assetsActivated, setAssetsActivated] = useState(false);
   const [processData, setProcessData] = useState([]);
   const [previouslySelectedAssets, setPreviouslySelectedAssets] = useState([]);
-  const [viewType, setViewType] = useState("List"); // State to manage view type (List or Grid)
   const [receiverData, setReceiverData] = useState([]);
   const [assetsData, setAssetsData] = useState([]);
+  const [senderData, setSenderData] = useState();
+  const [serviceArea, setServiceArea] = useState([]);
+
+  // const [locations, setLocations] = useState(null);
+  // const [selectedLocation, setSelectedLocation] = useState(null);
 
   const userRole = useSelector((state) => state.login.role);
   const userID = useSelector((state) => state.login.id);
@@ -31,6 +37,8 @@ export default function StartProcess() {
       if (previouslySelectedAssets.length > 0) {
         setSelectAssets(previouslySelectedAssets);
       }
+      console.log(selectedReceiver);
+      // setSelectedLocation(selectedReceiver);
     }
   }, [selectedReceiver]);
 
@@ -66,11 +74,6 @@ export default function StartProcess() {
     setProcessData(newData);
   };
 
-  const handleSegmentedChange = (value) => {
-    setViewType(value);
-    // Handle view change logic if needed
-  };
-
   const pageStyle = {
     display: "flex",
     flexDirection: "column",
@@ -82,25 +85,42 @@ export default function StartProcess() {
     flex: 1,
     overflowY: "auto", // Enable vertical scrolling if needed
     padding: "16px",
-  };
-
-  const headerStyle = {
-    marginBottom: "16px",
-    textAlign: "center",
+    margin: "50px",
   };
 
   useEffect(() => {
-    var responseData = [];
     if (userRole === "Supplier") {
       database
         .get(`warehouse/read/geojson`)
         .then((response) => {
-          responseData = response.data.map((item) => ({
-            key: item.properties.warehouseID,
-            name: item.properties.warehouseName,
+          const responseData = response.data.map((item) => ({
+            ...item,
+            properties: {
+              ...item.properties,
+              id: item.properties.warehouseID,
+              name: item.properties.warehouseName,
+              type: "Warehouse",
+            },
           }));
-          console.log(response.data);
           setReceiverData(responseData);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
+      database
+        .get(`supplier/read/geojson/${userID}`)
+        .then((response) => {
+          const responseData = response.data.map((item) => ({
+            ...item,
+            properties: {
+              ...item.properties,
+              id: item.properties.supplierID,
+              name: item.properties.supplierID,
+              type: "Supplier",
+            },
+          }));
+          setSenderData(responseData);
         })
         .catch((error) => {
           console.error(error);
@@ -109,12 +129,40 @@ export default function StartProcess() {
       database
         .get(`store/read/geojson`)
         .then((response) => {
-          responseData = response.data.map((item) => ({
-            key: item.properties.storeID,
-            name: item.properties.storeName,
+          const responseData = response.data.map((item) => ({
+            ...item,
+            properties: {
+              ...item.properties,
+              id: item.properties.storeID,
+              name: item.properties.storeName,
+              type: "Store",
+            },
           }));
-          // console.log(response.data);
           setReceiverData(responseData);
+          console.log(responseData);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
+      database
+        .get(`warehouse/read/geojson/`, {
+          params: {
+            id: userID,
+          },
+        })
+        .then((response) => {
+          const responseData = response.data.map((item) => ({
+            ...item,
+            properties: {
+              ...item.properties,
+              id: item.properties.warehouseID,
+              name: item.properties.warehouseName,
+              type: "Warehouse",
+            },
+          }));
+          setSenderData(responseData);
+          console.log(responseData);
         })
         .catch((error) => {
           console.error(error);
@@ -140,13 +188,48 @@ export default function StartProcess() {
             quantity: 0,
           }));
           setAssetsData(mappedData);
-          // console.log("Assets Data:", mappedData); // Add this line to check data
         })
         .catch((error) => {
           console.error("Error fetching assets:", error);
         });
     }
   }, [processData]);
+
+  useEffect(() => {
+    if (senderData) {
+      senderData.map((sender) => {
+        console.log(sender);
+
+        console.log(sender.geometry.coordinates);
+        setServiceArea(null);
+        geoapifyAPI
+          .get("/isoline", {
+            params: {
+              lat: sender.geometry.coordinates[1],
+              lon: sender.geometry.coordinates[0],
+              type: "distance",
+              mode: "drive",
+              range: 10000,
+              route_type: "short",
+              traffic: "approximated",
+            },
+          })
+          .then((res) => {
+            if (res.data.features.length > 0) {
+              setServiceArea(res.data.features[0]);
+              console.log(res.data.features);
+            } else {
+              setServiceArea([]);
+              console.log("No service area found");
+            }
+          })
+          .catch((err) => {
+            setServiceArea(null);
+            console.log(err);
+          });
+      });
+    }
+  }, [senderData]);
 
   return (
     <div style={pageStyle}>
@@ -160,68 +243,93 @@ export default function StartProcess() {
         }
         addButtonPath="/tracking/viewTracking"
       />
-      <div style={contentStyle}>
-        {/* Grid Layout for Assets Table and Map Container */}
-        <Row gutter={16}>
-          {/* Assets Table */}
-          <Col span={13}>
-            <ProcessSettings
-              receiverData={receiverData}
-              selectedReceiver={selectedReceiver}
-              setSelectedReceiver={setSelectedReceiver}
-            />
-            <div
-              style={{
-                height: "85%",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <div
-                style={{
-                  opacity: assetsActivated ? 1 : 0.5,
-                  pointerEvents: assetsActivated ? "auto" : "none",
-                  flex: 1,
-                }}
-              >
-                <AssetsTable
-                  setSelectAssets={(newAssets) => {
-                    setSelectAssets(newAssets);
-                    setPreviouslySelectedAssets(newAssets); // Update previouslySelectedAssets on selection change
-                  }}
-                  assetsData={assetsData}
-                  setAssetsData={setAssetsData}
-                  startProcessDisabled={startProcessDisabled}
-                  selectedReceiver={selectedReceiver}
-                  selectAssets={selectAssets}
-                  setProcessData={setProcessData}
-                  setSelectedReceiver={setSelectedReceiver}
-                  setAssetsActivated={setAssetsActivated}
-                />
-              </div>
-            </div>
-          </Col>
-
-          {/* Map Container */}
-          <Col span={11}>
-            <ReceiverMap />
-          </Col>
-        </Row>
-
-        {/* Process Table */}
-        <div style={{ marginTop: "16px" }}>
-          <ReceiverTable
-            processData={processData}
-            onDelete={handleDeleteProcess}
-            onSave={handleSaveProcess}
-            userRole={userRole}
-            userID={userID}
+      <div
+        style={{
+          display: "flex",
+          height: "500px",
+          zIndex: 1,
+          width: "100%",
+          marginTop: "2%",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            padding: "2%",
+            height: "100%",
+            width: "50%",
+            margin: "0px 10px 0px 20px",
+            height: "500px",
+            borderRadius: "10px",
+            backgroundColor: "white",
+          }}
+        >
+          <ProcessSettings
+            receiverData={receiverData}
             selectedReceiver={selectedReceiver}
-            setProcessData={setProcessData}
-            setAssetsData={setAssetsData}
-            assetsData={assetsData}
+            setSelectedReceiver={setSelectedReceiver}
+          />
+          <div
+            style={{
+              opacity: assetsActivated ? 1 : 0.5,
+              pointerEvents: assetsActivated ? "auto" : "none",
+              maxWidth: "100%",
+            }}
+          >
+            <AssetsTable
+              setSelectAssets={(newAssets) => {
+                setSelectAssets(newAssets);
+                setPreviouslySelectedAssets(newAssets); // Update previouslySelectedAssets on selection change
+              }}
+              assetsData={assetsData}
+              setAssetsData={setAssetsData}
+              startProcessDisabled={startProcessDisabled}
+              selectedReceiver={selectedReceiver}
+              selectAssets={selectAssets}
+              setProcessData={setProcessData}
+              setSelectedReceiver={setSelectedReceiver}
+              setAssetsActivated={setAssetsActivated}
+              setStartProcessDisabled={setStartProcessDisabled}
+            />
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            padding: "2%",
+            height: "100%",
+            width: "50%",
+            margin: "0px 20px 0px 10px",
+            height: "500px",
+            borderRadius: "10px",
+            backgroundColor: "white",
+          }}
+        >
+          <ReceiverMap
+            userRole={userRole}
+            receiverData={receiverData}
+            senderData={senderData}
+            // selectedLocation={selectedLocation}
+            selectedReceiver={selectedReceiver}
+            serviceArea={serviceArea}
           />
         </div>
+      </div>
+      <div style={{ margin: "10px 20px 50px 20px" }}>
+        <ReceiverTable
+          processData={processData}
+          onDelete={handleDeleteProcess}
+          onSave={handleSaveProcess}
+          userRole={userRole}
+          userID={userID}
+          selectedReceiver={selectedReceiver}
+          setProcessData={setProcessData}
+          setAssetsData={setAssetsData}
+          assetsData={assetsData}
+          setSelectedReceiver={setSelectedReceiver}
+        />
       </div>
     </div>
   );
