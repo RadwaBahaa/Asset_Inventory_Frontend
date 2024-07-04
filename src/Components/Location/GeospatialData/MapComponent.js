@@ -21,7 +21,6 @@ const MapComponent = (props) => {
     serviceArea,
     setSelectedLocation,
     serviedLocations,
-    // setServiceArea,
     setServiedLocations,
   } = props;
   const center = [40.71105853111035, -74.00752039016318];

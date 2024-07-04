@@ -24,7 +24,6 @@ const AssetsTable = ({
       assetsData.find((item) => item.key === key)
     );
     const filteredRows = selectedRows.filter((row) => row.quantity > 0);
-    // console.log("Selected rows with quantity > 0:", filteredRows);
     setSelectAssets(filteredRows);
   }, [selectedRowKeys, assetsData]);
 
@@ -66,6 +65,7 @@ const AssetsTable = ({
         item.initialAvailableQuantity = item.availableQuantity;
       }
     });
+
     console.log(newData);
     setAssetsData(newData);
     setSelectedReceiver(null);
@@ -134,6 +134,7 @@ const AssetsTable = ({
           max={record.initialAvailableQuantity}
           value={resetSelectedData ? 0 : record.quantity}
           onChange={(value) => handleQuantityChange(record.key, value)}
+          disabled={!selectedRowKeys.includes(record.key)}
         />
       ),
     },
@@ -160,7 +161,7 @@ const AssetsTable = ({
   };
 
   return (
-    <div style={{width: "100%"}}>
+    <div style={{ width: "100%" }}>
       {assetsData.length > 0 && (
         <Table
           rowSelection={rowSelection}
@@ -187,6 +188,7 @@ const AssetsTable = ({
           type="primary"
           onClick={handleStartProcess}
           disabled={startProcessDisabled}
+          style={{ width: "150px" }}
         >
           Add to Process
         </Button>

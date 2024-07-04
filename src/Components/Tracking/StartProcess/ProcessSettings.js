@@ -1,24 +1,40 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Select } from "antd";
-import { AppstoreOutlined, BarsOutlined } from "@ant-design/icons";
-import { Segmented } from "antd";
 
 const ProcessSettings = (props) => {
-  const { receiverData, selectedReceiver, setSelectedReceiver } = props;
+  const { receiverData, selectedReceiver, setSelectedReceiver, processData } =
+    props;
+
+  const [viewedData, setViewedData] = useState([]);
+
+  useEffect(() => {
+    if (processData.length > 0) {
+      setViewedData((prevData) =>
+        prevData.filter(
+          (item) =>
+            !processData.find(
+              (process) => process.receiverName === item.properties.name
+            )
+        )
+      );
+    }
+  }, [processData]);
+
+  useEffect(() => {
+    if (receiverData.length > 0) {
+      setViewedData(receiverData);
+    }
+  }, [receiverData]);
 
   const onSearch = (value) => {
     console.log("search:", value);
   };
 
   const onSelect = (value) => {
-    // console.log(
-    //   receiverData.find((receiver) => receiver.properties.name === value)
-    // );
+    console.log(selectedReceiver);
     setSelectedReceiver(
-      receiverData.find((receiver) => receiver.properties.name === value)
+      viewedData.find((receiver) => receiver.properties.name === value)
     );
-    // console.log(selectedReceiver);
-    // setSelectedReceiver(selectedReceiver);
   };
 
   return (
@@ -32,17 +48,17 @@ const ProcessSettings = (props) => {
         onSelect={onSelect}
         onSearch={onSearch}
         style={{ width: 620 }} // Set the width here
-        value={selectedReceiver ? selectedReceiver.name : null}
+        value={selectedReceiver ? selectedReceiver.properties.name : null}
+        size="large"
       >
         {receiverData.length > 0 &&
-          receiverData.map((receiver) => (
+          viewedData.length > 0 &&
+          viewedData.map((receiver) => (
             <Select.Option
               key={receiver.properties.id}
               value={receiver.properties.name}
               onSelect={() => onSelect(receiver)}
-            >
-              {receiver.name}
-            </Select.Option>
+            ></Select.Option>
           ))}
       </Select>
     </div>

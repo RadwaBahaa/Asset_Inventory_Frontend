@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
 import TrackingSubNavbar from "../../Components/NavBars/TrackingSubNavBar";
 import { EyeOutlined } from "@ant-design/icons";
-import { Row, Col, Divider } from "antd";
 import AssetsTable from "../../Components/Tracking/StartProcess/AssetsTable";
-import ReceiverTable from "../../Components/Tracking/StartProcess/ReceiverTable"; // Import ReceiverTable
+import ReceiverTable from "../../Components/Tracking/StartProcess/ReceiverTable";
 import ReceiverMap from "../../Components/Tracking/StartProcess/ReceiverMap";
 import ProcessSettings from "../../Components/Tracking/StartProcess/ProcessSettings";
 import { useSelector } from "react-redux";
 import database from "../../axios/database";
-import { Paper } from "@mui/material";
-import targomoAPI from "../../axios/targomoAPI";
 import geoapifyAPI from "../../axios/geoapifyAPI";
+import * as turf from "@turf/turf";
 
 export default function StartProcess() {
   const [selectedReceiver, setSelectedReceiver] = useState(null);
@@ -21,11 +19,10 @@ export default function StartProcess() {
   const [previouslySelectedAssets, setPreviouslySelectedAssets] = useState([]);
   const [receiverData, setReceiverData] = useState([]);
   const [assetsData, setAssetsData] = useState([]);
-  const [senderData, setSenderData] = useState();
-  const [serviceArea, setServiceArea] = useState([]);
-
-  // const [locations, setLocations] = useState(null);
-  // const [selectedLocation, setSelectedLocation] = useState(null);
+  const [senderData, setSenderData] = useState(null);
+  const [serviceArea, setServiceArea] = useState(null);
+  const [serviedLocations, setServiedLocations] = useState(null);
+  const [center, setCenter] = useState([40.71105853111035, -74.00752039016318]);
 
   const userRole = useSelector((state) => state.login.role);
   const userID = useSelector((state) => state.login.id);
@@ -33,12 +30,10 @@ export default function StartProcess() {
   useEffect(() => {
     if (selectedReceiver) {
       setAssetsActivated(true);
-      // Check if previously selected assets exist and update current selection
       if (previouslySelectedAssets.length > 0) {
         setSelectAssets(previouslySelectedAssets);
       }
       console.log(selectedReceiver);
-      // setSelectedLocation(selectedReceiver);
     }
   }, [selectedReceiver]);
 
@@ -51,7 +46,6 @@ export default function StartProcess() {
   const handleDeleteProcess = (key) => {
     const deletedProcess = processData.find((item) => item.key === key);
     if (deletedProcess) {
-      // Restore the quantities of the deleted assets
       const updatedAssetsData = assetsData.map((asset) => {
         const editedAsset = deletedProcess.assets.find(
           (a) => a.key === asset.key
@@ -66,7 +60,6 @@ export default function StartProcess() {
       });
       setAssetsData(updatedAssetsData);
     }
-
     setProcessData((prevData) => prevData.filter((item) => item.key !== key));
   };
 
@@ -78,98 +71,75 @@ export default function StartProcess() {
     display: "flex",
     flexDirection: "column",
     minHeight: "100vh",
-    overflowY: "auto", // Enable vertical scrolling if needed
+    overflowY: "auto",
   };
 
   const contentStyle = {
     flex: 1,
-    overflowY: "auto", // Enable vertical scrolling if needed
+    overflowY: "auto",
     padding: "16px",
     margin: "50px",
   };
 
   useEffect(() => {
     if (userRole === "Supplier") {
-      database
-        .get(`warehouse/read/geojson`)
-        .then((response) => {
-          const responseData = response.data.map((item) => ({
-            ...item,
-            properties: {
-              ...item.properties,
-              id: item.properties.warehouseID,
-              name: item.properties.warehouseName,
-              type: "Warehouse",
-            },
-          }));
-          setReceiverData(responseData);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-
-      database
-        .get(`supplier/read/geojson/${userID}`)
-        .then((response) => {
-          const responseData = response.data.map((item) => ({
-            ...item,
-            properties: {
-              ...item.properties,
-              id: item.properties.supplierID,
-              name: item.properties.supplierID,
-              type: "Supplier",
-            },
-          }));
-          setSenderData(responseData);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+      fetchReceiverData(
+        "warehouse",
+        "warehouseID",
+        "warehouseName",
+        "Warehouse"
+      );
+      fetchSenderData("supplier", "supplierID", "Supplier", userID);
     } else if (userRole === "Warehouse") {
-      database
-        .get(`store/read/geojson`)
-        .then((response) => {
-          const responseData = response.data.map((item) => ({
-            ...item,
-            properties: {
-              ...item.properties,
-              id: item.properties.storeID,
-              name: item.properties.storeName,
-              type: "Store",
-            },
-          }));
-          setReceiverData(responseData);
-          console.log(responseData);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-
-      database
-        .get(`warehouse/read/geojson/`, {
-          params: {
-            id: userID,
-          },
-        })
-        .then((response) => {
-          const responseData = response.data.map((item) => ({
-            ...item,
-            properties: {
-              ...item.properties,
-              id: item.properties.warehouseID,
-              name: item.properties.warehouseName,
-              type: "Warehouse",
-            },
-          }));
-          setSenderData(responseData);
-          console.log(responseData);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+      fetchReceiverData("store", "storeID", "storeName", "Store");
+      fetchSenderData("warehouse", "warehouseID", "Warehouse", userID);
     }
-    return () => {};
   }, []);
+
+  // useEffect(() => {
+  const fetchReceiverData = (endpoint, idField, nameField, type) => {
+    database
+      .get(`${endpoint}/read/geojson`)
+      .then((response) => {
+        const responseData = response.data.map((item) => ({
+          ...item,
+          properties: {
+            ...item.properties,
+            id: item.properties[idField],
+            name: item.properties[nameField],
+            type,
+          },
+        }));
+        setReceiverData(responseData);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const fetchSenderData = (endpoint, idField, type, userId) => {
+    database
+      .get(`${endpoint}/read/geojson/${userId}`)
+      .then((response) => {
+        const responseData = {
+          ...response.data,
+          properties: {
+            ...response.data.properties,
+            id: response.data.properties[idField],
+            name: response.data.properties[idField],
+            type,
+          },
+        };
+        console.log(response.data);
+        setSenderData(responseData);
+
+        const center = response.data.geometry.coordinates;
+        setCenter([center[1], center[0]]);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   useEffect(() => {
     if (processData.length == 0) {
@@ -193,41 +163,55 @@ export default function StartProcess() {
           console.error("Error fetching assets:", error);
         });
     }
-  }, [processData]);
+  }, []);
 
   useEffect(() => {
     if (senderData) {
-      senderData.map((sender) => {
-        console.log(sender);
+      // senderData.map((sender) => {
+      setServiceArea(null);
+      geoapifyAPI
+        .get("/isoline", {
+          params: {
+            lat: senderData.geometry.coordinates[1],
+            lon: senderData.geometry.coordinates[0],
+            type: "distance",
+            mode: "drive",
+            range: 20000,
+            route_type: "short",
+            traffic: "approximated",
+          },
+        })
+        .then((res) => {
+          if (res.data.features.length > 0) {
+            const polygon = res.data.features[0];
 
-        console.log(sender.geometry.coordinates);
-        setServiceArea(null);
-        geoapifyAPI
-          .get("/isoline", {
-            params: {
-              lat: sender.geometry.coordinates[1],
-              lon: sender.geometry.coordinates[0],
-              type: "distance",
-              mode: "drive",
-              range: 10000,
-              route_type: "short",
-              traffic: "approximated",
-            },
-          })
-          .then((res) => {
-            if (res.data.features.length > 0) {
-              setServiceArea(res.data.features[0]);
-              console.log(res.data.features);
-            } else {
-              setServiceArea([]);
-              console.log("No service area found");
+            if (receiverData.length > 0) {
+              const locationsWithinServiceArea = receiverData.filter(
+                (location) => {
+                  const point = turf.point(location.geometry.coordinates);
+                  console.log(
+                    point,
+                    turf.booleanPointInPolygon(point, polygon)
+                  );
+                  return turf.booleanPointInPolygon(point, polygon);
+                }
+              );
+
+              setServiceArea(polygon);
+              setServiedLocations(locationsWithinServiceArea);
+              console.log(locationsWithinServiceArea);
             }
-          })
-          .catch((err) => {
+          } else {
             setServiceArea(null);
-            console.log(err);
-          });
-      });
+            setServiedLocations([]);
+            console.log("No service area found");
+          }
+        })
+        .catch((err) => {
+          setServiceArea(null);
+          console.log(err);
+        });
+      // });
     }
   }, [senderData]);
 
@@ -269,6 +253,7 @@ export default function StartProcess() {
             receiverData={receiverData}
             selectedReceiver={selectedReceiver}
             setSelectedReceiver={setSelectedReceiver}
+            processData={processData}
           />
           <div
             style={{
@@ -280,7 +265,7 @@ export default function StartProcess() {
             <AssetsTable
               setSelectAssets={(newAssets) => {
                 setSelectAssets(newAssets);
-                setPreviouslySelectedAssets(newAssets); // Update previouslySelectedAssets on selection change
+                setPreviouslySelectedAssets(newAssets);
               }}
               assetsData={assetsData}
               setAssetsData={setAssetsData}
@@ -291,6 +276,8 @@ export default function StartProcess() {
               setSelectedReceiver={setSelectedReceiver}
               setAssetsActivated={setAssetsActivated}
               setStartProcessDisabled={setStartProcessDisabled}
+              setReceiverData={setReceiverData}
+              // processData={processData}
             />
           </div>
         </div>
@@ -308,12 +295,15 @@ export default function StartProcess() {
           }}
         >
           <ReceiverMap
-            userRole={userRole}
+            setSelectedReceiver={setSelectedReceiver}
             receiverData={receiverData}
             senderData={senderData}
-            // selectedLocation={selectedLocation}
+            userRole={userRole}
             selectedReceiver={selectedReceiver}
             serviceArea={serviceArea}
+            setServiedLocations={setServiedLocations}
+            serviedLocations={serviedLocations}
+            center={center}
           />
         </div>
       </div>
@@ -324,11 +314,10 @@ export default function StartProcess() {
           onSave={handleSaveProcess}
           userRole={userRole}
           userID={userID}
-          selectedReceiver={selectedReceiver}
-          setProcessData={setProcessData}
-          setAssetsData={setAssetsData}
+          setPreviouslySelectedAssets={setPreviouslySelectedAssets}
           assetsData={assetsData}
-          setSelectedReceiver={setSelectedReceiver}
+          setAssetsData={setAssetsData}
+          setProcessData={setProcessData}
         />
       </div>
     </div>

@@ -11,15 +11,12 @@ const ReceiverTable = ({
   setProcessData,
   setAssetsData,
   assetsData,
-  selectedReceiver,
-  // setSelectedReceiver,
 }) => {
   const [editingKey, setEditingKey] = useState("");
   const [editedAssets, setEditedAssets] = useState({});
   const [isStartProcessDisabled, setIsStartProcessDisabled] = useState(true);
 
   useEffect(() => {
-    // Check if there is any data in processData to enable/disable the Start Process button
     setIsStartProcessDisabled(processData.length === 0);
   }, [processData]);
 
@@ -82,7 +79,6 @@ const ReceiverTable = ({
     setEditingKey("");
     setEditedAssets({});
     // if ()
-    // setSelectedReceiver([]);
   };
 
   const handleStartProcess = async () => {
@@ -92,6 +88,9 @@ const ReceiverTable = ({
     } else if (userRole === "Warehouse") {
       receiverRole = "store";
     }
+    console.log("receiverRole", receiverRole);
+    // Disable button to prevent multiple clicks
+    setIsStartProcessDisabled(true);
 
     // Prepare data in the required format for API request
     const requestData = {
@@ -106,19 +105,23 @@ const ReceiverTable = ({
       })),
     };
 
+    // Make the API call to start the process
     await database
       .post(
         `/delivery-process/${userRole}-${receiverRole}/create/${userID}`,
         requestData
       )
       .then((response) => {
-        // Handle success (if needed)
+        // Handle success: clear processData and assetsData
         message.success("Process started successfully!");
         setProcessData([]);
+        setAssetsData([]);
       })
       .catch((error) => {
-        // Handle error
+        // Handle error: enable button and show error message
         message.error("Failed to start process. Please try again.");
+        setIsStartProcessDisabled(false);
+        console.error("Error starting process:", error);
       });
   };
 
@@ -254,7 +257,9 @@ const ReceiverTable = ({
           Start Process
         </Button>
       </div>
-      <Table columns={columns} dataSource={processData} pagination={false} />
+      {processData.length > 0 && (
+        <Table columns={columns} dataSource={processData} pagination={false} />
+      )}
     </div>
   );
 };

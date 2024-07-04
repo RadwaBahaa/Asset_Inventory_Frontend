@@ -123,6 +123,7 @@ export default function GeospatialData() {
               const locationsWithinServiceArea = allLocations.filter(
                 (location) => {
                   const point = turf.point(location.geometry.coordinates);
+                  // console.log(turf.booleanPointInPolygon(point, polygon));
                   return turf.booleanPointInPolygon(point, polygon);
                 }
               );
