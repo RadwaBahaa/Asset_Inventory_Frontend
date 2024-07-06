@@ -38,6 +38,7 @@ const loginSlice = createSlice({
   name: "login",
   initialState: {
     token: "", // JWT token
+    userName: "",
     role: "", // User role
     id: 0, // User ID
     error: null, // Error message if login fails
@@ -45,11 +46,15 @@ const loginSlice = createSlice({
   reducers: {
     setLogout: (state) => {
       state.token = "";
+      state.userName = "";
       state.role = "";
       state.id = 0;
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
     },
     setLogin: (state, action) => {
       state.token = action.payload.token;
+      state.userName = action.payload.userName;
       state.role = action.payload.role;
       state.id = action.payload.id;
     },
@@ -58,6 +63,7 @@ const loginSlice = createSlice({
     builder
       .addCase(login.fulfilled, (state, action) => {
         state.token = action.payload.token;
+        state.userName = action.payload.userName;
         state.role = action.payload.role;
         state.id = action.payload.id;
         state.error = null;
@@ -67,6 +73,7 @@ const loginSlice = createSlice({
       })
       .addCase(validateToken.fulfilled, (state, action) => {
         state.token = action.payload.token;
+        state.userName = action.payload.userName;
         state.role = action.payload.role;
         state.id = action.payload.id;
         state.error = null;

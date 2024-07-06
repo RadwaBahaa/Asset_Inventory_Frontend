@@ -2,10 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { validateToken } from "../store/Slices/login";
+import LoadingPage from "../Components/LoadingPage";
 
 const TokenValidation = ({ children }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token =
@@ -15,18 +18,19 @@ const TokenValidation = ({ children }) => {
         .unwrap()
         .then(() => {
           console.log("Token is valid");
+          setLoading(false);
         })
         .catch(() => {
           navigate("/login");
-          console.log("Token is invalid");
+          setLoading(false);
         });
     } else {
       navigate("/login");
-      console.log("No token found");
+      setLoading(false);
     }
   }, [dispatch, navigate]);
 
-  return children;
+  return loading ? <LoadingPage /> : children;
 };
 
 export default TokenValidation;

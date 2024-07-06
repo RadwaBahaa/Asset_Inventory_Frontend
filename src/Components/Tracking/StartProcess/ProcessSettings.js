@@ -9,6 +9,7 @@ const ProcessSettings = (props) => {
 
   useEffect(() => {
     if (processData.length > 0) {
+      // console.log("processData", processData);
       setViewedData((prevData) =>
         prevData.filter(
           (item) =>
@@ -17,8 +18,14 @@ const ProcessSettings = (props) => {
             )
         )
       );
+    } else {
+      setViewedData(receiverData);
     }
   }, [processData]);
+
+  useEffect(() => {
+    console.log("viewedData", viewedData);
+  }, [viewedData]);
 
   useEffect(() => {
     if (receiverData.length > 0) {

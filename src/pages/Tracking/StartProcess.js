@@ -43,24 +43,19 @@ export default function StartProcess() {
     }
   }, [selectAssets]);
 
-  const handleDeleteProcess = (key) => {
-    const deletedProcess = processData.find((item) => item.key === key);
-    if (deletedProcess) {
-      const updatedAssetsData = assetsData.map((asset) => {
-        const editedAsset = deletedProcess.assets.find(
-          (a) => a.key === asset.key
-        );
-        if (editedAsset) {
-          return {
-            ...asset,
-            availableQuantity: asset.availableQuantity + editedAsset.quantity,
-          };
-        }
-        return asset;
-      });
-      setAssetsData(updatedAssetsData);
-    }
-    setProcessData((prevData) => prevData.filter((item) => item.key !== key));
+  const handleDeleteProcess = (record) => {
+    const updatedData = processData.filter((item) => item.key !== record.key);
+    setProcessData(updatedData);
+
+    const updatedAssetsData = assetsData.map((asset) => {
+      return {
+        ...asset,
+        availableQuantity:
+          asset.availableQuantity +
+          record.assets.map((a) => a.assetQuantity).reduce((a, b) => a + b, 0),
+      };
+    });
+    setAssetsData(updatedAssetsData);
   };
 
   const handleSaveProcess = (newData) => {
@@ -111,6 +106,7 @@ export default function StartProcess() {
           },
         }));
         setReceiverData(responseData);
+        // setViewedData(responseData);
       })
       .catch((error) => {
         console.error(error);
@@ -167,7 +163,6 @@ export default function StartProcess() {
 
   useEffect(() => {
     if (senderData) {
-      // senderData.map((sender) => {
       setServiceArea(null);
       geoapifyAPI
         .get("/isoline", {
@@ -254,6 +249,8 @@ export default function StartProcess() {
             selectedReceiver={selectedReceiver}
             setSelectedReceiver={setSelectedReceiver}
             processData={processData}
+            // viewedData={viewedData}
+            // setViewedData={setViewedData}
           />
           <div
             style={{
@@ -277,7 +274,6 @@ export default function StartProcess() {
               setAssetsActivated={setAssetsActivated}
               setStartProcessDisabled={setStartProcessDisabled}
               setReceiverData={setReceiverData}
-              // processData={processData}
             />
           </div>
         </div>

@@ -3,35 +3,44 @@ import TrackingSubNavbar from "../../Components/NavBars/TrackingSubNavBar";
 import {
   DownOutlined,
   PlusOutlined,
-  PrinterOutlined,
+  // PrinterOutlined,
   FilterOutlined,
 } from "@ant-design/icons";
-import { Button, Dropdown, Menu, Input, Select } from "antd";
+import { Button, Dropdown, Menu, Input, Select, message } from "antd";
 import StepsComponent from "../../Components/Tracking/ViewTracking/StepsComponent";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import TrackingTable from "../../Components/Tracking/ViewTracking/TrackingTable"; // Adjust the import path as per your project structure
 // import AssetsSearchBar from '../../Components/Items/AssetsSearchBar';
-import TrackingTable from "../../Components/Tracking/ViewTracking/TrackingTable";
+// import TrackingTable from "../../Components/Tracking/ViewTracking/TrackingTable";
 import { useSelector } from "react-redux";
 import database from "../../axios/database";
+import { Box } from "@mui/material";
 
 export default function ViewTracking() {
-  const [activeComponent, setActiveComponent] = useState("Location"); // Set default to 'Location'
+  // const [activeComponent, setActiveComponent] = useState("Location"); // Set default to 'Location'
+
+  const [sentProcesses, setSentProcesses] = useState([]);
+  const [buttonStatus, setButtonStatus] = useState([]);
 
   const userRole = useSelector((state) => state.login.role);
   const userID = useSelector((state) => state.login.id);
 
-  const items = [
-    { label: "All" },
-    { label: "Suppliers" },
-    { label: "Warehouses" },
-    { label: "Stores" },
-  ];
+  const [sender, setSender] = useState(null);
+  const [receiver, setReceiver] = useState(null);
+
+  // const items = [
+  //   { label: "All" },
+  //   { label: "Suppliers" },
+  //   { label: "Warehouses" },
+  //   { label: "Stores" },
+  // ];
 
   const [searchValue, setSearch] = useState(""); // State for search input value
   const [searchBy, setSearchBy] = useState("Name"); // State for search by option
 
-  const handleSegmentedChange = (value) => {
-    setActiveComponent(value);
-  };
+  // const handleSegmentedChange = (value) => {
+  //   setActiveComponent(value);
+  // };
 
   const handleFilterMenuClick = (e) => {
     console.log("Clicked on filter:", e.key);
@@ -51,11 +60,11 @@ export default function ViewTracking() {
     minHeight: "100vh",
   };
 
-  const contentStyle = {
-    flex: 1,
-    overflowY: "auto",
-    padding: "16px",
-  };
+  // const contentStyle = {
+  //   flex: 1,
+  //   overflowY: "auto",
+  //   padding: "16px",
+  // };
 
   const buttonContainerStyle = {
     display: "flex",
@@ -65,43 +74,78 @@ export default function ViewTracking() {
     marginLeft: "24px",
   };
 
-  const footerStyle = {
-    background: "#f1f1f1",
-    padding: "16px",
-    textAlign: "center",
-    zIndex: 1,
-    position: "relative",
-  };
+  // const footerStyle = {
+  //   background: "#f1f1f1",
+  //   padding: "16px",
+  //   textAlign: "center",
+  //   zIndex: 1,
+  //   position: "relative",
+  // };
 
   useEffect(() => {
     if (userRole === "Supplier") {
-      fetchReceiverProcesses(
-        "warehouse",
-        "warehouseID",
-        "warehouseName",
-        "Warehouse"
-      );
-      fetchSenderProcesses("supplier", "supplierID", "Supplier", userID);
+      fetchSenderProcesses("supplier", "warehouse", userID);
+      setSender("Supplier");
+      setReceiver("Warehouse");
     } else if (userRole === "Warehouse") {
-      fetchReceiverProcesses("store", "storeID", "storeName", "Store");
-      fetchSenderProcesses("warehouse", "warehouseID", "Warehouse", userID);
+      fetchSenderProcesses("warehouse", "store", userID);
+      fetchReceiverProcesses("warehouse", userID);
+      setSender("Warehouse");
+      setReceiver("Store");
+    } else if (userRole === "Store") {
+      fetchReceiverProcesses("store", userID);
+      setSender("Warehouse");
+      setReceiver("Store");
     }
-  }, []);
-
+  }, [userRole, userID]);
 
   const fetchReceiverProcesses = (endpoint, idField, nameField, type) => {
-    database
-      .get(`${endpoint}/read/geojson`)
+    // database
+    //   .get(`${endpoint}/process/read/${userID}`)
+    //   .then((response) => {
+    //     console.log(response.data);
+    // setReceivedProcesses(response.data);
+    //     // const responseData = response.data.map((item) => ({
+    //     //   ...item,
+    //     //   properties: {
+    //     //     ...item.properties,
+    //     //     id: item.properties[idField],
+    //     //     name: item.properties[nameField],
+    //     //     type,
+    //     //   },
+    //     // }));
+    //     // setReceiverData(responseData);
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //   });
+  };
+
+  const fetchSenderProcesses = async (sender, receiver, userID) => {
+    await database
+      .get(`delivery-process/${sender}-${receiver}/read-by-${sender}/${userID}`)
       .then((response) => {
         const responseData = response.data.map((item) => ({
           ...item,
-          properties: {
-            ...item.properties,
-            id: item.properties[idField],
-            name: item.properties[nameField],
-            type,
-          },
+          [`${receiver}Processes`]: item[`${receiver}Processes`].map(
+            (process) => ({
+              ...process,
+              id: process[receiver][`${receiver}ID`],
+              name: process[receiver][`${receiver}Name`],
+            })
+          ),
         }));
+        console.log(responseData);
+        setSentProcesses(responseData);
+        // const responseData = response.data.map((item) => ({
+        //   ...item,
+        //   properties: {
+        //     ...item.properties,
+        //     id: item.properties[idField],
+        //     name: item.properties[nameField],
+        //     type,
+        //   },
+        // }));
         // setReceiverData(responseData);
       })
       .catch((error) => {
@@ -109,41 +153,44 @@ export default function ViewTracking() {
       });
   };
 
-  const fetchSenderProcesses = (endpoint, idField, nameField, type) => {
+  const handelUpdateStatus = (record) => {
+    // console.log("record:", record);
+    // console.log(sentProcesses[0].processID);
+    // console.log(record.id);
     database
-      .get(`${endpoint}/read/geojson`)
-      .then((response) => {
-        const responseData = response.data.map((item) => ({
-          ...item,
-          properties: {
-            ...item.properties,
-            id: item.properties[idField],
-            name: item.properties[nameField],
-            type,
-          },
-        }));
-        // setReceiverData(responseData);
+      .put(
+        `/${receiver}/process/update/${sentProcesses[2].processID}/${record.id}`
+      )
+      .then(() => {
+        // setButtonStatus((prev) => ({
+        //   ...prev,
+        //   [record.storeID]: "Delivering",
+        // }));
+        // Fetch updated data and update state
+        fetchSenderProcesses(sender, receiver, userID);
+        message.success(`Delivery of ${receiver} started successfully`);
       })
       .catch((error) => {
-        console.error(error);
+        // message.error(error);
+        message.error(`Error: ${error.message}`);
       });
   };
 
-  const selectBeforeSearch = (
-    <Select
-      defaultValue="Search Type"
-      dropdownStyle={{ width: 150 }}
-      onSelect={(value) => setSearchBy(value)}
-    >
-      <Select.Option value="Time" defaultValue>
-        Time
-      </Select.Option>
-      <Select.Option value="Cost">Cost</Select.Option>
-    </Select>
-  );
+  // const selectBeforeSearch = (
+  //   <Select
+  //     defaultValue="Search Type"
+  //     dropdownStyle={{ width: 150 }}
+  //     onSelect={(value) => setSearchBy(value)}
+  //   >
+  //     <Select.Option value="Time" defaultValue>
+  //       Time
+  //     </Select.Option>
+  //     <Select.Option value="Cost">Cost</Select.Option>
+  //   </Select>
+  // );
 
   return (
-    <div style={pageStyle}>
+    <>
       <TrackingSubNavbar
         title="View Tracking"
         addButtonLabel={
@@ -153,9 +200,19 @@ export default function ViewTracking() {
           </>
         }
       />
-      <div style={contentStyle}>
-        <div style={buttonContainerStyle}>
-          <Dropdown overlay={filterMenu} placement="bottomLeft">
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          // width: "80%",
+          padding: "2%",
+          height: "100%",
+        }}
+      >
+        {/* <div style={buttonContainerStyle}> */}
+        {/* <Dropdown overlay={filterMenu} placement="bottomLeft">
             <Button icon={<FilterOutlined />} style={{ width: "60px" }}>
               <DownOutlined />
             </Button>
@@ -170,16 +227,85 @@ export default function ViewTracking() {
             }
             className="search"
             style={{ backgroundColor: "white", width: "80%" }}
-          />
-          {/* <AssetsSearchBar /> */}
-          {/* <Button type="primary" icon={<PrinterOutlined />} size="large">
+          /> */}
+        {/* <AssetsSearchBar /> */}
+        {/* <Button type="primary" icon={<PrinterOutlined />} size="large">
             Print
           </Button> */}
+        {/* </div> */}
+        {/* <div> */}
+        <StepsComponent sentProcesses={sentProcesses} />
+        <div
+          style={{
+            marginTop: "1%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "2%",
+            width: "100%",
+          }}
+        >
+          <div
+            style={{
+              width: "50%",
+              height: "360px",
+              padding: "1.5%",
+              backgroundColor: "white",
+              borderRadius: "15px",
+            }}
+          >
+            {/* <Paper
+            sx={{
+              padding: 2,
+              height: "400px",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          > */}
+            {sentProcesses && (
+              <TrackingTable
+                // setCurrentStep={setCurrentStep}
+                // markedForDelivery={markedForDelivery}
+                // markForDelivery={markForDelivery}
+                sentProcesses={sentProcesses[2]}
+                sender={sender}
+                receiver={receiver}
+                buttonStatus={buttonStatus}
+                handelUpdateStatus={handelUpdateStatus}
+              />
+            )}
+            {/* </Paper> */}
+          </div>
+          <div
+            style={{
+              height: "100%",
+              width: "50%",
+              zIndex: 1,
+            }}
+          >
+            {/* <Paper sx={{ padding: 2, height: "400px" }}> */}
+            {/* <Box sx={{ height: "100%", width: "100%" ,padding:0,margin:0,borderRadius:20}}> */}
+            <MapContainer
+              center={[51.505, -0.09]}
+              zoom={13}
+              style={{ height: "100%", width: "100%", borderRadius: 15 }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              <Marker position={[51.505, -0.09]}>
+                <Popup>
+                  A pretty CSS3 popup. <br /> Easily customizable.
+                </Popup>
+              </Marker>
+            </MapContainer>
+            {/* </Box> */}
+            {/* </Paper> */}
+          </div>
         </div>
-        <div style={{ marginTop: "16px" }}>
-          <StepsComponent />
-        </div>
+        {/* </div> */}
       </div>
-    </div>
+    </>
   );
 }

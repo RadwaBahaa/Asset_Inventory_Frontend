@@ -3,7 +3,7 @@ import { Layout, Dropdown, Space, Avatar } from "antd";
 import SearchBar from "../../SearchBar";
 import { Link, useLocation } from "react-router-dom";
 import { UserOutlined } from "@ant-design/icons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setLogout } from "../../../../store/Slices/login";
 import "../CSS/TopNavBar.css";
 
@@ -13,6 +13,8 @@ const TopNavBar = () => {
   const dispatch = useDispatch();
 
   const [activeDropdown, setActiveDropdown] = useState("");
+
+  const userName = useSelector((state) => state.login.userName);
 
   const addNew = [
     { label: <Link to="/addNew/assets">Assets</Link>, key: "Assets" },
@@ -107,7 +109,7 @@ const TopNavBar = () => {
             }`}
           >
             <Link onClick={(e) => e.preventDefault()}>
-              <Space>User</Space>
+              <Space>{userName}</Space>
               <Avatar size="large" icon={<UserOutlined />} className="avatar" />
             </Link>
           </Dropdown>

@@ -1,139 +1,200 @@
-import React, { useState } from 'react';
-import { Tooltip, Table, Button } from 'antd';
+import React, { useEffect, useState } from "react";
+import { Tooltip, Table, Button, Tag } from "antd";
+import database from "../../../axios/database";
+import { UnorderedListOutlined } from "@ant-design/icons";
 
-const TrackingTable = ({ setCurrentStep, markedForDelivery, markForDelivery }) => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+const TrackingTable = ({
+  // setCurrentStep,
+  // markedForDelivery,
+  // markForDelivery,
+  sentProcesses,
+  receiver,
+  sender,
+  buttonStatus,
+  // setButtonStatus,
+  handelUpdateStatus,
+}) => {
+  // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [processData, setProcessData] = useState([]);
 
-  const handleRowSelectChange = (selectedRowKeys) => {
-    setSelectedRowKeys(selectedRowKeys);
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Supplying":
+        return "default";
+      case "Delivering":
+        return "primary";
+      case "Inventory":
+        return "success";
+      default:
+        return "default";
+    }
   };
 
+  useEffect(() => {
+    if (sentProcesses) {
+      // setChangeStatus(sentProcesses);
+      console.log(`${receiver.toLowerCase()}Processes`);
+    }
+  }, [sentProcesses]);
+
+  // const handleStartDelivery = (record) => {
+  //   database.put(`/${receiver}/process/update/${record.id}/{storeID}`, {});
+  //   setButtonStatus((prev) => ({
+  //     ...prev,
+  //     [record.storeID]: "Delivering",
+  //   }));
+  //   console.log("record:", record);
+  // };
+
+  // useEffect(() => {
+  //   if (sentProcesses) {
+  //     console.log("table:", sentProcesses);
+  //   }
+  // }, [sentProcesses]);
+
+  // const handleRowSelectChange = (selectedRowKeys) => {
+  //   setSelectedRowKeys(selectedRowKeys);
+  // };
+
   const expandedRowRender = (record) => {
-    if (record.key === '4') { // Render internal table only for the last row
+    if (record.key === "4") {
+      console.log("record:", record);
       const columns = [
         {
-          title: 'Store ID',
-          dataIndex: 'storeId',
-          key: 'storeId',
+          title: "ID",
+          dataIndex: "id",
+          key: "id",
+          width: "8%",
         },
         {
-          title: 'Store Name',
-          dataIndex: 'storeName',
-          key: 'storeName',
+          title: "Name",
+          dataIndex: "name",
+          key: "name",
+          width: "25%",
         },
         {
-          title: 'Assets',
-          key: 'assets',
-          render: () => <a href="#assets">View Assets</a>,
+          title: "Quantity",
+          dataIndex: "quantity",
+          key: "quantity",
+          width: "20%",
         },
         {
-          title: 'Action',
-          key: 'action',
+          title: "Assets",
+          key: "assets",
+          width: "20%",
+          render: () => (
+            <>
+              <UnorderedListOutlined />
+            </>
+          ),
+        },
+        {
+          title: "Status",
+          key: "status",
           render: (text, record) => (
-            <Tooltip title={`Start delivery for ${record.storeName}`}>
+            <Tooltip title={`Start delivery for ${record.name}`}>
               <Button
-                type="link"
-                onClick={() => {
-                  markForDelivery(record.storeId);
-                  setSelectedRowKeys([]); // Deselect all rows after starting delivery
-                }}
-                disabled={markedForDelivery.includes(record.storeId)}
+                type={getStatusColor(record.status)}
+                onClick={() => handelUpdateStatus(record)}
+                // disabled={record.status === "Delivering"}
+                style={
+                  record.status === "Delivering"
+                    ? { pointerEvents: "none", opacity: 0.6 }
+                    : {}
+                }
+                unselectable="off"
               >
-                Start Delivery
+                {record.status}
               </Button>
             </Tooltip>
           ),
         },
       ];
 
-      const expandedData = [
-        {
-          key: '1',
-          storeId: '001',
-          storeName: 'Store A',
-        },
-        {
-          key: '2',
-          storeId: '002',
-          storeName: 'Store B',
-        },
-        {
-          key: '3',
-          storeId: '003',
-          storeName: 'Store C',
-        },
-      ];
-
-      const rowSelection = {
-        selectedRowKeys,
-        onChange: handleRowSelectChange,
-      };
+      // const rowSelection = {
+      //   selectedRowKeys,
+      //   onChange: handleRowSelectChange,
+      // };
 
       return (
-        <Table
-          columns={columns}
-          dataSource={expandedData}
-          pagination={false}
-          rowSelection={rowSelection}
-        />
+        sentProcesses && (
+          <Table
+            columns={columns}
+            dataSource={sentProcesses[`${receiver.toLowerCase()}Processes`]}
+            pagination={false}
+            // size="small"
+            // rowSelection={rowSelection}
+            scroll={{
+              y: 100,
+            }}
+          />
+        )
       );
     }
-    return null; // Return null for other rows to avoid internal table
+    return null;
   };
 
   const columns = [
     {
-      title: 'Field',
-      dataIndex: 'field',
-      key: 'field',
+      title: "Field",
+      dataIndex: "field",
+      key: "field",
+      width: "55%",
     },
     {
-      title: 'Value',
-      dataIndex: 'value',
-      key: 'value',
-      width: '55%',
+      title: "Value",
+      dataIndex: "value",
+      key: "value",
     },
   ];
 
-  const data = [
-    {
-      key: '1',
-      field: 'Process ID',
-      value: 'Screen',
-      hasInternalTable: false, // Add a flag to indicate whether the row has an internal table
-    },
-    {
-      key: '2',
-      field: 'Total Process Assets Number',
-      value: 'iOS',
-      hasInternalTable: false,
-    },
-    {
-      key: '3',
-      field: 'Starting Process Date',
-      value: '2024-07-04',
-      hasInternalTable: false,
-    },
-    {
-      key: '4',
-      field: 'Starting Process Time',
-      value: '10:00',
-      hasInternalTable: true, // Set to true for the last row
-    },
-  ];
+  useEffect(() => {
+    if (sentProcesses) {
+      setProcessData([
+        {
+          key: "1",
+          field: "Process ID",
+          value: sentProcesses.processID,
+          hasInternalTable: false,
+        },
+        {
+          key: "2",
+          field: "Total Process Assets Number",
+          value: sentProcesses.totalAssets,
+          hasInternalTable: false,
+        },
+        {
+          key: "3",
+          field: "Starting Process Date",
+          value: sentProcesses.formattedDate,
+          hasInternalTable: false,
+        },
+        {
+          key: "4",
+          field: "Receivers Data",
+          hasInternalTable: true,
+          defaultExpandAllRows: true,
+        },
+      ]);
+    }
+  }, [sentProcesses]);
 
   return (
     <div>
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={processData}
         expandable={{
           expandedRowRender,
-          rowExpandable: (record) => record.hasInternalTable, // Only show expand icon for rows with internal table
+          // defaultExpandAllRows: true,
+          rowExpandable: (record) => record.hasInternalTable,
+          defaultExpandedRowKeys: ["4"],
         }}
         pagination={false}
-        size='small'
-        rowClassName={(record) => (markedForDelivery.includes(record.key) ? 'marked-for-delivery' : '')}
+        size="small"
+        // rowClassName={(record) =>
+        //   markedForDelivery.includes(record.key) ? "marked-for-delivery" : ""
+        // }
       />
     </div>
   );
