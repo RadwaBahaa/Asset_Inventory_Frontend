@@ -1,0 +1,59 @@
+.shipment-card {
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+    border-radius: 10px;
+    padding: 10px;
+    width: 400px;
+    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+
+  }
+  
+  .shipment-card .icon-container {
+    background-color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+  }
+  
+  .shipment-card .icon {
+    font-size: 27px;
+    /* margin-right: 5px; */
+    align-items: center;
+  }
+  
+  .shipment-card .details {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .shipment-card .count {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .shipment-card .percentage {
+    display: flex;
+    align-items: center;
+    color: #28a745;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
+  .shipment-card .percentage .increase {
+    margin-right: 5px;
+  }
+  
+  .shipment-card .percentage .arrow {
+    font-size: 12px;
+  }
+  
+  .shipment-card .description {
+    font-size: 14px;
+    color: #777;
+  }
+  

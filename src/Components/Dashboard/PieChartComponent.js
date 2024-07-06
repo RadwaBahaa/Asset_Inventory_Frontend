@@ -9,17 +9,19 @@ const data = [
 
 const PieChartComponent = () => {
   return (
-    // Render the PieChart component with specific properties.
-    <PieChart
-      series={[
-        {
-          data, // Use the data defined above for the series.
-          highlightScope: { faded: "global", highlighted: "item" }, // Highlight configuration.
-          faded: { innerRadius:10 , additionalRadius: -10, color: "gray" }, // Fading configuration for the unhighlighted segments.
-        },
-      ]}
-      height={300} // Set the height of the PieChart to 400 pixels.
-    />
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <PieChart
+        series={[
+          {
+            data,
+            highlightScope: { faded: "global", highlighted: "item" },
+            faded: { innerRadius: 10, additionalRadius: -10, color: "gray" },
+          },
+        ]}
+        height={300}
+        width={450}
+      />
+    </div>
   );
 };
 
