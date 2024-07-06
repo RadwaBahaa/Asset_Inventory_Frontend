@@ -15,9 +15,10 @@ const xLabels = [
 
 export default function SimpleLineChart() {
   return (
+    <div style={{width:"620px", height:"252px", padding:"10px"}}>
     <LineChart
-      width={500}
-      height={300}
+      // width={600}
+      // height={300}
       series={[
         { data: pData, label: 'pv' },
         { data: uData, label: 'uv' },
@@ -28,6 +29,6 @@ export default function SimpleLineChart() {
         height: '100px', // Adjust height as needed
         margin: '0 auto', // Centers the chart horizontally
       }}
-    />
+    /></div>
   );
 }

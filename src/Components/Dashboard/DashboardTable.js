@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Tooltip, Table, Button } from 'antd';
 
-const DashboardTable = ({ setCurrentStep, markedForDelivery, markForDelivery }) => {
+const DashboardTable = ({ storesData, warehousesData, suppliersData }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const handleRowSelectChange = (selectedRowKeys) => {
@@ -10,33 +10,34 @@ const DashboardTable = ({ setCurrentStep, markedForDelivery, markForDelivery }) 
 
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'field',
-      key: 'field',
+
+      title: 'Location Type',
+      dataIndex: 'locationType',
+      key: 'locationType',
+      width: '65%',
     },
     {
-      title: 'Address',
-      dataIndex: 'value',
-      key: 'value',
-      width: '55%',
+      title: 'Count',
+      dataIndex: 'count',
+      key: 'count',
     },
   ];
 
-  const data = [
-    {
-      key: '1',
-      field: 'Process ID',
-      value: 'Screen',    },
-    {
-      key: '2',
-      field: 'Total Process Assets Number',
-      value: 'iOS',
-    },
-    {
-      key: '3',
-      field: 'Starting Process Date',
-      value: '2024-07-04',
-    },
+  const data = [{
+    key: 'stores',
+    field: 'Stores',
+    value: storesData.length,
+  },
+  {
+    key: 'wareHouses',
+    field: 'WareHouses',
+    value: warehousesData.length,
+  },
+  {
+    key: 'supplires',
+    field: 'Supplires',
+    value: suppliersData.length,
+  },
 
   ];
 

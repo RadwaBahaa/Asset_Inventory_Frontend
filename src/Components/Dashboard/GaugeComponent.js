@@ -1,12 +1,12 @@
 import React from 'react';
 import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
 
-const GaugeComponent = () => {
+const GaugeComponent = ({sucssededProcesses}) => {
   return (
     <Gauge
       width={500}
       height={130}
-      value={75}
+      value={sucssededProcesses}
       startAngle={-90}
       endAngle={90}
       sx={{
@@ -18,7 +18,7 @@ const GaugeComponent = () => {
           transform: 'translate(0px, -15px)',
         },
       }}
-      text={({ value, valueMax }) => `${value} / ${valueMax}`}
+      text={({ sucssededProcesses, valueMax }) => `${sucssededProcesses}%`}
     />
   );
 };

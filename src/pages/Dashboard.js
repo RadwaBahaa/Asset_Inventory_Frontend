@@ -41,12 +41,54 @@ export default function Dashboard() {
   const [selectedType, setSelectedType] = useState(null);
   const [selectedData, setSelectedData] = useState(null); // State to hold selected data
   const [selectedTableData, setSelectedTableData] = useState(null); // State to hold selected table data
+  const [totalShipments, setTotalShipments] = useState(0);
+  const [pendingPackages, setPendingPackages] = useState(0);
+  const [deliveryShipments, setDeliveryShipments] = useState(0);
+  const[sucssededProcesses ,setSucssededProcesses]= useState(0);
+  const[totalProcesses, setTotalProcesses]= useState(0);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [storeResponse, warehouseResponse] = await Promise.all([
+          database.get("/store/process/read"),
+          database.get("/warehouse/process/read"),
+        ]);
+
+        const allResponses = [...storeResponse.data, ...warehouseResponse.data];
+
+        const supplyingCount = allResponses.filter(
+          (item) =>
+            item.status === "Supplying" ||
+            item.status === "Delivering" ||
+            item.status === "Inventory"
+        ).length;
+
+        const deliveringCount = allResponses.filter(
+          (item) => item.status === "Delivering" || item.status === "Inventory"
+        ).length;
+
+        const inventoryCount = allResponses.filter(
+          (item) => item.status === "Inventory"
+        ).length;
+
+        setTotalProcesses(allResponses);
+        setTotalShipments(supplyingCount);
+        setPendingPackages(deliveringCount);
+        setDeliveryShipments(inventoryCount);
+        setSucssededProcesses(inventoryCount/allResponses.length);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     database
       .get("/store/read/geojson")
       .then((response) => {
-        console.log("Response data:", response.data);
+        // console.log("Response data:", response.data);
         setStoresData(response.data);
       })
       .catch((error) => {
@@ -56,7 +98,7 @@ export default function Dashboard() {
     database
       .get("/warehouse/read/geojson")
       .then((response) => {
-        console.log("Response data:", response.data);
+        // console.log("Response data:", response.data);
         setWarehousesData(response.data);
       })
       .catch((error) => {
@@ -66,7 +108,7 @@ export default function Dashboard() {
     database
       .get("/supplier/read/geojson")
       .then((response) => {
-        console.log("Response data:", response.data);
+        // console.log("Response data:", response.data);
         setSuppliersData(response.data);
       })
       .catch((error) => {
@@ -75,19 +117,19 @@ export default function Dashboard() {
   }, []);
 
   const handlePieChartClick = (data) => {
-    console.log("Pie slice clicked:", data.name); // Log the clicked pie slice
+    // console.log("Pie slice clicked:", data.name); // Log the clicked pie slice
     setSelectedType(data.name);
     setSelectedData(data); // Set selected data for display
   };
 
   const handleMarkerClick = (type, item) => {
-    console.log(`${type} marker clicked:`, item); // Log the clicked marker data
+    // console.log(`${type} marker clicked:`, item); // Log the clicked marker data
     setSelectedType(type);
     setSelectedTableData(item); // Set selected table data
   };
 
   const renderMarkers = () => {
-    console.log("Selected Type:", selectedType); // Log the selected type
+    // console.log("Selected Type:", selectedType); // Log the selected type
     switch (selectedType) {
       case "Stores":
         return storesData?.map((store) => (
@@ -156,29 +198,14 @@ export default function Dashboard() {
 
   return (
     <>
-      <DashNavbar        
-        // editButtonLabel={
-        //   <>
-        //     {/* <HomeOutlined /> */}
-        //     <span style={{ marginLeft: "8px" }}>To Home Page</span>
-        //   </>
-        // }
-        // editButtonPath="/"
-        // addButtonLabel={
-        //   <>
-        //     {/* <PlusOutlined /> */}
-        //     <span style={{ marginLeft: "8px" }}>Add Asset</span>
-        //   </>
-        // }
-        // addButtonPath="/addNew/assets"
-      />
+      <DashNavbar/>
       <Grid container spacing={1.5} sx={{ padding: 2 }}>
         {/* Cards and Map */}
         <Grid item xs={12} md={6}>
         <div style={{ display :"flex", justifyContent:"space-between", borderRadius:"15px", backgroundColor:"transparent"}}>
-            <ShipmentCard count={172} percentage={1.92} description="Total Shipments" Icon={ShoppingCartOutlined} />
-            <ShipmentCard count={200} percentage={-0.5} description="Pending Packages" Icon={ClockCircleOutlined} />
-            <ShipmentCard count={150} percentage={0.75} description="Delivery Shipments" Icon={NodeIndexOutlined} />
+            <ShipmentCard count={totalShipments} percentage={1.92} description="Total Shipments" Icon={ShoppingCartOutlined} />
+            <ShipmentCard count={pendingPackages} percentage={-0.5} description="Pending Packages" Icon={ClockCircleOutlined} />
+            <ShipmentCard count={deliveryShipments} percentage={0.75} description="Delivery Shipments" Icon={NodeIndexOutlined} />
           </div>
           <div style={{ height: "423px", borderRadius: "15px", overflow: "hidden", backgroundColor: "transparent", marginTop: "12px" }}>
             <MapContainer
@@ -204,19 +231,20 @@ export default function Dashboard() {
                 <div style={{ textAlign: 'left' }}>
                   <h3 id="gauge-header" style={{ marginBottom: '0px' }}>Analytic View</h3>
                 </div>
-                <GaugeComponent />
+                <GaugeComponent 
+                sucssededProcesses={sucssededProcesses}/>
                 <p id="gauge-text" style={{ marginTop: '8px', color: '#999', fontSize: '14px', lineHeight: '1.4' }}>Total shipping revenue overview</p>
               </div>
             </Grid>
             <Grid item xs={10} md={6}>
               <div style={{ height: '100%', padding: 2, display: 'flex', flexDirection: 'column', alignItems: 'center',  borderRadius: "15px", backgroundColor:"white" }}>
-                <DashboardTable selectedTableData={selectedTableData} />
+                <DashboardTable selectedTableData={selectedTableData} storesData={storesData} warehousesData={warehousesData} suppliersData={suppliersData}/>
               </div>
             </Grid>
 
             <Grid item xs={6} md={12}>
               <div style={{  borderRadius: "15px", backgroundColor:"white"}} >
-                <Typography  style={{ paddingLeft:"20px",  borderRadius: "15px"}}variant="h6">Annual Information</Typography>
+                <Typography  style={{ paddingLeft:"20px", paddingTop:"15px" ,borderRadius: "15px"}}variant="h6">Annual Information</Typography>
                 <SimpleLineChart
                   data={dataBar}
                 />
