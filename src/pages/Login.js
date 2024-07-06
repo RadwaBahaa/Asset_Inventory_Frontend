@@ -18,8 +18,10 @@ const Login = () => {
 
   const onFinish = async (values) => {
     try {
+
       const { staySignedIn, ...loginValues } = values;
       const response = await dispatch(login(loginValues)).unwrap();
+
       console.log(response);
       console.log(staySignedIn);
 

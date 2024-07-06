@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Steps, theme } from "antd";
 
-const StepsComponent = () => {
+const StepsComponent = ({ senderProcessDetails, receiverProcessDetail ,current,precent}) => {
   const { token } = theme.useToken();
-  const [current, setCurrent] = useState(0);
+
   // const [markedForDelivery, setMarkedForDelivery] = useState([]);
+
+
+  
 
   // const setCurrentStep = (step) => {
   //   setCurrent(step);
@@ -110,14 +113,25 @@ const StepsComponent = () => {
 
   return (
     <>
-      <Steps
-        current={current}
-        items={items}
-        // size="small"
-        percent={60}
-        // labelPlacement="vertical"
-        style={{ width: "80%", marginBottom: "1.5%" }}
-      />
+      {senderProcessDetails &&
+        (<Steps
+          current={current}
+          items={items}
+          // size="small"
+          percent={precent}
+          // labelPlacement="vertical"
+          style={{ width: "80%", marginBottom: "1.5%" }}
+        />)}
+      {receiverProcessDetail && (
+        <Steps
+          current={current}
+          items={items}
+          // size="small"
+          // percent={precent}
+          // labelPlacement="vertical"
+          style={{ width: "80%", marginBottom: "1.5%" }}
+        />
+      )}
 
       {/* <div style={contentStyle}>
         {steps.map((step, index) => (
@@ -158,5 +172,4 @@ const StepsComponent = () => {
     </>
   );
 };
-
 export default StepsComponent;

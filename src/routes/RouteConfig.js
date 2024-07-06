@@ -51,7 +51,7 @@ function RouteConfige() {
           element={<TrackingStartProgress />}
         />
         <Route
-          path="/tracking/viewTracking"
+          path="/tracking/viewtracking"
           element={<TrackingViewTracking />}
         />
         <Route path="/members" element={<Members />} />
