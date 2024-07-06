@@ -25,10 +25,12 @@ import { useSelector } from "react-redux";
 
 const provider = new OpenStreetMapProvider();
 
+
 export default function Location() {
   const [locations, setLocations] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [error, setError] = useState(null);
+  // const [selectedItem, setSelectedItem] = useState(null);
 
   const [isFormModalVisible, setIsFormModalVisible] = useState(false);
   const [drawnPoint, setDrawnPoint] = useState({});
@@ -68,14 +70,31 @@ export default function Location() {
     }
   }, [locations]);
 
+  // const handleSearchChange = async (value) => {
+  //   setSearchTerm(value);
+  //   if (value) {
+  //     const results = await provider.search({ query: value });
+  //     setSuggestions(results.map((result) => ({ value: result.label })));
+
+  //   } else {
+  //     setSuggestions([]);
+  //   }
+  // };
   const handleSearchChange = async (value) => {
     setSearchTerm(value);
     if (value) {
       const results = await provider.search({ query: value });
-      setSuggestions(results.map((result) => ({ value: result.label })));
+      setSuggestions(results.map((result) => ({ value: result.label, coordinates: [result.y, result.x] })));
     } else {
       setSuggestions([]);
     }
+  };
+
+  const handleSelectSuggestion = (value, option) => {
+    setSelectedLocation({
+      properties: { name: value },
+      geometry: { coordinates: option.coordinates }
+    });
   };
 
   useEffect(() => {
@@ -179,7 +198,8 @@ export default function Location() {
               border: "1px solid #ccc",
               marginRight: "1rem",
             }}
-            onChange={handleSearchChange}
+            onSearch={handleSearchChange}
+            onSelect={handleSelectSuggestion}
           />
           <Dropdown overlay={menu} placement="bottomCenter">
             <Tooltip title="Select Point Type">
@@ -207,6 +227,8 @@ export default function Location() {
           searchTerm={searchTerm}
           locations={locations}
           selectedLocation={selectedLocation}
+          setSelectedLocation={setSelectedLocation}
+        // setSelectedItem={setSelectedItem}
         />
         {selectedPointType && (
           <Modal
@@ -283,3 +305,4 @@ export default function Location() {
     </div>
   );
 }
+ 

@@ -9,6 +9,7 @@ import ShipmentCard from "../Components/Dashboard/Card/Javascript/Card";
 import GaugeComponent from "../Components/Dashboard/GaugeComponent";
 import DashNavbar from "../Components/Dashboard/DashNavbar";
 import SimpleLineChart from '../Components/Dashboard/AreaChart'; // Import the default export
+import MapComponent from "../Components/Dashboard/MapComponent";
 
 // Sample data for BarChart and LineChart
 const dataBar = [
@@ -44,8 +45,12 @@ export default function Dashboard() {
   const [totalShipments, setTotalShipments] = useState(0);
   const [pendingPackages, setPendingPackages] = useState(0);
   const [deliveryShipments, setDeliveryShipments] = useState(0);
-  const[sucssededProcesses ,setSucssededProcesses]= useState(0);
-  const[totalProcesses, setTotalProcesses]= useState(0);
+  const [sucssededProcesses, setSucssededProcesses] = useState(0);
+  const [totalProcesses, setTotalProcesses] = useState(0);
+
+  const [locations, setLocations] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -53,6 +58,7 @@ export default function Dashboard() {
           database.get("/store/process/read"),
           database.get("/warehouse/process/read"),
         ]);
+
 
         const allResponses = [...storeResponse.data, ...warehouseResponse.data];
 
@@ -75,7 +81,7 @@ export default function Dashboard() {
         setTotalShipments(supplyingCount);
         setPendingPackages(deliveringCount);
         setDeliveryShipments(inventoryCount);
-        setSucssededProcesses(inventoryCount/allResponses.length);
+        setSucssededProcesses(inventoryCount / allResponses.length);
       } catch (error) {
         console.error(error);
       }
@@ -198,27 +204,21 @@ export default function Dashboard() {
 
   return (
     <>
-      <DashNavbar/>
+      <DashNavbar />
       <Grid container spacing={1.5} sx={{ padding: 2 }}>
         {/* Cards and Map */}
         <Grid item xs={12} md={6}>
-        <div style={{ display :"flex", justifyContent:"space-between", borderRadius:"15px", backgroundColor:"transparent"}}>
+          <div style={{ display: "flex", justifyContent: "space-between", borderRadius: "15px", backgroundColor: "transparent" }}>
             <ShipmentCard count={totalShipments} percentage={1.92} description="Total Shipments" Icon={ShoppingCartOutlined} />
             <ShipmentCard count={pendingPackages} percentage={-0.5} description="Pending Packages" Icon={ClockCircleOutlined} />
             <ShipmentCard count={deliveryShipments} percentage={0.75} description="Delivery Shipments" Icon={NodeIndexOutlined} />
           </div>
+
           <div style={{ height: "423px", borderRadius: "15px", overflow: "hidden", backgroundColor: "transparent", marginTop: "12px" }}>
-            <MapContainer
-              center={[40.7128, -74.006]}
-              zoom={10}
-              style={{ height: "100%", width: "100%", borderRadius: "15px" }}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              {renderMarkers()}
-            </MapContainer>
+            <MapComponent
+              locations={{ stores: storesData, warehouses: warehousesData, suppliers: suppliersData }}
+              setSelectedLocation={setSelectedLocation}
+            />
           </div>
         </Grid>
 
@@ -227,24 +227,24 @@ export default function Dashboard() {
           <Grid container spacing={1.5}>
             {/* DashboardTable and GaugeComponent */}
             <Grid item xs={10} md={6}>
-              <div style={{ height: '100%', padding: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: '15px', backgroundColor:"white" }}>
+              <div style={{ height: '100%', padding: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: '15px', backgroundColor: "white" }}>
                 <div style={{ textAlign: 'left' }}>
                   <h3 id="gauge-header" style={{ marginBottom: '0px' }}>Analytic View</h3>
                 </div>
-                <GaugeComponent 
-                sucssededProcesses={sucssededProcesses}/>
+                <GaugeComponent
+                  sucssededProcesses={sucssededProcesses} />
                 <p id="gauge-text" style={{ marginTop: '8px', color: '#999', fontSize: '14px', lineHeight: '1.4' }}>Total shipping revenue overview</p>
               </div>
             </Grid>
             <Grid item xs={10} md={6}>
-              <div style={{ height: '100%', padding: 2, display: 'flex', flexDirection: 'column', alignItems: 'center',  borderRadius: "15px", backgroundColor:"white" }}>
-                <DashboardTable selectedTableData={selectedTableData} storesData={storesData} warehousesData={warehousesData} suppliersData={suppliersData}/>
+              <div style={{ height: '100%', padding: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: "15px", backgroundColor: "white" }}>
+                <DashboardTable selectedTableData={selectedTableData} storesData={storesData} warehousesData={warehousesData} suppliersData={suppliersData} />
               </div>
             </Grid>
 
             <Grid item xs={6} md={12}>
-              <div style={{  borderRadius: "15px", backgroundColor:"white"}} >
-                <Typography  style={{ paddingLeft:"20px", paddingTop:"15px" ,borderRadius: "15px"}}variant="h6">Annual Information</Typography>
+              <div style={{ borderRadius: "15px", backgroundColor: "white" }} >
+                <Typography style={{ paddingLeft: "20px", paddingTop: "15px", borderRadius: "15px" }} variant="h6">Annual Information</Typography>
                 <SimpleLineChart
                   data={dataBar}
                 />

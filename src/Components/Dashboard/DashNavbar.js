@@ -33,20 +33,6 @@ const DashNavbar = ({
                     Explore your analytics and manage your assets efficiently
                 </div>
             </div>
-
-
-            {/* <div style={{ display: "flex", gap: "10px" }}>
-        <Link to={editButtonPath}>
-          <Button type="primary" style={{ width: "140px", borderRadius: "4px" }}>
-            {editButtonLabel}
-          </Button>
-        </Link>
-        <Link to={addButtonPath}>
-          <Button type="primary" style={{ width: "140px", borderRadius: "4px" }}>
-            {addButtonLabel}
-          </Button>
-        </Link>
-      </div> */}
         </Header>
     );
 };
