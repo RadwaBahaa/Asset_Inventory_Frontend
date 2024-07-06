@@ -13,6 +13,7 @@ const AssetsTable = ({
   setSelectedReceiver,
   setAssetsActivated,
   setStartProcessDisabled,
+  setReceiverData,
 }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -56,7 +57,12 @@ const AssetsTable = ({
       assets: selectAssets,
     };
     setProcessData((prevData) => [...prevData, newProcessEntry]);
-
+    // setReceiverData((prevData) =>
+    //   prevData.filter(
+    //     (item) =>
+    //       ![...prevData, newProcessEntry].map((value) => item.key === value.key)
+    //   )
+    // );
     var newData = assetsData;
 
     newData.map((item) => {
@@ -129,7 +135,7 @@ const AssetsTable = ({
       dataIndex: "quantity",
       render: (_, record) => (
         <InputNumber
-          style={{ width: "50%" }}
+          style={{ width: "100%" }}
           min={0}
           max={record.initialAvailableQuantity}
           value={resetSelectedData ? 0 : record.quantity}
@@ -146,6 +152,7 @@ const AssetsTable = ({
           <Button
             type="link"
             icon={<ReloadOutlined />}
+            style={{ width: "100%" }}
             onClick={() => handleReset(record.key)}
           >
             Reset

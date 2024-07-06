@@ -1,185 +1,165 @@
-import React, { useEffect, useState } from "react";
-import TrackingSubNavbar from "../../Components/NavBars/TrackingSubNavBar";
-import {
-  DownOutlined,
-  PlusOutlined,
-  PrinterOutlined,
-  FilterOutlined,
-} from "@ant-design/icons";
-import { Button, Dropdown, Menu, Input, Select } from "antd";
-import StepsComponent from "../../Components/Tracking/ViewTracking/StepsComponent";
-// import AssetsSearchBar from '../../Components/Items/AssetsSearchBar';
-import TrackingTable from "../../Components/Tracking/ViewTracking/TrackingTable";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import database from "../../axios/database";
+import { Divider } from "antd";
+import { HomeOutlined, PlusOutlined } from "@ant-design/icons";
+import SubNavbar from "../../Components/NavBars/SubNavbar";
+import ProcessesTable from "../../Components/Tracking/ViewTracking/ProcessesTable";
+import { useLocation } from "react-router-dom";
+import Tapping from "../../Components/Tracking/ViewTracking/Tapping";
+import ViewProcess from "../../Components/Tracking/ViewTracking/ViewProcess";
+import ViewTrackingSetting from "../../Components/Tracking/ViewTracking/ViewTrakingSetting";
 
 export default function ViewTracking() {
-  const [activeComponent, setActiveComponent] = useState("Location"); // Set default to 'Location'
-
   const userRole = useSelector((state) => state.login.role);
   const userID = useSelector((state) => state.login.id);
 
-  const items = [
-    { label: "All" },
-    { label: "Suppliers" },
-    { label: "Warehouses" },
-    { label: "Stores" },
-  ];
+  const [sender, setSender] = useState(null);
+  const [receiver, setReceiver] = useState(null);
 
-  const [searchValue, setSearch] = useState(""); // State for search input value
-  const [searchBy, setSearchBy] = useState("Name"); // State for search by option
+  const [sentProcesses, setSentProcesses] = useState(null);
+  const [receivedProcesses, setReceivedProcesses] = useState(null);
 
-  const handleSegmentedChange = (value) => {
-    setActiveComponent(value);
-  };
+  const [activeComponent, setActiveComponent] = useState("Sender");
 
-  const handleFilterMenuClick = (e) => {
-    console.log("Clicked on filter:", e.key);
-    // Handle filtering logic based on selected option (e.g., by Category, by Price)
-  };
-
-  const filterMenu = (
-    <Menu onClick={handleFilterMenuClick}>
-      <Menu.Item key="byCategory">Time</Menu.Item>
-      <Menu.Item key="byCategory">Cost</Menu.Item>
-    </Menu>
-  );
-
-  const pageStyle = {
-    display: "flex",
-    flexDirection: "column",
-    minHeight: "100vh",
-  };
-
-  const contentStyle = {
-    flex: 1,
-    overflowY: "auto",
-    padding: "16px",
-  };
-
-  const buttonContainerStyle = {
-    display: "flex",
-    alignItems: "center",
-    gap: "16px",
-    marginTop: "16px",
-    marginLeft: "24px",
-  };
-
-  const footerStyle = {
-    background: "#f1f1f1",
-    padding: "16px",
-    textAlign: "center",
-    zIndex: 1,
-    position: "relative",
-  };
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const processID = queryParams.get("processID");
 
   useEffect(() => {
     if (userRole === "Supplier") {
-      fetchReceiverProcesses(
-        "warehouse",
-        "warehouseID",
-        "warehouseName",
-        "Warehouse"
-      );
-      fetchSenderProcesses("supplier", "supplierID", "Supplier", userID);
+      fetchSenderProcesses("supplier", "warehouse", userID);
+      setSender("supplier");
+      setReceiver("warehouse");
     } else if (userRole === "Warehouse") {
-      fetchReceiverProcesses("store", "storeID", "storeName", "Store");
-      fetchSenderProcesses("warehouse", "warehouseID", "Warehouse", userID);
+      if (activeComponent === "Receiver") {
+        fetchReceiverProcesses("supplier", "warehouse", userID);
+      } else if (activeComponent === "Sender") {
+        fetchSenderProcesses("warehouse", "store", userID);
+      }
+      setSender("warehouse");
+      setReceiver("store");
+    } else if (userRole === "Store") {
+      fetchReceiverProcesses("warehouse", "store", userID);
+      setSender("warehouse");
+      setReceiver("store");
     }
-  }, []);
+  }, [userRole, userID]);
 
-
-  const fetchReceiverProcesses = (endpoint, idField, nameField, type) => {
+  const fetchReceiverProcesses = (sender, receiver, userID) => {
     database
-      .get(`${endpoint}/read/geojson`)
+      .get(
+        `delivery-process/${sender}-${receiver}/read-by-${receiver}/${userID}`
+      )
       .then((response) => {
+        console.log(response.data);
         const responseData = response.data.map((item) => ({
-          ...item,
-          properties: {
-            ...item.properties,
-            id: item.properties[idField],
-            name: item.properties[nameField],
-            type,
-          },
+          [`${receiver}Processes`]: item[`${receiver}Processes`].map(
+            (process) => ({
+              ...process,
+              receiverID: process[receiver][`${receiver}ID`],
+              name: process[receiver][`${receiver}Name`],
+              processID: item.processID,
+              senderID: item[`${sender}ID`],
+              senderName: item[sender][`${sender}Name`],
+              formattedDate: item.formattedDate,
+            })
+          ),
         }));
-        // setReceiverData(responseData);
+        const flattenedData = responseData.flatMap(
+          (item) => item[`${receiver}Processes`]
+        );
+        setReceivedProcesses(flattenedData);
+        console.log(flattenedData);
+        // console.log(responseData[0][`${receiver}Processes`]);
       })
       .catch((error) => {
         console.error(error);
       });
   };
 
-  const fetchSenderProcesses = (endpoint, idField, nameField, type) => {
-    database
-      .get(`${endpoint}/read/geojson`)
+  const fetchSenderProcesses = async (sender, receiver, userID) => {
+    console.log(sender, receiver, userID);
+    await database
+      .get(`delivery-process/${sender}-${receiver}/read-by-${sender}/${userID}`)
       .then((response) => {
         const responseData = response.data.map((item) => ({
           ...item,
-          properties: {
-            ...item.properties,
-            id: item.properties[idField],
-            name: item.properties[nameField],
-            type,
-          },
+          [`${receiver}Processes`]: item[`${receiver}Processes`].map(
+            (process) => ({
+              ...process,
+              id: process[receiver][`${receiver}ID`],
+              name: process[receiver][`${receiver}Name`],
+            })
+          ),
         }));
-        // setReceiverData(responseData);
+        console.log(responseData);
+        setSentProcesses(responseData);
       })
       .catch((error) => {
         console.error(error);
       });
   };
-
-  const selectBeforeSearch = (
-    <Select
-      defaultValue="Search Type"
-      dropdownStyle={{ width: 150 }}
-      onSelect={(value) => setSearchBy(value)}
-    >
-      <Select.Option value="Time" defaultValue>
-        Time
-      </Select.Option>
-      <Select.Option value="Cost">Cost</Select.Option>
-    </Select>
-  );
 
   return (
-    <div style={pageStyle}>
-      <TrackingSubNavbar
-        title="View Tracking"
+    <div>
+      <SubNavbar
+        title="Assets"
+        editButtonLabel={
+          <>
+            <HomeOutlined />
+            <span style={{ marginLeft: "8px" }}>To Home Page</span>
+          </>
+        }
+        editButtonPath="/"
         addButtonLabel={
           <>
             <PlusOutlined />
-            <span style={{ marginLeft: "8px" }}>Add Location</span>
+            <span style={{ marginLeft: "8px" }}>Add Asset</span>
           </>
         }
+        addButtonPath="/addNew/assets"
       />
-      <div style={contentStyle}>
-        <div style={buttonContainerStyle}>
-          <Dropdown overlay={filterMenu} placement="bottomLeft">
-            <Button icon={<FilterOutlined />} style={{ width: "60px" }}>
-              <DownOutlined />
-            </Button>
-          </Dropdown>
-          <Input.Search
-            addonBefore={selectBeforeSearch}
-            placeholder="Location Search"
-            allowClear
-            onSearch={(value) => setSearch(value)}
-            onChange={(e) =>
-              e.target.value === "" ? setSearch(e.target.value) : null
-            }
-            className="search"
-            style={{ backgroundColor: "white", width: "80%" }}
+      <Tapping processID={processID} />
+
+      <ViewTrackingSetting
+        setActiveComponent={setActiveComponent}
+        userRole={userRole}
+      />
+
+      <Divider />
+
+      {!processID ? (
+        <ProcessesTable
+          sentProcesses={sentProcesses}
+          sender={sender}
+          receivedProcesses={receivedProcesses}
+          receiver={receiver}
+        />
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            padding: "0 2%",
+            height: "100%",
+          }}
+        >
+          <ViewProcess
+            sender={sender}
+            receiver={receiver}
+            userID={userID}
+            userRole={userRole}
+            processID={processID}
+            receivedProcesses={receivedProcesses}
+            sentProcesses={sentProcesses}
+            activeComponent={activeComponent}
+            fetchReceiverProcesses={fetchReceiverProcesses}
+            fetchSenderProcesses={fetchSenderProcesses}
           />
-          {/* <AssetsSearchBar /> */}
-          {/* <Button type="primary" icon={<PrinterOutlined />} size="large">
-            Print
-          </Button> */}
         </div>
-        <div style={{ marginTop: "16px" }}>
-          <StepsComponent />
-        </div>
-      </div>
+      )}
     </div>
   );
 }

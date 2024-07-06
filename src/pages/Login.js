@@ -18,8 +18,10 @@ const Login = () => {
 
   const onFinish = async (values) => {
     try {
+
       const { staySignedIn, ...loginValues } = values;
       const response = await dispatch(login(loginValues)).unwrap();
+
       console.log(response);
       console.log(staySignedIn);
 
@@ -125,9 +127,9 @@ const Login = () => {
                     alignItems: "center",
                   }}
                 >
-                  <a className="login-form-forgot" href="">
+                  {/* <a className="login-form-forgot" href="">
                     Forgot Password?
-                  </a>
+                  </a> */}
                 </div>
               </Form.Item>
               <Form.Item style={{ marginBottom: "24px" }}>

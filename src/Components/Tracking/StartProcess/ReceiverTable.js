@@ -97,7 +97,7 @@ const ReceiverTable = ({
       [`${receiverRole}Processes`]: processData.map((process) => ({
         [`${receiverRole}ID`]: process.key, // Assuming key is receiverID here
         note: "Start Process Confirmed", // Replace with actual note if needed
-        assetShipmentWSts: process.assets.map((asset) => ({
+        assetShipment: process.assets.map((asset) => ({
           assetID: asset.id,
           serialNumber: asset.serialNumber,
           quantity: asset.assetQuantity,
@@ -115,7 +115,7 @@ const ReceiverTable = ({
         // Handle success: clear processData and assetsData
         message.success("Process started successfully!");
         setProcessData([]);
-        setAssetsData([]);
+        // setAssetsData([]);
       })
       .catch((error) => {
         // Handle error: enable button and show error message
@@ -222,7 +222,7 @@ const ReceiverTable = ({
       title: "Delete",
       dataIndex: "delete",
       render: (text, record) => (
-        <Button type="link" onClick={() => onDelete(record.key)}>
+        <Button type="link" onClick={() => onDelete(record)}>
           Delete
         </Button>
       ),
@@ -257,7 +257,7 @@ const ReceiverTable = ({
           Start Process
         </Button>
       </div>
-        <Table columns={columns} dataSource={processData} pagination={false} />
+      <Table columns={columns} dataSource={processData} pagination={false} />
     </div>
   );
 };

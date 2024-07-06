@@ -1,5 +1,6 @@
 import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
+import LoadingPage from "../Components/LoadingPage";
 
 const Dashboard = React.lazy(() => import("../pages/Dashboard"));
 const ItemsAssets = React.lazy(() => import("../pages/Items/Assets"));
@@ -34,7 +35,7 @@ const AlertPurchaseRequests = React.lazy(() =>
 
 function RouteConfige() {
   return (
-    <Suspense fallback={<h4>Loading...</h4>}>
+    <Suspense fallback={<LoadingPage />}>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/items/assets" element={<ItemsAssets />} />
@@ -50,7 +51,7 @@ function RouteConfige() {
           element={<TrackingStartProgress />}
         />
         <Route
-          path="/tracking/viewTracking"
+          path="/tracking/viewtracking"
           element={<TrackingViewTracking />}
         />
         <Route path="/members" element={<Members />} />
