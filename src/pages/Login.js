@@ -9,6 +9,7 @@ import { Button, Checkbox, Form, Input, Row, Col, message, Layout } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../store/Slices/login";
+import LoginLogo from "../../src/Images/LoginLogo.png"; // Adjust the path as necessary
 
 const { Content } = Layout;
 
@@ -18,7 +19,6 @@ const Login = () => {
 
   const onFinish = async (values) => {
     try {
-
       const { staySignedIn, ...loginValues } = values;
       const response = await dispatch(login(loginValues)).unwrap();
 
@@ -64,8 +64,20 @@ const Login = () => {
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
+              alignItems: "center", // Center align items horizontally
             }}
           >
+            <img
+              src={LoginLogo}
+              alt="Company Logo"
+              style={{
+                width: "220px", // Adjusted the size
+                height: "100px", // Adjusted the size
+                marginBottom: "15px", // Spacing below the logo
+                objectFit: "contain",
+                marginRight: "10px",
+              }}
+            />
             <Form
               name="normal_login"
               className="login-form"
@@ -75,10 +87,10 @@ const Login = () => {
             >
               <h1
                 style={{
-                  textAlign: "center",
                   color: "#101251",
-                  marginBottom: "24px",
-                  fontSize: "2.1rem",
+                  fontSize: "2rem",
+                  margin: "0",
+                  textAlign: "center", // Center align the text
                 }}
               >
                 SIGN <span style={{ color: "#1890ff" }}>IN</span>
@@ -88,7 +100,7 @@ const Login = () => {
                 rules={[
                   { required: true, message: "Please input your Username!" },
                 ]}
-                style={{ marginBottom: "24px" }}
+                style={{ marginBottom: "24px", marginTop: "24px" }} // Adjust spacing as needed
               >
                 <Input
                   size="large"
@@ -115,25 +127,18 @@ const Login = () => {
               <Form.Item
                 name="staySignedIn"
                 valuePropName="checked"
-                style={{ marginBottom: "24px" }}
+                style={{ marginBottom: "12px" }} // Reduced marginBottom to reduce space
               >
                 <Checkbox>Stay signed in</Checkbox>
               </Form.Item>
-              <Form.Item style={{ marginBottom: "24px" }}>
+              <Form.Item style={{ marginBottom: "12px" }}> {/* Reduced marginBottom */}
                 <div
                   style={{
                     display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    justifyContent: "center",
+                    marginTop: "12px", // Adjusted marginTop for spacing
                   }}
                 >
-                  {/* <a className="login-form-forgot" href="">
-                    Forgot Password?
-                  </a> */}
-                </div>
-              </Form.Item>
-              <Form.Item style={{ marginBottom: "24px" }}>
-                <div style={{ display: "flex", justifyContent: "center" }}>
                   <Button
                     style={{
                       width: "100%",
@@ -151,12 +156,12 @@ const Login = () => {
                     htmlType="submit"
                     className="login-form-button"
                     onMouseEnter={(e) =>
-                      (e.currentTarget.style.backgroundImage =
-                        "linear-gradient(45deg, #40a9ff, #1890ff)")
+                    (e.currentTarget.style.backgroundImage =
+                      "linear-gradient(45deg, #40a9ff, #1890ff)")
                     }
                     onMouseLeave={(e) =>
-                      (e.currentTarget.style.backgroundImage =
-                        "linear-gradient(45deg, #1890ff, #40a9ff)")
+                    (e.currentTarget.style.backgroundImage =
+                      "linear-gradient(45deg, #1890ff, #40a9ff)")
                     }
                   >
                     Login

@@ -6,6 +6,7 @@ import { UserOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { setLogout } from "../../../../store/Slices/login";
 import "../CSS/TopNavBar.css";
+import logo from "../../../../Images/Picture6.png"; // Adjust the path as necessary
 
 const TopNavBar = () => {
   const { Header } = Layout;
@@ -22,7 +23,7 @@ const TopNavBar = () => {
       label: <Link to="/addNew/categories">Categories</Link>,
       key: "Categories",
     },
-    // { label: <Link to="/addNew/requests">Requests</Link>, key: "Requests" },
+    { label: <Link to="/addNew/requests">Requests</Link>, key: "Requests" },
     { label: <Link to="/addNew/location">Location</Link>, key: "Location" },
   ];
 
@@ -35,11 +36,11 @@ const TopNavBar = () => {
   ];
 
   const user = [
-    // {
-    //   label: <Link to="/user/viewprofile">View Profile</Link>,
-    //   key: "viewprofile",
-    // },
-    // { type: "divider" },
+    {
+      label: <Link to="/user/viewprofile">View Profile</Link>,
+      key: "viewprofile",
+    },
+    { type: "divider" },
     {
       label: (
         <Link to="/login" onClick={() => dispatch(setLogout())} type="danger">
@@ -74,7 +75,7 @@ const TopNavBar = () => {
       <Header className="header">
         <div className="first-div">
           <Link to="/" className="CompanyName">
-            Company Name
+            <img src={logo} alt="Company Logo" className="company-logo" />
           </Link>
           <SearchBar />
         </div>
@@ -90,7 +91,7 @@ const TopNavBar = () => {
               <Space>Add New</Space>
             </Link>
           </Dropdown>
-          {/* <Dropdown
+          <Dropdown
             overlayClassName="dropdown-menu"
             menu={{ items: alert }}
             className={`dropdown ${
@@ -100,7 +101,7 @@ const TopNavBar = () => {
             <Link onClick={(e) => e.preventDefault()}>
               <Space>Alert</Space>
             </Link>
-          </Dropdown> */}
+          </Dropdown>
           <Dropdown
             overlayClassName="dropdown-menu"
             menu={{ items: user }}

@@ -57,3 +57,8 @@
   font-weight: bold;
   font-size: 16px;
 }
+.company-logo {
+  width: 100px; /* Adjust the size as needed */
+  height: 50;
+  padding-top: 20px;
+}

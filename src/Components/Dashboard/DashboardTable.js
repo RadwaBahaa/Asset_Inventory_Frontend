@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Tooltip, Table, Button } from 'antd';
+import { Table } from 'antd';
 
 const DashboardTable = ({ storesData, warehousesData, suppliersData }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -10,7 +10,6 @@ const DashboardTable = ({ storesData, warehousesData, suppliersData }) => {
 
   const columns = [
     {
-
       title: 'Location Type',
       dataIndex: 'locationType',
       key: 'locationType',
@@ -23,22 +22,22 @@ const DashboardTable = ({ storesData, warehousesData, suppliersData }) => {
     },
   ];
 
-  const data = [{
-    key: 'stores',
-    field: 'Stores',
-    value: storesData.length,
-  },
-  {
-    key: 'wareHouses',
-    field: 'WareHouses',
-    value: warehousesData.length,
-  },
-  {
-    key: 'supplires',
-    field: 'Supplires',
-    value: suppliersData.length,
-  },
-
+  const data = [
+    {
+      key: 'stores',
+      locationType: 'Stores',
+      count: '6',
+    },
+    {
+      key: 'warehouses',
+      locationType: 'Warehouses',
+      count: "3",
+    },
+    {
+      key: 'suppliers',
+      locationType: 'Suppliers',
+      count: "2",
+    },
   ];
 
   return (
