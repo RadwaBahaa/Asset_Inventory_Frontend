@@ -27,21 +27,21 @@ const ReceiverMap = (props) => {
     center,
   } = props;
 
-  const [loading, setLoading] = useState(true); // State to manage loading state
+  const [loading, setLoading] = useState(false); // State to manage loading state
   const [dataLoaded, setDataLoaded] = useState(false); // State to track if all data is loaded
   const [pointsVisible, setPointsVisible] = useState(true); // State to control points visibility
 
-  useEffect(() => {
-    if (!receiverData || !senderData || !serviceArea || !center) {
-      console.log("Data not fully loaded");
-      setLoading(true);
-      return;
-    }
-    setLoading(false);
-    setDataLoaded(true);
-    console.log("Data loaded");
-    console.log(serviceArea); // Make sure serviceArea is not null here
-  }, [receiverData, senderData, serviceArea]);
+  // useEffect(() => {
+  //   if (receiverData || senderData || serviceArea || center) {
+  //     console.log("Data not fully loaded");
+  //     setLoading(true);
+  //     return;
+  //   }
+  //   setLoading(false);
+  //   setDataLoaded(true);
+  //   console.log("Data loaded");
+  //   console.log(serviceArea); // Make sure serviceArea is not null here
+  // }, [receiverData, senderData, serviceArea]);
 
   const outerCircleOptions = {
     opacity: 0.2,
@@ -144,7 +144,7 @@ const ReceiverMap = (props) => {
 
   return (
     <>
-      {dataLoaded && ( // Render the map only when data is loaded
+      {/* {dataLoaded && ( // Render the map only when data is loaded */}
         <>
           <MapContainer
             center={center}
@@ -250,8 +250,8 @@ const ReceiverMap = (props) => {
             )}
           </MapContainer>
         </>
-      )}
-      {loading && (
+      {/* )} */}
+      {/* {loading && (
         <Box
           sx={{
             display: "flex",
@@ -264,7 +264,7 @@ const ReceiverMap = (props) => {
         >
           <CircularProgress />
         </Box>
-      )}
+      )} */}
     </>
   );
 };

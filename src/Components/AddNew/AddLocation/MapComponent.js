@@ -15,13 +15,11 @@
 // import "leaflet/dist/leaflet.css";
 // import MapZoomHandler from "./MapZoomHandler";
 
-
 // const MapComponent = ({ onDrawComplete, searchTerm, locations,setSelectedLocation }) => {
 //   const center = [40.71105853111035, -74.00752039016318]; // Initial center of the USA
 //   const [selectedPosition, setSelectedPosition] = useState(null);
 //   const [pointsVisible, setPointsVisible] = useState(true); // State to control points visibility
 //   const mapRef = useRef(null); // Ref to hold map instance
-
 
 //   const handleMapClick = (e) => {
 //     setSelectedPosition([e.latlng.lat, e.latlng.lng]);
@@ -193,7 +191,7 @@
 //             </CircleMarker>
 //           </React.Fragment>
 //         ))}
-      
+
 //       {locations.warehouses &&
 //         pointsVisible &&
 //         locations.warehouses.map((warehouse) => (
@@ -206,7 +204,6 @@
 //               ]}
 //               pathOptions={warehouseCircleOptions.outer}
 
-              
 //             />
 //             <CircleMarker
 //               key={warehouse.properties.warehouseID}
@@ -271,7 +268,7 @@
 //   }
 // };
 
-// export default MapComponent; 
+// export default MapComponent;
 import React, { useState, useEffect, useRef } from "react";
 import {
   MapContainer,
@@ -288,10 +285,15 @@ import { OpenStreetMapProvider } from "leaflet-geosearch";
 import "leaflet/dist/leaflet.css";
 import MapZoomHandler from "./MapZoomHandler";
 
-const MapComponent = ({ onDrawComplete, searchTerm, locations, setSelectedLocation }) => {
+const MapComponent = ({
+  onDrawComplete,
+  searchTerm,
+  locations,
+  setSelectedPosition,
+  selectedPosition,
+}) => {
   const center = [40.71105853111035, -74.00752039016318]; // Initial center of the USA
-  const [selectedPosition, setSelectedPosition] = useState(null);
-  const [pointsVisible, setPointsVisible] = useState(true); // State to control points visibility
+  const [pointsVisible, setPointsVisible] = useState(false); // State to control points visibility
   const mapRef = useRef(null); // Ref to hold map instance
 
   const handleMapClick = (e) => {
@@ -416,7 +418,7 @@ const MapComponent = ({ onDrawComplete, searchTerm, locations, setSelectedLocati
         setPointsVisible={setPointsVisible}
       />
       <AddResetViewButton />
-      {selectedPosition && (
+      {selectedPosition && pointsVisible && (
         <CircleMarker
           center={selectedPosition}
           pathOptions={{ fillColor: "blue" }}
@@ -449,7 +451,10 @@ const MapComponent = ({ onDrawComplete, searchTerm, locations, setSelectedLocati
               pathOptions={storeCircleOptions.inner}
               eventHandlers={{
                 click: () => {
-                  setSelectedLocation(store);
+                  setSelectedPosition(
+                    store.geometry.coordinates[1],
+                    store.geometry.coordinates[0]
+                  );
                 },
               }}
             >
@@ -481,7 +486,10 @@ const MapComponent = ({ onDrawComplete, searchTerm, locations, setSelectedLocati
               pathOptions={warehouseCircleOptions.inner}
               eventHandlers={{
                 click: () => {
-                  setSelectedLocation(warehouse);
+                  setSelectedPosition([
+                    warehouse.geometry.coordinates[1],
+                    warehouse.geometry.coordinates[0],
+                  ]);
                 },
               }}
             >
@@ -513,7 +521,10 @@ const MapComponent = ({ onDrawComplete, searchTerm, locations, setSelectedLocati
               pathOptions={supplierCircleOptions.inner}
               eventHandlers={{
                 click: () => {
-                  setSelectedLocation(supplier);
+                  setSelectedPosition([
+                    supplier.geometry.coordinates[1],
+                    supplier.geometry.coordinates[0],
+                  ]);
                 },
               }}
             >

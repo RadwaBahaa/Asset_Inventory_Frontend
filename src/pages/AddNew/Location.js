@@ -20,17 +20,12 @@ import {
 } from "antd";
 import MapComponent from "../../Components/AddNew/AddLocation/MapComponent";
 import database from "../../axios/database";
-import { OpenStreetMapProvider } from "leaflet-geosearch";
 import { useSelector } from "react-redux";
-
-const provider = new OpenStreetMapProvider();
-
 
 export default function Location() {
   const [locations, setLocations] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [error, setError] = useState(null);
-  // const [selectedItem, setSelectedItem] = useState(null);
 
   const [isFormModalVisible, setIsFormModalVisible] = useState(false);
   const [drawnPoint, setDrawnPoint] = useState({});
@@ -38,8 +33,9 @@ export default function Location() {
   const [isDrawingEnabled, setIsDrawingEnabled] = useState(false);
   const [submitedPoint, setSubmitedPoint] = useState({});
   const [form] = Form.useForm();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [suggestions, setSuggestions] = useState([]); // State for autocomplete suggestions
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchPlaces, setSearchPlaces] = useState([]);
+  const [selectedPosition, setSelectedPosition] = useState(null);
 
   const userRole = useSelector((state) => state.login.role);
 
@@ -63,39 +59,31 @@ export default function Location() {
     };
 
     fetchData();
-  }, []);
+  }, [submitedPoint]);
+
   useEffect(() => {
-    if (locations !== null) {
-      console.log(locations);
+    if (setSelectedLocation !== null) {
+      console.log(selectedLocation);
     }
-  }, [locations]);
+  }, [selectedLocation]);
 
-  // const handleSearchChange = async (value) => {
-  //   setSearchTerm(value);
-  //   if (value) {
-  //     const results = await provider.search({ query: value });
-  //     setSuggestions(results.map((result) => ({ value: result.label })));
-
-  //   } else {
-  //     setSuggestions([]);
-  //   }
-  // };
-  const handleSearchChange = async (value) => {
-    setSearchTerm(value);
-    if (value) {
-      const results = await provider.search({ query: value });
-      setSuggestions(results.map((result) => ({ value: result.label, coordinates: [result.y, result.x] })));
-    } else {
-      setSuggestions([]);
-    }
-  };
-
-  const handleSelectSuggestion = (value, option) => {
-    setSelectedLocation({
-      properties: { name: value },
-      geometry: { coordinates: option.coordinates }
-    });
-  };
+  useEffect(() => {
+    var getData = setTimeout(() => {
+      // Define an asynchronous function named getPlaceCoordinate
+      const getPlaceCoordinate = async () => {
+        // Use the fetch function to make a GET request to the OpenStreetMap Nominatim API
+        fetch(
+          `https://nominatim.openstreetmap.org/search?q=${searchQuery}&format=json`
+        )
+          .then((responseObject) => responseObject.json()) // Parse the response body as JSON
+          .then((data) => setSearchPlaces(data)); // Log the data to the console
+      };
+      // Call the getPlaceCoordinate function to initiate the process of fetching place coordinates
+      getPlaceCoordinate();
+      // setSelectedLocation(null);
+    }, 500);
+    return () => clearTimeout(getData);
+  }, [searchQuery]);
 
   useEffect(() => {
     if (submitedPoint.geometry) {
@@ -124,6 +112,7 @@ export default function Location() {
         address: address,
       },
     };
+    setSelectedPosition(null);
     setSubmitedPoint(updatedPoint);
     setIsFormModalVisible(false);
     form.resetFields();
@@ -190,7 +179,11 @@ export default function Location() {
           }}
         >
           <AutoComplete
-            options={suggestions}
+            options={searchPlaces.map((place) => ({
+              value: place.display_name,
+              label: place.display_name,
+              coordinates: [place.lat, place.lon],
+            }))}
             placeholder="Search for location..."
             style={{
               width: "400px",
@@ -198,8 +191,11 @@ export default function Location() {
               border: "1px solid #ccc",
               marginRight: "1rem",
             }}
-            onSearch={handleSearchChange}
-            onSelect={handleSelectSuggestion}
+            value={searchQuery}
+            onInput={(e) => setSearchQuery(e.target.value)}
+            onSelect={(value, option) =>
+              setSelectedPosition(option.coordinates)
+            }
           />
           <Dropdown overlay={menu} placement="bottomCenter">
             <Tooltip title="Select Point Type">
@@ -220,15 +216,12 @@ export default function Location() {
             </Tooltip>
           </Dropdown>
         </div>
-
         <MapComponent
           onDrawComplete={handleDrawComplete}
           isDrawingEnabled={isDrawingEnabled}
-          searchTerm={searchTerm}
           locations={locations}
-          selectedLocation={selectedLocation}
-          setSelectedLocation={setSelectedLocation}
-        // setSelectedItem={setSelectedItem}
+          selectedPosition={selectedPosition}
+          setSelectedPosition={setSelectedPosition}
         />
         {selectedPointType && (
           <Modal
@@ -305,4 +298,3 @@ export default function Location() {
     </div>
   );
 }
- 

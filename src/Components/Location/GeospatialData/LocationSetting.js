@@ -60,10 +60,6 @@ const LocationSetting = (props) => {
           <FilterOutlined />
           {startServiceArea ? "Disable Service Area" : "Enable Service Area"}
         </Button>
-        <Button style={{ width: "100%" }} disabled={!selectedLocation}>
-          <FilterOutlined />
-          Location Allocation
-        </Button>
       </div>
     </div>
   );

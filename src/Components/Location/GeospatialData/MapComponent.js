@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -25,6 +25,7 @@ const MapComponent = (props) => {
   } = props;
   const center = [40.71105853111035, -74.00752039016318];
   const [pointsVisible, setPointsVisible] = useState(true); // State to control points visibility
+  const [isViewReset, setIsViewReset] = useState(false);
 
   const outerCircleOptions = {
     fillColor: "#006688",
@@ -86,28 +87,34 @@ const MapComponent = (props) => {
 
   const AddResetViewButton = () => {
     const map = useMap();
+    const buttonRef = useRef(); // Ref to keep track of the button
+
     useEffect(() => {
-      const control = L.control({ position: "topleft" });
-      control.onAdd = () => {
-        const div = L.DomUtil.create("div", "reset-view-button");
-        const root = createRoot(div);
-        root.render(
-          <ResetViewButton
-            onClick={() => {
-              setSelectedItem(null);
-              setSelectedLocation(null);
-              setServiedLocations(null);
-              map.getCenter().lat != center[0] && map.flyTo(center, 10);
-            }}
-          />
-        );
-        return div;
-      };
-      control.addTo(map);
-      return () => {
-        control.remove();
-      };
-    }, []);
+      if (!buttonRef.current) {
+        const control = L.control({ position: "topleft" });
+        control.onAdd = () => {
+          const div = L.DomUtil.create("div", "reset-view-button");
+          const root = createRoot(div);
+          root.render(
+            <ResetViewButton
+              onClick={() => {
+                setSelectedItem(null);
+                setSelectedLocation(null);
+                setServiedLocations(null);
+                map.getCenter().lat !== center[0] && map.flyTo(center, 10);
+              }}
+              selectedLocation={selectedLocation}
+            />
+          );
+          buttonRef.current = div;
+          return div;
+        };
+        control.addTo(map);
+        return () => {
+          control.remove();
+        };
+      }
+    }, [map, selectedLocation]);
   };
 
   if (
@@ -129,6 +136,7 @@ const MapComponent = (props) => {
         url="http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
         attribution='&copy; <a href="http://services.arcgisonline.com">Arcgisonline</a> contributors'
       />
+
       <MapZoomHandler
         serviceArea={serviceArea}
         selectedLocation={selectedLocation}
@@ -175,7 +183,7 @@ const MapComponent = (props) => {
             }}
           />
         ))}
-      
+
       {/* <MapClickHandler /> */}
 
       {locations.stores &&

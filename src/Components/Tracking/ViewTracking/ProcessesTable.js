@@ -114,25 +114,25 @@ const ProcessesTable = (props) => {
       title: "Sender Name",
       dataIndex: "senderName",
       key: "senderName",
-      width: "8%",
+      width: "9%",
     },
     {
       title: "Total Process Assets",
       dataIndex: "quantity",
       key: "quantity",
-      width: "15%",
+      width: "10%",
     },
     {
       title: "Starting Process Date",
       dataIndex: "formattedDate",
       key: "formattedDate",
-      width: "25%",
+      width: "10%",
     },
     {
       title: "Details",
       dataIndex: "details",
       key: "details",
-      width: "10%",
+      width: "7%",
       render: (text, record) => (
         <Link
           to={`/tracking/viewtracking?role=receiver&processID=${record.processID}`}
@@ -172,16 +172,18 @@ const ProcessesTable = (props) => {
         <Table
           columns={senderColumns}
           dataSource={sentProcesses}
-          pagination={true}
+          pagination={false}
           key={sentProcesses.key}
+          scroll={{ y: 300 }}
         />
       )}
       {receivedProcesses && (
         <Table
           columns={receiverColumns}
           dataSource={receivedProcesses}
-          pagination={true}
+          pagination={false}
           key={receivedProcesses.key}
+          scroll={{ y: 300 }}
         />
       )}
     </div>

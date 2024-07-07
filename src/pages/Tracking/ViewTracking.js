@@ -63,6 +63,13 @@ export default function ViewTracking() {
               senderID: item[`${sender}ID`],
               senderName: item[sender][`${sender}Name`],
               formattedDate: item.formattedDate,
+              assetShipment: process.assetShipment.map((asset) => ({
+                assetID: asset[`${sender}Asset`].assetID,
+                serialNumber: asset[`${sender}Asset`].serialNumber,
+                quantity: asset.quantity,
+                price: asset[`${sender}Asset`].asset.price,
+                assetName: asset[`${sender}Asset`].asset.assetName,
+              })),
             })
           ),
         }));
@@ -125,6 +132,10 @@ export default function ViewTracking() {
       <ViewTrackingSetting
         setActiveComponent={setActiveComponent}
         userRole={userRole}
+        sentProcesses={sentProcesses}
+        receivedProcesses={receivedProcesses}
+        setSentProcesses={setSentProcesses}
+        setReceivedProcesses={setReceivedProcesses}
       />
 
       <Divider />
