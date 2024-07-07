@@ -1,28 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Tooltip, Table, Button, Tag } from "antd";
 import { UnorderedListOutlined } from "@ant-design/icons";
-import { useLocation } from "react-router-dom";
 
 const TrackingTable = ({
   senderProcessDetails,
   receiver,
   sender,
   handelUpdateStatus,
-  userRole,
   activeComponent,
   queryRole,
   receiverProcessDetail,
 }) => {
   const [processData, setProcessData] = useState([]);
-
-  // useEffect(() => {
-  //   if ((senderProcessDetails, receiver)) {
-  //     setProcessData(senderProcessDetails[`${receiver}Processes`]);
-  //     console.log(activeComponent);
-  //     console.log(sender);
-  //     // console.log(queryRole);
-  //   }
-  // }, [senderProcessDetails]);
 
   useEffect(() => {
     if (receiverProcessDetail) {
@@ -37,7 +26,7 @@ const TrackingTable = ({
       case "Delivering":
         return "primary";
       case "Inventory":
-        return "success";
+        return "ghost";
       default:
         return "default";
     }
@@ -76,7 +65,12 @@ const TrackingTable = ({
         else if (queryRole === "sender")
           return { pointerEvents: "none", opacity: 0.6 };
       case "Inventory":
-        return { pointerEvents: "none", opacity: 0.6 };
+        return {
+          pointerEvents: "none",
+          opacity: 0.6,
+          backgroundColor: "#7ac379",
+          color: "#fff",
+        };
       default:
         return { pointerEvents: "none", opacity: 0.6 };
     }
@@ -165,6 +159,21 @@ const TrackingTable = ({
       title: "Value",
       dataIndex: "value",
       key: "value",
+      render: (text, record) => {
+        if (record.field === "Status") {
+          return (
+            <Button
+              type={getStatusColor(receiverProcessDetail.status)}
+              style={handleButtonStyle(receiverProcessDetail.status)}
+              onClick={() => handelUpdateStatus(receiverProcessDetail)}
+              unselectable="off"
+            >
+              {handleButtonValue(receiverProcessDetail.status)}
+            </Button>
+          );
+        }
+        return text;
+      },
     },
   ];
 
@@ -196,57 +205,41 @@ const TrackingTable = ({
           defaultExpandAllRows: true,
         },
       ]);
+    } else if (receiverProcessDetail) {
+      setProcessData([
+        {
+          key: "1",
+          field: "Process ID",
+          value: receiverProcessDetail.processID,
+          hasInternalTable: false,
+        },
+        {
+          key: "2",
+          field: "Sender Name",
+          value: receiverProcessDetail.senderName,
+          hasInternalTable: false,
+        },
+        {
+          key: "3",
+          field: "Total Process Assets Number",
+          value: receiverProcessDetail.quantity,
+          hasInternalTable: false,
+        },
+        {
+          key: "4",
+          field: "Starting Process Date",
+          value: receiverProcessDetail.formattedDate,
+          hasInternalTable: false,
+        },
+        {
+          key: "5",
+          field: "Status",
+          value: receiverProcessDetail.status,
+          hasInternalTable: false,
+        },
+      ]);
     }
-  }, [senderProcessDetails]);
-
-  const receiverColumns = [
-    {
-      title: "Process ID",
-      dataIndex: "processID",
-      key: "processID",
-      // width: "16%",
-    },
-    {
-      title: "Sender Name",
-      dataIndex: "senderName",
-      key: "senderName",
-      // width: "26%",
-    },
-    {
-      title: "Quantity",
-      dataIndex: "quantity",
-      key: "quantity",
-      // width: "10%",
-    },
-    {
-      title: "Assets",
-      key: "assets",
-      // width: "15%",
-      render: (text, record) => (
-        <>
-          <UnorderedListOutlined key={record.id} />
-        </>
-      ),
-    },
-    {
-      title: "Status",
-      key: "status",
-      render: (text, record) => {
-        return (
-          <Tooltip title={`Start delivery for ${record.name}`} key={record.id}>
-            <Button
-              type={getStatusColor(record.status)}
-              style={handleButtonStyle(record.status)}
-              onClick={() => handelUpdateStatus(record)}
-              unselectable="off"
-            >
-              {handleButtonValue(record.status)}
-            </Button>
-          </Tooltip>
-        );
-      },
-    },
-  ];
+  }, [senderProcessDetails, receiverProcessDetail]);
 
   return (
     sender &&
@@ -263,18 +256,15 @@ const TrackingTable = ({
             }}
             pagination={false}
             size="small"
-            rowKey="key" // Add rowKey for unique key prop
+            rowKey="key"
           />
         )}
         {receiverProcessDetail && queryRole === "receiver" && (
           <Table
-            columns={receiverColumns}
-            dataSource={[receiverProcessDetail]}
+            columns={columns}
+            dataSource={processData}
             pagination={false}
-            scroll={{
-              y: 100,
-            }}
-            rowKey="id" // Add rowKey for unique key prop
+            rowKey="key"
             size="small"
           />
         )}

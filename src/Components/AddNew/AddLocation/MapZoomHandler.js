@@ -13,6 +13,7 @@ const MapZoomHandler = ({
     if (selectedPosition) {
       map.flyTo(selectedPosition, 15, { animate: true, duration: 1 });
       console.log("hi from selectedPosition");
+      // console.log(selectedPosition);
     } else {
       map.flyTo(center, 10, { animate: true, duration: 1 });
       console.log("hi from center");

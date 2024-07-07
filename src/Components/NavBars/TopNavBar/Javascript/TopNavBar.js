@@ -22,7 +22,7 @@ const TopNavBar = () => {
       label: <Link to="/addNew/categories">Categories</Link>,
       key: "Categories",
     },
-    { label: <Link to="/addNew/requests">Requests</Link>, key: "Requests" },
+    // { label: <Link to="/addNew/requests">Requests</Link>, key: "Requests" },
     { label: <Link to="/addNew/location">Location</Link>, key: "Location" },
   ];
 
@@ -35,11 +35,11 @@ const TopNavBar = () => {
   ];
 
   const user = [
-    {
-      label: <Link to="/user/viewprofile">View Profile</Link>,
-      key: "viewprofile",
-    },
-    { type: "divider" },
+    // {
+    //   label: <Link to="/user/viewprofile">View Profile</Link>,
+    //   key: "viewprofile",
+    // },
+    // { type: "divider" },
     {
       label: (
         <Link to="/login" onClick={() => dispatch(setLogout())} type="danger">
@@ -90,7 +90,7 @@ const TopNavBar = () => {
               <Space>Add New</Space>
             </Link>
           </Dropdown>
-          <Dropdown
+          {/* <Dropdown
             overlayClassName="dropdown-menu"
             menu={{ items: alert }}
             className={`dropdown ${
@@ -100,7 +100,7 @@ const TopNavBar = () => {
             <Link onClick={(e) => e.preventDefault()}>
               <Space>Alert</Space>
             </Link>
-          </Dropdown>
+          </Dropdown> */}
           <Dropdown
             overlayClassName="dropdown-menu"
             menu={{ items: user }}

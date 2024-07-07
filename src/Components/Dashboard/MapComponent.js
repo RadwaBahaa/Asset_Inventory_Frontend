@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, mapRef } from "react";
 import {
   MapContainer,
@@ -11,22 +10,14 @@ import {
 import L from "leaflet";
 import { createRoot } from "react-dom/client";
 import ResetViewButton from "../Location/GeospatialData/ResetViewButton";
-import { OpenStreetMapProvider } from "leaflet-geosearch";
 import "leaflet/dist/leaflet.css";
 import MapZoomHandler from "../Location/GeospatialData/MapZoomHandler";
+import AnimatedPolyline from "../Tracking/StartProcess/AnimatedPolyline";
 
-const MapComponent = ({
-    // onDrawComplete, searchTerm,
-    locations, setSelectedLocation }) => {
+const MapComponent = ({ locations, setSelectedLocation, selectedLocation }) => {
   const center = [40.71105853111035, -74.00752039016318]; // Initial center of the USA
-  const [selectedPosition, setSelectedPosition] = useState(null);
-  const [pointsVisible, setPointsVisible] = useState(true); // State to control points visibility
+  const [pointsVisible, setPointsVisible] = useState(false); // State to control points visibility
   const mapRef = useRef(null); // Ref to hold map instance
-
-//   const handleMapClick = (e) => {
-//     setSelectedPosition([e.latlng.lat, e.latlng.lng]);
-//     // onDrawComplete([e.latlng.lng, e.latlng.lat]); // Pass coordinates to parent component
-//   };
 
   const outerCircleOptions = {
     fillColor: "#006688",
@@ -86,7 +77,6 @@ const MapComponent = ({
     },
   };
 
-
   const AddResetViewButton = () => {
     const map = useMap();
     useEffect(() => {
@@ -97,7 +87,7 @@ const MapComponent = ({
         root.render(
           <ResetViewButton
             onClick={() => {
-              setSelectedPosition(null);
+              setSelectedLocation(null);
               map.getCenter().lat !== center[0] && map.flyTo(center, 10);
             }}
           />
@@ -127,14 +117,18 @@ const MapComponent = ({
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
       <MapZoomHandler
-        selectedPosition={selectedPosition}
+        selectedLocation={selectedLocation}
         center={center}
         setPointsVisible={setPointsVisible}
       />
       <AddResetViewButton />
-      {selectedPosition && (
+
+      {selectedLocation && pointsVisible && (
         <CircleMarker
-          center={selectedPosition}
+          center={[
+            selectedLocation.geometry.coordinates[1],
+            selectedLocation.geometry.coordinates[0],
+          ]}
           pathOptions={{ fillColor: "blue" }}
           radius={10}
         >
@@ -143,7 +137,7 @@ const MapComponent = ({
           </Popup>
         </CircleMarker>
       )}
-      <EventHandlers />
+      {/* <EventHandlers /> */}
       {locations.stores &&
         pointsVisible &&
         locations.stores.map((store) => (
@@ -242,13 +236,6 @@ const MapComponent = ({
         ))}
     </MapContainer>
   );
-
-  function EventHandlers() {
-    useMapEvents({
-    //   click: handleMapClick,
-    });
-    return null;
-  }
 };
 
 export default MapComponent;

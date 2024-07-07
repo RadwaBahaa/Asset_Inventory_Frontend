@@ -5,12 +5,8 @@ import { Link } from "react-router-dom";
 const Tapping = ({ processID }) => {
   const breadcrumbItems = [
     {
-      title: <HomeOutlined />,
-    },
-    {
       title: (
         <>
-          <UserOutlined />
           <Link to="/tracking/viewtracking">View Tracking</Link>
         </>
       ),
@@ -23,7 +19,11 @@ const Tapping = ({ processID }) => {
     },
   ].filter(Boolean);
 
-  return <Breadcrumb items={breadcrumbItems} />;
+  return (
+    <div style={{ margin: "20px" }}>
+      <Breadcrumb items={breadcrumbItems} />
+    </div>
+  );
 };
 
 export default Tapping;

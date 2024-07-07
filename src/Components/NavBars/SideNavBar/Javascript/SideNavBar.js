@@ -32,7 +32,7 @@ const items = [
     ],
   },
   {
-    key: "/locations",
+    key: "locations",
     icon: <PushpinOutlined />,
     label: "Locations",
     children: [
@@ -53,25 +53,25 @@ const items = [
     label: "Tracking",
     children: [
       {
-        key: "/tracking/startProcess",
-        label: <Link to="/tracking/startProcess">Start process</Link>,
+        key: "/tracking/startprocess",
+        label: <Link to="/tracking/startprocess">Start process</Link>,
       },
       {
-        key: "/tracking/viewTracking",
-        label: <Link to="/tracking/viewTracking">View tracking</Link>,
+        key: "/tracking/viewtracking",
+        label: <Link to="/tracking/viewtracking">View tracking</Link>,
       },
     ],
   },
-  {
-    key: "/members",
-    icon: <TeamOutlined />,
-    label: <Link to="/members">Members</Link>,
-  },
-  {
-    key: "/reports",
-    icon: <FileDoneOutlined />,
-    label: <Link to="/reports">Reports</Link>,
-  },
+  // {
+  //   key: "/members",
+  //   icon: <TeamOutlined />,
+  //   label: <Link to="/members">Members</Link>,
+  // },
+  // {
+  //   key: "/reports",
+  //   icon: <FileDoneOutlined />,
+  //   label: <Link to="/reports">Reports</Link>,
+  // },
 ];
 
 const SideNavbar = () => {
@@ -89,7 +89,7 @@ const SideNavbar = () => {
     return [];
   };
 
-  const defaultOpenKeys = getDefaultOpenKeys(pathname);
+  const defaultOpenKeys = ["items", "locations", "tracking"];
 
   return (
     <Sider className="sider">
@@ -98,6 +98,7 @@ const SideNavbar = () => {
         mode="inline"
         selectedKeys={[pathname]}
         defaultOpenKeys={defaultOpenKeys} // Automatically open the parent menu of the current path
+        // openKeys={}
         items={items}
       />
     </Sider>

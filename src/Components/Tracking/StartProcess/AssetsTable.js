@@ -162,10 +162,10 @@ const AssetsTable = ({
     },
   ];
 
-  const handlePageChange = (page, pageSize) => {
-    setCurrentPage(page);
-    setPageSize(pageSize);
-  };
+  // const handlePageChange = (page, pageSize) => {
+  //   setCurrentPage(page);
+  //   setPageSize(pageSize);
+  // };
 
   return (
     <div style={{ width: "100%" }}>
@@ -175,6 +175,7 @@ const AssetsTable = ({
           columns={columns}
           dataSource={assetsData}
           pagination={false}
+          scroll={{ y: 280 }}
         />
       )}
       <div
@@ -185,12 +186,6 @@ const AssetsTable = ({
           padding: "10px 0",
         }}
       >
-        <Pagination
-          current={currentPage}
-          pageSize={pageSize}
-          onChange={handlePageChange}
-          total={assetsData.length}
-        />
         <Button
           type="primary"
           onClick={handleStartProcess}
