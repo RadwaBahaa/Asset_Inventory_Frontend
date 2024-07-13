@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { Grid, Typography } from "@mui/material";
-import { ShoppingCartOutlined, ClockCircleOutlined, NodeIndexOutlined } from "@ant-design/icons";
+import {
+  ShoppingCartOutlined,
+  ClockCircleOutlined,
+  NodeIndexOutlined,
+} from "@ant-design/icons";
 import database from "../axios/database";
 import DashboardTable from "../Components/Dashboard/DashboardTable";
 import ShipmentCard from "../Components/Dashboard/Card/Javascript/Card";
@@ -19,19 +23,31 @@ const appleSupplyChainData = {
     stores: [
       {
         geometry: { coordinates: [30.0444, 31.2357] },
-        properties: { id: "1", name: "Apple Store Cairo", address: "Cairo, Egypt" },
+        properties: {
+          id: "1",
+          name: "Apple Store Cairo",
+          address: "Cairo, Egypt",
+        },
       },
     ],
     warehouses: [
       {
         geometry: { coordinates: [29.9753, 31.1376] },
-        properties: { id: "2", name: "Apple Warehouse Giza", address: "Giza, Egypt" },
+        properties: {
+          id: "2",
+          name: "Apple Warehouse Giza",
+          address: "Giza, Egypt",
+        },
       },
     ],
     suppliers: [
       {
         geometry: { coordinates: [31.2001, 29.9187] },
-        properties: { id: "3", name: "Apple Supplier Alexandria", address: "Alexandria, Egypt" },
+        properties: {
+          id: "3",
+          name: "Apple Supplier Alexandria",
+          address: "Alexandria, Egypt",
+        },
       },
     ],
   },
@@ -66,18 +82,30 @@ export default function Dashboard() {
     // Example: Calculating a metric based on total shipments and succeeded processes
     const totalShipments = appleSupplyChainData.totalShipments;
     const succeededProcesses = appleSupplyChainData.sucssededProcesses;
-    
+
     // Example calculation (modify as per your actual metric calculation)
-    return totalShipments * succeededProcesses / 100; // Adjust this calculation as needed
+    return (totalShipments * succeededProcesses) / 100; // Adjust this calculation as needed
   };
 
   return (
     <>
       <DashNavbar />
-      <Grid container spacing={1.5} sx={{ padding: 2 }} style={{ width: "100%" }}>
+      <Grid
+        container
+        spacing={1.5}
+        sx={{ padding: 2 }}
+        style={{ width: "100%" }}
+      >
         {/* Cards and Map */}
         <Grid item xs={12} md={6}>
-          <div style={{ display: "flex", justifyContent: "space-between", borderRadius: "15px", backgroundColor: "transparent" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              borderRadius: "15px",
+              backgroundColor: "transparent",
+            }}
+          >
             <ShipmentCard
               count={appleSupplyChainData.totalShipments}
               percentage={1.92}
@@ -98,7 +126,15 @@ export default function Dashboard() {
             />
           </div>
 
-          <div style={{ height: "415px", borderRadius: "15px", overflow: "hidden", backgroundColor: "transparent", marginTop: "12px" }}>
+          <div
+            style={{
+              height: "415px",
+              borderRadius: "15px",
+              overflow: "hidden",
+              backgroundColor: "transparent",
+              marginTop: "12px",
+            }}
+          >
             <MapComponent
               locations={appleSupplyChainData.locations}
               handleMarkerClick={handleMarkerClick}
@@ -111,7 +147,17 @@ export default function Dashboard() {
           <Grid container spacing={1.5}>
             {/* DashboardTable and GaugeComponent */}
             <Grid item xs={10} md={6}>
-              <div style={{ height: "100%", padding: 2, display: "flex", flexDirection: "column", alignItems: "center", borderRadius: "15px", backgroundColor: "white" }}>
+              <div
+                style={{
+                  height: "100%",
+                  padding: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  borderRadius: "15px",
+                  backgroundColor: "white",
+                }}
+              >
                 <div style={{ textAlign: "left" }}>
                   <h3 id="gauge-header" style={{ marginBottom: "0px" }}>
                     Analytic View
@@ -123,13 +169,31 @@ export default function Dashboard() {
                   totalAssets={appleSupplyChainData.appleAssets.totalAssets}
                   currentAssets={appleSupplyChainData.appleAssets.currentAssets}
                 />
-                <p id="gauge-text" style={{ marginTop: "8px", color: "#999", fontSize: "14px", lineHeight: "1.4" }}>
+                <p
+                  id="gauge-text"
+                  style={{
+                    marginTop: "8px",
+                    color: "#999",
+                    fontSize: "14px",
+                    lineHeight: "1.4",
+                  }}
+                >
                   Total shipping revenue overview
                 </p>
               </div>
             </Grid>
             <Grid item xs={10} md={6}>
-              <div style={{ height: "100%", padding: 2, display: "flex", flexDirection: "column", alignItems: "center", borderRadius: "15px", backgroundColor: "white" }}>
+              <div
+                style={{
+                  height: "100%",
+                  padding: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  borderRadius: "15px",
+                  backgroundColor: "white",
+                }}
+              >
                 {appleSupplyChainData.locations && (
                   <DashboardTable
                     storesData={appleSupplyChainData.locations.stores}
@@ -142,7 +206,14 @@ export default function Dashboard() {
 
             <Grid item xs={6} md={12}>
               <div style={{ borderRadius: "15px", backgroundColor: "white" }}>
-                <Typography style={{ paddingLeft: "20px", paddingTop: "15px", borderRadius: "15px" }} variant="h6">
+                <Typography
+                  style={{
+                    paddingLeft: "20px",
+                    paddingTop: "15px",
+                    borderRadius: "15px",
+                  }}
+                  variant="h6"
+                >
                   Annual Information
                 </Typography>
                 <SimpleLineChart data={appleSupplyChainData.annualData} />

@@ -36,10 +36,10 @@ const items = [
     icon: <PushpinOutlined />,
     label: "Locations",
     children: [
-      {
-        key: "/locations/descriptive-data",
-        label: <Link to="/locations/descriptive-data">Descriptive Data</Link>,
-      },
+      // {
+      //   key: "/locations/descriptive-data",
+      //   label: <Link to="/locations/descriptive-data">Descriptive Data</Link>,
+      // },
       {
         key: "/locations/geospatial-data",
         label: <Link to="/locations/geospatial-data">Geospatial Data</Link>,

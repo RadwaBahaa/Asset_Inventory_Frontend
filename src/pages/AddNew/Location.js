@@ -39,27 +39,23 @@ export default function Location() {
 
   const userRole = useSelector((state) => state.login.role);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const storesResponse = await database.get("store/read/geojson");
-        const suppliersResponse = await database.get("supplier/read/geojson");
-        const warehousesResponse = await database.get("warehouse/read/geojson");
-        console.log(userRole);
-        // Update locations state with all fetched data
-        setLocations({
-          stores: storesResponse.data,
-          suppliers: suppliersResponse.data,
-          warehouses: warehousesResponse.data,
-        });
-      } catch (error) {
-        setError(error.message);
-        setLocations({ stores: [], suppliers: [], warehouses: [] }); // Initialize state in case of error
-      }
-    };
-
-    fetchData();
-  }, [submitedPoint]);
+  const fetchData = async () => {
+    try {
+      const storesResponse = await database.get("store/read/geojson");
+      const suppliersResponse = await database.get("supplier/read/geojson");
+      const warehousesResponse = await database.get("warehouse/read/geojson");
+      console.log(userRole);
+      // Update locations state with all fetched data
+      setLocations({
+        stores: storesResponse.data,
+        suppliers: suppliersResponse.data,
+        warehouses: warehousesResponse.data,
+      });
+    } catch (error) {
+      setError(error.message);
+      setLocations({ stores: [], suppliers: [], warehouses: [] }); // Initialize state in case of error
+    }
+  };
 
   useEffect(() => {
     if (setSelectedLocation !== null) {
@@ -116,7 +112,12 @@ export default function Location() {
     setSubmitedPoint(updatedPoint);
     setIsFormModalVisible(false);
     form.resetFields();
+    fetchData();
   };
+
+  useEffect(() => {
+    fetchData();
+  }, [submitedPoint]);
 
   const handleCancel = () => {
     setIsFormModalVisible(false);
