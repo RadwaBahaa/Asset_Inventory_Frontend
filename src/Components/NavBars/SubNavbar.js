@@ -31,12 +31,12 @@ const SubNavbar = ({
       </div>
       <div style={{ display: "flex", gap: "10px" }}>
         <Link to={editButtonPath}>
-          <Button type="primary" style={{ width: "140px" }}>
+          <Button type="primary" style={{ width: "100%" }}>
             {editButtonLabel}
           </Button>
         </Link>
         <Link to={addButtonPath}>
-          <Button type="primary" style={{ width: "140px" }}>
+          <Button type="primary" style={{ width: "100%" }}>
             {addButtonLabel}
           </Button>
         </Link>

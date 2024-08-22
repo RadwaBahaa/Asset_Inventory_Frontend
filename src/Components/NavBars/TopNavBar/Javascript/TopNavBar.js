@@ -12,10 +12,15 @@ const TopNavBar = () => {
   const { Header } = Layout;
   const location = useLocation();
   const dispatch = useDispatch();
+  const userRole = useSelector((state) => state.login.role);
 
   const [activeDropdown, setActiveDropdown] = useState("");
 
   const userName = useSelector((state) => state.login.userName);
+
+  const addRequset = [
+    { label: <Link to="/addNew/requests">Requests</Link>, key: "Requests" },
+  ];
 
   const addNew = [
     { label: <Link to="/addNew/assets">Assets</Link>, key: "Assets" },
@@ -23,7 +28,6 @@ const TopNavBar = () => {
       label: <Link to="/addNew/categories">Categories</Link>,
       key: "Categories",
     },
-    { label: <Link to="/addNew/requests">Requests</Link>, key: "Requests" },
     { label: <Link to="/addNew/location">Location</Link>, key: "Location" },
   ];
 
@@ -56,8 +60,10 @@ const TopNavBar = () => {
   useEffect(() => {
     const path = location.pathname.split("/")[1];
     if (path) {
-      if (["addNew"].includes(path)) {
+      if (["addNew"].includes(path) && userRole === "Admin") {
         setActiveDropdown("addNew");
+      } else if (["addRequset"].includes(path) && userRole !== "Admin") {
+        setActiveDropdown("addRequset");
       } else if (["alert"].includes(path)) {
         setActiveDropdown("alert");
       } else if (["user"].includes(path)) {
@@ -82,7 +88,7 @@ const TopNavBar = () => {
         <div>
           <Dropdown
             overlayClassName="dropdown-menu"
-            menu={{ items: addNew }}
+            menu={{ items: userRole === "Admin" ? addNew : addRequset }}
             className={`dropdown ${
               activeDropdown === "addNew" ? "dropdown-active" : ""
             }`}
@@ -91,6 +97,7 @@ const TopNavBar = () => {
               <Space>Add New</Space>
             </Link>
           </Dropdown>
+
           <Dropdown
             overlayClassName="dropdown-menu"
             menu={{ items: alert }}

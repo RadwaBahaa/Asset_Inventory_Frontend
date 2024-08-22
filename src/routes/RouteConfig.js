@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-import LoadingPage from "../Components/LoadingPage";
+import FullPageLoader from "../Components/FullPageLoader/FullPageLoader";
 
 const Dashboard = React.lazy(() => import("../pages/Dashboard"));
 const ItemsAssets = React.lazy(() => import("../pages/Items/Assets"));
@@ -35,7 +35,7 @@ const AlertPurchaseRequests = React.lazy(() =>
 
 function RouteConfige() {
   return (
-    <Suspense fallback={<LoadingPage />}>
+    <Suspense fallback={<FullPageLoader />}>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/items/assets" element={<ItemsAssets />} />
@@ -59,8 +59,9 @@ function RouteConfige() {
 
         <Route path="/addNew/assets" element={<AddNewAssets />} />
         <Route path="/addNew/categories" element={<AddNewCategories />} />
-        <Route path="/addNew/requests" element={<AddNewRequests />} />
         <Route path="/addNew/location" element={<AddNewLocation />} />
+
+        <Route path="/addNew/requests" element={<AddNewRequests />} />
 
         <Route path="/user/viewprofile" element={<UserViewProfile />} />
 

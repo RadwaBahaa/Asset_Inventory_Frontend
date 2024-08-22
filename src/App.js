@@ -6,8 +6,6 @@ import TokenValidation from "./routes/TokenValidation";
 import "./App.css";
 
 function App() {
-  // const [authorized, setAuthorized] = useState(false);
-
   return (
     <BrowserRouter>
       <TokenValidation>

@@ -1,11 +1,11 @@
 import React from "react";
 import { Card, Form, Input, Button, message, Modal } from "antd";
-import database from "../../../../../axios/database";
-import "../CSS/AddCategoryForm.css";
+import database from "../../../../axios/database";
+import "../CSS/AddCategory.css";
 
 const { TextArea } = Input;
 
-const AddCategoryForm = () => {
+const AddCategory = () => {
   const [form] = Form.useForm(); // Create form instance
 
   const onFinish = (values) => {
@@ -83,4 +83,4 @@ const AddCategoryForm = () => {
   );
 };
 
-export default AddCategoryForm;
+export default AddCategory;

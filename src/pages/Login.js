@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   EyeInvisibleOutlined,
   EyeTwoTone,
@@ -10,35 +10,37 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../store/Slices/login";
 import LoginLogo from "../../src/Images/LoginLogo.png"; // Adjust the path as necessary
+import FullPageLoader from "../Components/FullPageLoader/FullPageLoader";
 
 const { Content } = Layout;
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false); // Start with loading true
 
   const onFinish = async (values) => {
     try {
+      setLoading(true);
       const { staySignedIn, ...loginValues } = values;
       const response = await dispatch(login(loginValues)).unwrap();
-
-      console.log(response);
-      console.log(staySignedIn);
-
       if (staySignedIn) {
         localStorage.setItem("token", response.token);
       } else {
         sessionStorage.setItem("token", response.token);
       }
-
+      
       navigate("/"); // Navigate to the home page
+      setLoading(false);
     } catch (err) {
       message.error(err || "Login failed"); // Show an error message if login fails
+      setLoading(false);
     }
   };
 
   return (
     <Layout className="first-layout" style={{ minHeight: "100vh" }}>
+      {loading ? <FullPageLoader /> : null}
       <Content
         style={{
           display: "flex",
@@ -85,7 +87,7 @@ const Login = () => {
               onFinish={onFinish}
               style={{ width: "100%" }}
             >
-              <h1
+              {/* <h1
                 style={{
                   color: "#101251",
                   fontSize: "2rem",
@@ -94,7 +96,7 @@ const Login = () => {
                 }}
               >
                 SIGN <span style={{ color: "#1890ff" }}>IN</span>
-              </h1>
+              </h1> */}
               <Form.Item
                 name="userName"
                 rules={[
@@ -131,7 +133,9 @@ const Login = () => {
               >
                 <Checkbox>Stay signed in</Checkbox>
               </Form.Item>
-              <Form.Item style={{ marginBottom: "12px" }}> {/* Reduced marginBottom */}
+              <Form.Item style={{ marginBottom: "12px" }}>
+                {" "}
+                {/* Reduced marginBottom */}
                 <div
                   style={{
                     display: "flex",
@@ -156,12 +160,12 @@ const Login = () => {
                     htmlType="submit"
                     className="login-form-button"
                     onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundImage =
-                      "linear-gradient(45deg, #40a9ff, #1890ff)")
+                      (e.currentTarget.style.backgroundImage =
+                        "linear-gradient(45deg, #40a9ff, #1890ff)")
                     }
                     onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundImage =
-                      "linear-gradient(45deg, #1890ff, #40a9ff)")
+                      (e.currentTarget.style.backgroundImage =
+                        "linear-gradient(45deg, #1890ff, #40a9ff)")
                     }
                   >
                     Login

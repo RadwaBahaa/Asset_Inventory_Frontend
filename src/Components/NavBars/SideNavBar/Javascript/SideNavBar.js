@@ -36,10 +36,10 @@ const items = [
     icon: <PushpinOutlined />,
     label: "Locations",
     children: [
-      // {
-      //   key: "/locations/descriptive-data",
-      //   label: <Link to="/locations/descriptive-data">Descriptive Data</Link>,
-      // },
+      {
+        key: "/locations/descriptive-data",
+        label: <Link to="/locations/descriptive-data">Descriptive Data</Link>,
+      },
       {
         key: "/locations/geospatial-data",
         label: <Link to="/locations/geospatial-data">Geospatial Data</Link>,
@@ -62,16 +62,16 @@ const items = [
       },
     ],
   },
-  // {
-  //   key: "/members",
-  //   icon: <TeamOutlined />,
-  //   label: <Link to="/members">Members</Link>,
-  // },
-  // {
-  //   key: "/reports",
-  //   icon: <FileDoneOutlined />,
-  //   label: <Link to="/reports">Reports</Link>,
-  // },
+  {
+    key: "/members",
+    icon: <TeamOutlined />,
+    label: <Link to="/members">Members</Link>,
+  },
+  {
+    key: "/reports",
+    icon: <FileDoneOutlined />,
+    label: <Link to="/reports">Reports</Link>,
+  },
 ];
 
 const SideNavbar = () => {
@@ -98,7 +98,6 @@ const SideNavbar = () => {
         mode="inline"
         selectedKeys={[pathname]}
         defaultOpenKeys={defaultOpenKeys} // Automatically open the parent menu of the current path
-        // openKeys={}
         items={items}
       />
     </Sider>

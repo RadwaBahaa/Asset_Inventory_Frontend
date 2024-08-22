@@ -1,7 +1,7 @@
 import React from "react";
 import { ShoppingCartOutlined, HomeOutlined } from "@ant-design/icons";
 import SubNavbar from "../../Components/NavBars/SubNavbar";
-import AddCategoryForm from "../../Components/AddNew/AddCategory/AddCategoryForm/Javascript/AddCategoryForm";
+import AddCategory from "../../Components/AddNew/AddCategory/Javascript/AddCategory";
 
 export default function Categories() {
   return (
@@ -24,7 +24,7 @@ export default function Categories() {
         addButtonPath={"/items/categories"}
       />
       <div style={{ padding: "20px" }}>
-        <AddCategoryForm />
+        <AddCategory />
       </div>
     </div>
   );
